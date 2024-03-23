@@ -1,0 +1,45 @@
+socket: Cria um novo socket e retorna um descritor de arquivo para ele. O socket pode ser usado para comunicação de rede, como TCP ou UDP.
+
+close: Fecha um descritor de arquivo, liberando os recursos associados a ele. No contexto de sockets, é usada para fechar conexões de socket.
+
+setsockopt: Define opções de socket. É usada para definir várias opções de socket, como reutilização de endereço, tempo limite de conexão, etc.
+
+getsockname: Obtém o endereço associado a um socket. Retorna informações sobre o endereço local ao qual um socket está associado.
+
+getprotobyname: Obtém o número do protocolo associado a um nome de protocolo. Retorna informações sobre um protocolo específico, dado o seu nome.
+
+gethostbyname: Obtém informações sobre um host, dado o seu nome. Retorna informações sobre o host, como endereço IP.
+
+getaddrinfo: Resolve um nome de host e um serviço para um conjunto de endereços. É usada para obter informações sobre o endereço de um host e o número da porta.
+
+freeaddrinfo: Libera a memória alocada pela função getaddrinfo. É usada para liberar a estrutura de dados retornada pela função getaddrinfo.
+
+bind: Associa um endereço a um socket. É usada para associar um endereço local a um socket, como um servidor TCP.
+
+connect: Estabelece uma conexão com um socket. É usada para conectar um cliente a um servidor TCP.
+
+listen: Coloca um socket em modo de escuta. É usada em servidores TCP para aceitar conexões de entrada.
+
+accept: Aceita uma conexão de entrada. É usada em servidores TCP para aceitar uma conexão de um cliente.
+
+htons, htonl: Converte um número de porta ou um número de 32 bits de host para a ordem de bytes da rede (Big Endian).
+
+ntohs, ntohl: Converte um número de porta ou um número de 32 bits da ordem de bytes da rede para a ordem de bytes do host.
+
+inet_addr: Converte um endereço IP de uma string para uma forma binária.
+
+inet_ntoa: Converte um endereço IP de uma forma binária para uma string.
+
+send: Envia dados por um socket. É usada para enviar dados por uma conexão de socket.
+
+recv: Recebe dados de um socket. É usada para receber dados de uma conexão de socket.
+
+signal, sigaction: Estabelece um manipulador de sinal. É usada para definir o comportamento de um processo quando um sinal específico é recebido.
+
+lseek: Move o ponteiro do arquivo para uma posição específica. É usada para mover o ponteiro de leitura/escrita dentro de um arquivo.
+
+fstat: Obtém informações sobre um arquivo. É usada para obter informações sobre um arquivo, como tamanho, permissões, etc.
+
+fcntl: Manipula descritores de arquivo. É usada para realizar várias operações em descritores de arquivo, como definir flags ou configurar o modo de arquivo.
+
+poll: Espera por eventos em descritores de arquivo. É usada para esperar por eventos em um ou mais descritores de arquivo, como entrada de dados disponível para leitura ou espaço disponível para escrita.
