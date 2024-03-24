@@ -10,7 +10,8 @@ It’s always a good thing to know.
 
 
 Functions Used:
-[] socket
+[x] socket
+
 [] close
 [] setsockopt
 [] getsockname
