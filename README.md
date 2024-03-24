@@ -11,7 +11,6 @@ It’s always a good thing to know.
 
 Functions Used:
 [x] socket
-
 [] close
 [] setsockopt
 [] getsockname
