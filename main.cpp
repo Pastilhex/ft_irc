@@ -6,7 +6,7 @@
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/23 17:28:47 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/24 13:34:56 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/03/24 13:41:20 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,9 @@ int main(int argc, char* argv[])
 	(void) argv;
 	if (argc == 3)
 	{
-		if (isdigit(argv[1]))
+		if (!isValidPort(argv[1]))
 			return 0;
-		int port = 6667; //std::atoi(argv[1]); //isdigit(std::atoi(argv[1]));
+		int port = std::atoi(argv[1]);
 		int serverSocket = getServerSocket();
 		struct sockaddr_in serverAddress = getServerAddress(port);
 		if (serverSocket && bindSocketAddress(serverSocket, serverAddress) && listenConnections(serverSocket))
