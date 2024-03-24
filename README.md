@@ -9,27 +9,27 @@ with each other.
 It’s always a good thing to know.
 
 
-Functions Used:
-[x] socket
-[] close
-[] setsockopt
-[] getsockname
-[] getprotobyname
-[] gethostbyname
-[] getaddrinfo
-[] freeaddrinfo
-[] bind
-[] connect
-[] listen
-[] accept
-[] htons, htonl
-[] ntohs, ntohl
-[] inet_addr
-[] inet_ntoa
-[] send
-[] recv
-[] signal, sigaction
-[] lseek
-[] fstat
-[] fcntl
-[] poll
+Functions Used: 
+- [x] socket
+- [x] close
+- [ ] setsockopt
+- [ ] getsockname
+- [ ] getprotobyname
+- [x] gethostbyname
+- [ ] getaddrinfo
+- [ ] freeaddrinfo
+- [x] bind
+- [ ] connect
+- [x] listen
+- [x] accept
+- [x] htons, htonl
+- [ ] ntohs, ntohl
+- [ ] inet_addr
+- [x] inet_ntoa
+- [ ] send
+- [ ] recv
+- [ ] signal, sigaction
+- [ ] lseek
+- [ ] fstat
+- [ ] fcntl
+- [ ] poll
