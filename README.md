@@ -10,8 +10,8 @@ It’s always a good thing to know.
 
 
 Functions Used: 
-- [x] socket - 	Cria um novo socket e retorna um descritor de arquivo para ele. O socket pode ser usado para comunicação de rede, como TCP ou UDP.
-- [ ] close
+- [x] socket
+- [x] close
 - [ ] setsockopt
 - [ ] getsockname
 - [ ] getprotobyname
