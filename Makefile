@@ -3,7 +3,7 @@ SRC = main.cpp \
 	srcs/ft_bindSocketAddress.cpp \
 	srcs/ft_getServerAddress.cpp \
 	srcs/ft_getServerSocket.cpp \
-	srcs/serverListen.cpp \
+	srcs/ft_listenConnections.cpp \
 	srcs/ft_isValidPort.cpp \
 	srcs/ft_getAddressInfo.cpp \
 	srcs/ft_connectClient.cpp

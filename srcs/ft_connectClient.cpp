@@ -21,7 +21,7 @@ bool	ft_connectClient(int& serverSocket)
 		int clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddress_size);
 		if (clientSocket == -1)
 		{
-			std::cerr << "Erro ao aceitar conexão do cliente." << std::endl;
+			cerr << "Erro ao aceitar conexão do cliente." << endl;
 			close(serverSocket);
 			return false;
 		}
@@ -30,19 +30,19 @@ bool	ft_connectClient(int& serverSocket)
 		int bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
 		if (bytesReceived == -1)
 		{
-			std::cerr << "Erro ao receber dados do cliente." << std::endl;
+			cerr << "Erro ao receber dados do cliente." << endl;
 			close(clientSocket);
 			close(serverSocket);
 			return false;
 		}
 		else if (bytesReceived == 0)
 		{
-			std::cout << "Conexão fechada pelo cliente." << std::endl;
+			cout << "Conexão fechada pelo cliente." << endl;
 			close(clientSocket);
 		}
 		else
 		{
-			std::cout << "Dados recebidos do cliente: " << std::string(buffer, bytesReceived) << std::endl;
+			cout << "Dados recebidos do cliente: " << string(buffer, bytesReceived) << endl;
 		}
 	}
 }

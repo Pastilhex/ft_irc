@@ -16,7 +16,7 @@ struct sockaddr_in ft_getServerAddress(int port)
 {
 	struct sockaddr_in serverAddress;
 
-	std::memset(&serverAddress, 0, sizeof(serverAddress));
+	memset(&serverAddress, 0, sizeof(serverAddress));
 	serverAddress.sin_family = AF_INET;
 	serverAddress.sin_addr.s_addr = INADDR_ANY;
 	serverAddress.sin_port = htons(port);

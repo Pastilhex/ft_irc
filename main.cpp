@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 	{
 		if (!ft_isValidPort(argv[1]))
 			return 0;
-		int port = std::atoi(argv[1]);
+		int port = atoi(argv[1]);
 		int serverSocket = ft_getServerSocket();
 		struct sockaddr_in serverAddress = ft_getServerAddress(port);
 		if (serverSocket && ft_bindSocketAddress(serverSocket, serverAddress) && ft_listenConnections(serverSocket))

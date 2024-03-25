@@ -25,6 +25,8 @@
 #include <unistd.h>
 #include <netdb.h>
 
+using namespace std;
+
 int		ft_getServerSocket(void);
 struct	sockaddr_in ft_getServerAddress(int port);
 bool	ft_bindSocketAddress(int& socket, struct sockaddr_in& addr);

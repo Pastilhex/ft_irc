@@ -1,25 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_getServerSocket.cpp                                :+:      :+:    :+:   */
+/*   ft_bindSocketAddress.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/23 17:28:47 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/24 09:29:29 by ialves-m         ###   ########.fr       */
+/*   Created: 2024/03/24 07:47:19 by ialves-m          #+#    #+#             */
+/*   Updated: 2024/03/24 09:28:59 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
 
-int ft_getServerSocket(void)
+bool	ft_bindSocketAddress(int& serverSocket, struct sockaddr_in& serverAddress)
 {
-	int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-
-	if (serverSocket == -1) {
-		std::cerr << "Erro ao criar o socket." << std::endl;
-		return -1;
+	if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1)
+	{
+		cerr << "Erro ao associar o socket ao endereço." << endl;
+		close(serverSocket);
+		return false;
 	}
 
-	return serverSocket;
+	return true;
 }
