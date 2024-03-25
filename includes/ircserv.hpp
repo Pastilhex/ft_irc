@@ -25,13 +25,13 @@
 #include <unistd.h>
 #include <netdb.h>
 
-int		getServerSocket(void);
-struct	sockaddr_in getServerAddress(int port);
-bool	bindSocketAddress(int& socket, struct sockaddr_in& addr);
-bool	listenConnections(int& serverSocket);
-bool	isValidPort(char *str);
-bool	connectClient(int& serverSocket);
-void	getAddressInfo(void);
+int		ft_getServerSocket(void);
+struct	sockaddr_in ft_getServerAddress(int port);
+bool	ft_bindSocketAddress(int& socket, struct sockaddr_in& addr);
+bool	ft_listenConnections(int& serverSocket);
+bool	ft_isValidPort(char *str);
+bool	ft_connectClient(int& serverSocket);
+void	ft_getAddressInfo(void);
 
 
 #endif

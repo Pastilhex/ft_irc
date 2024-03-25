@@ -1,12 +1,12 @@
 NAME = ircserv
 SRC = main.cpp \
-	srcs/bindSocketAddress.cpp \
-	srcs/getServerAddress.cpp \
-	srcs/getServerSocket.cpp \
+	srcs/ft_bindSocketAddress.cpp \
+	srcs/ft_getServerAddress.cpp \
+	srcs/ft_getServerSocket.cpp \
 	srcs/serverListen.cpp \
-	srcs/isValidPort.cpp \
-	srcs/getAddressInfo.cpp \
-	srcs/connectClient.cpp
+	srcs/ft_isValidPort.cpp \
+	srcs/ft_getAddressInfo.cpp \
+	srcs/ft_connectClient.cpp
 OBJ = $(SRC:.cpp=.o)
 CXX = c++
 CFLAGS = -Wall -Werror -Wextra -std=c++98 -g

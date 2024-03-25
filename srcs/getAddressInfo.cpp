@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   getAddressInfo.cpp                                 :+:      :+:    :+:   */
+/*   ft_getAddressInfo.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,7 +12,7 @@
 
 #include "../includes/ircserv.hpp"
 
-void	getAddressInfo(void)
+void	ft_getAddressInfo(void)
 {
     char hostname[256];
     if (gethostname(hostname, sizeof(hostname)) == -1) {

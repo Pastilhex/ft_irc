@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   getServerAddress.cpp                               :+:      :+:    :+:   */
+/*   ft_getServerAddress.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,7 +12,7 @@
 
 #include "../includes/ircserv.hpp"
 
-struct sockaddr_in getServerAddress(int port)
+struct sockaddr_in ft_getServerAddress(int port)
 {
 	struct sockaddr_in serverAddress;
 

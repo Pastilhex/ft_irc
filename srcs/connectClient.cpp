@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   connectClient.cpp                                  :+:      :+:    :+:   */
+/*   ft_connectClient.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,7 +12,7 @@
 
 #include "../includes/ircserv.hpp"
 
-bool	connectClient(int& serverSocket)
+bool	ft_connectClient(int& serverSocket)
 {
 	while (true)
 	{

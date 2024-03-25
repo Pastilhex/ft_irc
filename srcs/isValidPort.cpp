@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   isValidPort.cpp                                    :+:      :+:    :+:   */
+/*   ft_isValidPort.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,7 +12,7 @@
 
 #include "../includes/ircserv.hpp"
 
-bool	isValidPort(char *str)
+bool	ft_isValidPort(char *str)
 {
 	for (size_t i = 0; i < strlen(str); i++)
 		if (!isdigit(str[i]))

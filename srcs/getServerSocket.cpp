@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   getServerSocket.cpp                                :+:      :+:    :+:   */
+/*   ft_getServerSocket.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,7 +12,7 @@
 
 #include "../includes/ircserv.hpp"
 
-int getServerSocket(void)
+int ft_getServerSocket(void)
 {
 	int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 

@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   listenConnections.cpp                              :+:      :+:    :+:   */
+/*   ft_listenConnections.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,7 +12,7 @@
 
 #include "../includes/ircserv.hpp"
 
-bool	listenConnections(int& serverSocket)
+bool	ft_listenConnections(int& serverSocket)
 {
 	if (listen(serverSocket, 5) == -1)
 	{

@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   bindSocketAddress.cpp                              :+:      :+:    :+:   */
+/*   ft_bindSocketAddress.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,7 +12,7 @@
 
 #include "../includes/ircserv.hpp"
 
-bool	bindSocketAddress(int& serverSocket, struct sockaddr_in& serverAddress)
+bool	ft_bindSocketAddress(int& serverSocket, struct sockaddr_in& serverAddress)
 {
 	if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1)
 	{

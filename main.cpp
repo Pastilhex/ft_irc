@@ -18,15 +18,15 @@ int main(int argc, char* argv[])
 
 	if (argc == 3)
 	{
-		if (!isValidPort(argv[1]))
+		if (!ft_isValidPort(argv[1]))
 			return 0;
 		int port = std::atoi(argv[1]);
-		int serverSocket = getServerSocket();
-		struct sockaddr_in serverAddress = getServerAddress(port);
-		if (serverSocket && bindSocketAddress(serverSocket, serverAddress) && listenConnections(serverSocket))
+		int serverSocket = ft_getServerSocket();
+		struct sockaddr_in serverAddress = ft_getServerAddress(port);
+		if (serverSocket && ft_bindSocketAddress(serverSocket, serverAddress) && ft_listenConnections(serverSocket))
 		{
-			getAddressInfo();
-			connectClient(serverSocket);
+			ft_getAddressInfo();
+			ft_connectClient(serverSocket);
 		} 
 		close(serverSocket);
 	}
