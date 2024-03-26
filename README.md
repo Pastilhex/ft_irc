@@ -26,10 +26,10 @@ Functions Used:
 - [ ] ntohs, ntohl
 - [ ] inet_addr
 - [x] inet_ntoa
-- [ ] send
-- [ ] recv
+- [x] send
+- [x] recv
 - [ ] signal, sigaction
 - [ ] lseek
 - [ ] fstat
 - [ ] fcntl
-- [ ] poll
+- [x] poll

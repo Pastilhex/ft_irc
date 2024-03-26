@@ -1,25 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_getServerAddress.cpp                            :+:      :+:    :+:   */
+/*   ft_messages.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/24 07:40:25 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/26 12:17:53 by ialves-m         ###   ########.fr       */
+/*   Created: 2024/03/26 13:07:13 by ialves-m          #+#    #+#             */
+/*   Updated: 2024/03/26 13:40:52 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
 
-struct sockaddr_in ft_getServerAddress(int port)
+void sendWelcome(int clientSocket)
 {
-	struct sockaddr_in serverAddress;
+    std::string welcome = "Bem-vindo ao servidor FT_IRC!\r\n";
+    welcome += "Este é um servidor de exemplo. Divirta-se!\r\n";
 
-	memset(&serverAddress, 0, sizeof(serverAddress));
-	serverAddress.sin_family = AF_INET;
-	serverAddress.sin_addr.s_addr = INADDR_ANY;
-	serverAddress.sin_port = htons(port);
-
-	return serverAddress;
+    if (send(clientSocket, welcome.c_str(), welcome.length(), 0) == -1)
+	{
+        std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
+    }
 }

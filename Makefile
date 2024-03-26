@@ -6,7 +6,9 @@ SRC = main.cpp \
 	srcs/ft_listenConnections.cpp \
 	srcs/ft_isValidPort.cpp \
 	srcs/ft_getAddressInfo.cpp \
-	srcs/ft_connectClient.cpp
+	srcs/ft_connectClient.cpp \
+	srcs/ft_messages.cpp
+
 OBJ = $(SRC:.cpp=.o)
 CXX = c++
 CFLAGS = -Wall -Werror -Wextra -std=c++98 -g
