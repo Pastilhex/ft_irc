@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 18:41:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/26 15:39:04 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/03/26 17:03:32 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,8 @@ void	ft_connectClient(int& serverSocket)
 	while (true)
 	{
         int activity = poll(fds.data(), fds.size(), -1); // Aguarda atividade nos sockets
-        if (activity == -1) {
+        if (activity == -1)
+		{
             std::cerr << "Erro ao chamar poll()." << std::endl;
             break;
         }
@@ -74,7 +75,16 @@ void	ft_connectClient(int& serverSocket)
 				}
 				else
 				{
-					std::cout << "Dados recebidos do cliente: " << std::string(buffer, bytesRead) << std::endl;
+                    // Processar mensagem do cliente
+                    std::string message(buffer, bytesRead);
+                    if (message.substr(0, 4) == "JOIN")
+					{
+                        // Confirmar que o cliente entrou no canal
+                        std::string channel = message.substr(4);
+                        send(fds[i].fd, channel.c_str(), channel.size(), 0);
+                    }
+					else
+						std::cout << "Dados recebidos do cliente: " << std::string(buffer, bytesRead) << std::endl;
 				}
 			}
 		}
