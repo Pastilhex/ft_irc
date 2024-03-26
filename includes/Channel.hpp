@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/26 18:22:12 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/03/26 23:04:45 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@
 
 class Channel {
 private:
-	string	_name;
-	enum	_userType;
+	// string	_name;
+	// string	_userType;
 
 public:
 

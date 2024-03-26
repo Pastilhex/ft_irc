@@ -1,13 +1,5 @@
 NAME = ircserv
-SRC = main.cpp \
-	srcs/ft_bindSocketAddress.cpp \
-	srcs/ft_getServerAddress.cpp \
-	srcs/ft_getServerSocket.cpp \
-	srcs/ft_listenConnections.cpp \
-	srcs/ft_isValidPort.cpp \
-	srcs/ft_getAddressInfo.cpp \
-	srcs/ft_connectClient.cpp \
-	srcs/ft_messages.cpp
+SRC = main.cpp srcs/ft_messages.cpp srcs/Server.cpp
 
 OBJ = $(SRC:.cpp=.o)
 CXX = c++
