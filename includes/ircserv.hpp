@@ -27,7 +27,7 @@
 #include <netdb.h>
 #include <vector>
 #include <fcntl.h>
-
+#include <string>
 #include "Server.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"

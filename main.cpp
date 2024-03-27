@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 				std::cerr << "Erro ao obter o nome do host." << std::endl;
 				return 1;
 			}
-
+			server.setHostname((string)hostname);	
 			std::cout << "Nome do servidor: " << hostname << std::endl;
 			server.run();
 		}

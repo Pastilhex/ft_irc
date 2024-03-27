@@ -24,6 +24,11 @@ int Server::getSocket(void)
     return this->_socket; // Retorna o descritor de arquivo do socket do servidor
 }
 
+string Server::getHostname(void)
+{
+    return this->_hostname; // Retorna o descritor de arquivo do socket do servidor
+}
+
 /**
  * @brief Obtém a estrutura sockaddr_in do servidor.
  *
@@ -48,6 +53,10 @@ void Server::setSocket(int newSocket)
     this->_socket = newSocket; // Define o descritor de arquivo do socket do servidor
 }
 
+void Server::setHostname(string hostname)
+{
+    this->_hostname = hostname; // Define o descritor de arquivo do socket do servidor
+}
 /**
  * @brief Define a estrutura sockaddr_in do servidor.
  *
@@ -303,13 +312,25 @@ void	Server::connectToClient(const int& serverSocket)
 				}
 				else
 				{
-                    // Processar mensagem do cliente
+                     // Processar mensagem do cliente
                     std::string message(buffer, bytesRead);
                     if (message.substr(0, 4) == "JOIN")
-					{
-                        // Confirmar que o cliente entrou no canal
-                        std::string channel = message.substr(4);
-                        send(fds[i].fd, channel.c_str(), channel.size(), 0);
+                    {
+                        // Extrair o nome do canal da mensagem
+                        std::string::size_type pos = message.find(" ");
+                        if (pos != std::string::npos)
+                        {
+                            std::string channel = message.substr(pos + 1);
+
+                            // Enviar comando JOIN para o servidor IRC
+                            std::string joinMessage = ":" + this->getHostname() + " JOIN " + channel + "\r\n";
+                            send(fds[i].fd, joinMessage.c_str(), joinMessage.size(), 0);
+                            std::cout << joinMessage << endl;
+                            
+                            // Configurar modos do canal (opcional)
+                            // std::string mode_cmd = "MODE " + channel + " +tns\r\n";
+                            // send(fds[i].fd, mode_cmd.c_str(), mode_cmd.length(), 0);
+                        }
                     }
 					else
 						std::cout << "Dados recebidos do cliente: " << std::string(buffer, bytesRead) << std::endl;

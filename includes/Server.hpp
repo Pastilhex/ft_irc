@@ -14,23 +14,26 @@
 # define _SERVER_
 
 #include "ircserv.hpp"
+using namespace std;
 
 class Server {
 private:
 	int	_socket;
 	int	_port;
 	struct sockaddr_in	_address;
-	//string _name;
+	string _hostname;
 	
 
 public:
 	/* Getters */
 	int getSocket(void);
 	struct sockaddr_in getAddress(void);
+	string getHostname(void);
 
 	/* Setters */
 	void setSocket(int newSocket);
 	void setAddress(struct sockaddr_in newAddress);
+	void setHostname(string hostname);
 
 	/* Methods */
 	static bool			isValidPort(char *str);
