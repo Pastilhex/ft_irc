@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/27 12:14:26 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/03/27 22:32:18 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,7 @@
  */
 int Server::getSocket(void)
 {
-    return this->_socket; // Retorna o descritor de arquivo do socket do servidor
-}
-
-string Server::getHostname(void)
-{
-    return this->_hostname; // Retorna o descritor de arquivo do socket do servidor
+	return this->_socket;
 }
 
 /**
@@ -36,9 +31,10 @@ string Server::getHostname(void)
  *
  * @return Retorna a estrutura sockaddr_in do servidor.
  */
+
 struct sockaddr_in Server::getAddress(void)
 {
-    return this->_address; // Retorna a estrutura sockaddr_in do servidor
+	return this->_address; // Retorna a estrutura sockaddr_in do servidor
 }
 
 /**
@@ -50,13 +46,9 @@ struct sockaddr_in Server::getAddress(void)
  */
 void Server::setSocket(int newSocket)
 {
-    this->_socket = newSocket; // Define o descritor de arquivo do socket do servidor
+	this->_socket = newSocket;
 }
 
-void Server::setHostname(string hostname)
-{
-    this->_hostname = hostname; // Define o descritor de arquivo do socket do servidor
-}
 /**
  * @brief Define a estrutura sockaddr_in do servidor.
  *
@@ -64,9 +56,10 @@ void Server::setHostname(string hostname)
  *
  * @param newAddress O novo valor da estrutura sockaddr_in do servidor.
  */
+
 void Server::setAddress(struct sockaddr_in newAddress)
 {
-    this->_address = newAddress; // Define a estrutura sockaddr_in do servidor
+	this->_address = newAddress;
 }
 
 /**
@@ -77,13 +70,13 @@ void Server::setAddress(struct sockaddr_in newAddress)
  * @param str A string contendo a porta a ser verificada.
  * @return Retorna true se a porta for válida, false caso contrário.
  */
+
 bool Server::isValidPort(char *str)
 {
-    // Verifica se cada caractere na string é um dígito
-    for (size_t i = 0; i < strlen(str); i++)
-        if (!isdigit(str[i]))
-            return false; // Retorna false se encontrar um caractere que não é um dígito
-    return true; // Retorna true se todos os caracteres forem dígitos
+	for (size_t i = 0; i < strlen(str); i++)
+		if (!isdigit(str[i]))
+			return false;
+	return true;
 }
 
 /**
@@ -95,27 +88,25 @@ bool Server::isValidPort(char *str)
  *         -1 se ocorrer um erro ao criar o socket,
  *         1 se ocorrer um erro ao definir o modo não-bloqueante para o socket.
  */
+
 int Server::createSocket(void)
 {
-    // Cria um socket TCP IPv4
-    int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+	int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 
-    // Verifica se ocorreu um erro ao criar o socket
-    if (serverSocket == -1)
-    {
-        cerr << "Erro ao criar o socket." << endl;
-        return -1; // Retorna -1 em caso de erro
-    }
+	if (serverSocket == -1)
+	{
+		cerr << "Erro ao criar o socket." << endl;
+		return -1;
+	}
 
-    // Define o socket para modo não-bloqueante
-    if (fcntl(serverSocket, F_SETFL, O_NONBLOCK) == -1)
-    {
-        std::cerr << "Erro ao definir modo não-bloqueante para o socket do servidor." << std::endl;
-        close(serverSocket);
-        return 1; // Retorna 1 em caso de erro ao definir o modo não-bloqueante
-    }
+	if (fcntl(serverSocket, F_SETFL, O_NONBLOCK) == -1)
+	{
+		std::cerr << "Erro ao definir modo não-bloqueante para o socket do servidor." << std::endl;
+		close(serverSocket);
+		return 1;
+	}
 
-    return serverSocket; // Retorna o descritor de arquivo do socket do servidor
+	return serverSocket;
 }
 
 /**
@@ -128,22 +119,13 @@ int Server::createSocket(void)
  */
 struct sockaddr_in Server::createAddress(int port)
 {
-    // Cria uma estrutura sockaddr_in para o endereço do servidor
-    struct sockaddr_in serverAddress;
+	struct sockaddr_in serverAddress;
 
-    // Limpa a estrutura de endereço
-    memset(&serverAddress, 0, sizeof(serverAddress));
-
-    // Define a família de endereços para IPv4
-    serverAddress.sin_family = AF_INET;
-
-    // Define o endereço IP como INADDR_ANY, permitindo conexões em todos os interfaces de rede
-    serverAddress.sin_addr.s_addr = INADDR_ANY;
-
-    // Define a porta do servidor, convertendo para o formato de rede
-    serverAddress.sin_port = htons(port);
-
-    return serverAddress; // Retorna a estrutura sockaddr_in configurada
+	memset(&serverAddress, 0, sizeof(serverAddress));
+	serverAddress.sin_family = AF_INET;
+	serverAddress.sin_addr.s_addr = INADDR_ANY;
+	serverAddress.sin_port = htons(port);
+	return serverAddress;
 }
 
 /**
@@ -153,27 +135,22 @@ struct sockaddr_in Server::createAddress(int port)
  */
 void Server::getAddressInfo(void)
 {
-    char hostname[256];
-    // Obtém o nome do host local
-    if (gethostname(hostname, sizeof(hostname)) == -1)
-    {
-        cerr << "Erro ao obter o nome do host." << endl;
-        return; // Retorna se ocorrer um erro ao obter o nome do host
-    }
+	char hostname[256];
 
-    // Obtém as informações do host usando o nome do host
-    struct hostent *host_info = gethostbyname(hostname);
-    if (host_info == NULL || host_info->h_addr_list[0] == NULL)
-    {
-        cerr << "Erro ao obter o endereço IP." << endl;
-        return; // Retorna se ocorrer um erro ao obter o endereço IP
-    }
+	if (gethostname(hostname, sizeof(hostname)) == -1)
+	{
+		cerr << "Erro ao obter o nome do host." << endl;
+		return;
+	}
 
-    // Converte o endereço IP para uma representação de string
-    char *ip_address = inet_ntoa(*((struct in_addr *)host_info->h_addr_list[0]));
-
-    // Exibe o endereço IP local do servidor
-    cout << "Endereço IP local do servidor: " << ip_address << endl;
+	struct hostent *host_info = gethostbyname(hostname);
+	if (host_info == NULL || host_info->h_addr_list[0] == NULL)
+	{
+		cerr << "Erro ao obter o endereço IP." << endl;
+		return;
+	}
+	char *ip_address = inet_ntoa(*((struct in_addr *)host_info->h_addr_list[0]));
+	cout << "Endereço IP local do servidor: " << ip_address << endl;
 }
 
 /**
@@ -187,20 +164,12 @@ void Server::getAddressInfo(void)
  */
 bool Server::start(char* str)
 {
-    // Verifica se a porta fornecida é válida
-    if (!isValidPort(str))
-        return false; // Retorna false se a porta não for válida
-
-    // Converte a porta de string para inteiro
-    this->_port = atoi(str);
-
-    // Cria o socket do servidor
-    this->_socket = createSocket();
-
-    // Cria o endereço do servidor usando a porta fornecida
-    this->_address = createAddress(this->_port);
-
-    return true; // Retorna true se o servidor foi iniciado com sucesso
+	if (!isValidPort(str))
+		return false;
+	this->_port = atoi(str);
+	this->_socket = createSocket();
+	this->_address = createAddress(this->_port);
+	return true;
 }
 
 /**
@@ -215,15 +184,13 @@ bool Server::start(char* str)
  */
 bool Server::bindSocket(const int& serverSocket, const struct sockaddr_in& serverAddress)
 {
-    // Associa o socket ao endereço IP e número de porta específicos
-    if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1)
-    {
-        cerr << "Erro ao associar o socket ao endereço." << endl;
-        close(serverSocket);
-        return false; // Retorna false em caso de erro
-    }
-
-    return true; // Retorna true se bem-sucedido
+	if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1)
+	{
+		cerr << "Erro ao associar o socket ao endereço." << endl;
+		close(serverSocket);
+		return false;
+	}
+	return true;
 }
 
 /**
@@ -236,17 +203,16 @@ bool Server::bindSocket(const int& serverSocket, const struct sockaddr_in& serve
  * @return Retorna true se o socket foi colocado no modo de escuta com sucesso,
  *         false caso contrário.
  */
+
 bool Server::checkConnections(const int& serverSocket)
 {
-    // Coloca o socket em modo de escuta
-    if (listen(serverSocket, 5) == -1)
-    {
-        cerr << "Erro ao colocar o socket em modo de escuta." << endl;
-        close(serverSocket);
-        return false; // Retorna false em caso de erro
-    }
-
-    return true; // Retorna true se bem-sucedido
+	if (listen(serverSocket, 5) == -1)
+	{
+		cerr << "Erro ao colocar o socket em modo de escuta." << endl;
+		close(serverSocket);
+		return false;
+	}
+	return true;
 }
 
 void	Server::connectToClient(const int& serverSocket)
@@ -254,25 +220,22 @@ void	Server::connectToClient(const int& serverSocket)
 	struct sockaddr_in clientAddress;
 	socklen_t clientAddressSize = sizeof(clientAddress);
 
-	// Inicialização da matriz de estruturas pollfd
 	pollfd serverPoll;
 	serverPoll.fd = serverSocket;
 	serverPoll.events = POLLIN;
 	serverPoll.revents = 0;
 
 	std::vector<pollfd> fds;
-	fds.push_back(serverPoll); // Adiciona o socket do servidor à matriz
-
+	fds.push_back(serverPoll);
 	while (true)
 	{
-        int activity = poll(fds.data(), fds.size(), -1); // Aguarda atividade nos sockets
-        if (activity == -1)
+		int activity = poll(fds.data(), fds.size(), -1);
+		if (activity == -1)
 		{
-            std::cerr << "Erro ao chamar poll()." << std::endl;
-            break;
-        }
-
-        if (fds[0].revents & POLLIN) // Verifica se há atividade no socket do servidor
+			std::cerr << "Erro ao chamar poll()." << std::endl;
+			break;
+		}
+		if (fds[0].revents & POLLIN)
 		{
 			int clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressSize);
 			if (clientSocket == -1)
@@ -281,21 +244,17 @@ void	Server::connectToClient(const int& serverSocket)
 				close(serverSocket);
 				return ;
 			}
-
-			// Adicionar o novo socket à matriz de estruturas pollfd
 			pollfd clientPoll;
 			clientPoll.fd = clientSocket;
 			clientPoll.events = POLLIN;
 			clientPoll.revents = 0;
 			fds.push_back(clientPoll);
 
-			sendWelcome(clientSocket); // Envia msg de boas vindas
+			sendWelcome(clientSocket);
 		}
-
-		
-		for (size_t i = 1; i < fds.size(); ++i) // Verificar se há atividade(dados) nos sockets dos clientes para ler
+		for (size_t i = 1; i < fds.size(); ++i)
 		{
-			if (fds[i].revents & POLLIN) // Socket do cliente pronto para leitura
+			if (fds[i].revents & POLLIN)
 			{
 				char buffer[1024];
 				int bytesRead = recv(fds[i].fd, buffer, sizeof(buffer), 0);
@@ -312,26 +271,12 @@ void	Server::connectToClient(const int& serverSocket)
 				}
 				else
 				{
-                     // Processar mensagem do cliente
-                    std::string message(buffer, bytesRead);
-                    if (message.substr(0, 4) == "JOIN")
-                    {
-                        // Extrair o nome do canal da mensagem
-                        std::string::size_type pos = message.find(" ");
-                        if (pos != std::string::npos)
-                        {
-                            std::string channel = message.substr(pos + 1);
-
-                            // Enviar comando JOIN para o servidor IRC
-                            std::string joinMessage = ":" + this->getHostname() + " JOIN " + channel + "\r\n";
-                            send(fds[i].fd, joinMessage.c_str(), joinMessage.size(), 0);
-                            std::cout << joinMessage << endl;
-                            
-                            // Configurar modos do canal (opcional)
-                            // std::string mode_cmd = "MODE " + channel + " +tns\r\n";
-                            // send(fds[i].fd, mode_cmd.c_str(), mode_cmd.length(), 0);
-                        }
-                    }
+					std::string message(buffer, bytesRead);
+					if (message.substr(0, 4) == "JOIN")
+					{
+						std::string channel = message.substr(4);
+						send(fds[i].fd, channel.c_str(), channel.size(), 0);
+					}
 					else
 						std::cout << "Dados recebidos do cliente: " << std::string(buffer, bytesRead) << std::endl;
 				}
@@ -351,20 +296,11 @@ void	Server::connectToClient(const int& serverSocket)
  */
 bool Server::run(void)
 {
-    // Verifica se o socket do servidor está configurado, se está associado a um endereço válido
-    // e se as conexões foram verificadas com sucesso
-    if (getSocket() && bindSocket(getSocket(), getAddress()) && checkConnections(getSocket()))
-    {
-        // Obtém e exibe informações de endereço do servidor
-        getAddressInfo();
-
-        // Conecta-se com o cliente
-        connectToClient(getSocket());
-
-        return true; // Retorna true se todas as etapas foram concluídas com sucesso
-    }
-    else
-    {
-        return false; // Retorna false se alguma etapa falhou
-    }
+	if (getSocket() && bindSocket(getSocket(), getAddress()) && checkConnections(getSocket()))
+	{
+		getAddressInfo();
+		connectToClient(getSocket());
+		return true;
+	}
+	return false;
 }
