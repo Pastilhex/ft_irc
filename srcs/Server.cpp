@@ -274,6 +274,8 @@ void	Server::connectToClient(const int& serverSocket)
 					std::string message(buffer, bytesRead);
 					if (message.substr(0, 4) == "JOIN")
 					{
+                        // ToDo: adicionar canal na lista de canais junto com o user associado
+                        // ToDo: retornar :hostname JOIN #nome_canal
 						std::string channel = message.substr(4);
 						send(fds[i].fd, channel.c_str(), channel.size(), 0);
 					}
