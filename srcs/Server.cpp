@@ -6,37 +6,75 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/26 23:06:12 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/03/27 12:14:26 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
 
-int	Server::getSocket(void)
+/**
+ * @brief Obtém o descritor de arquivo do socket do servidor.
+ *
+ * Esta função retorna o descritor de arquivo do socket do servidor.
+ *
+ * @return Retorna o descritor de arquivo do socket do servidor.
+ */
+int Server::getSocket(void)
 {
-	return this->_socket;
+    return this->_socket; // Retorna o descritor de arquivo do socket do servidor
 }
+
+/**
+ * @brief Obtém a estrutura sockaddr_in do servidor.
+ *
+ * Esta função retorna a estrutura sockaddr_in que representa o endereço do servidor.
+ *
+ * @return Retorna a estrutura sockaddr_in do servidor.
+ */
 struct sockaddr_in Server::getAddress(void)
 {
-	return this->_address;
+    return this->_address; // Retorna a estrutura sockaddr_in do servidor
 }
 
+/**
+ * @brief Define o descritor de arquivo do socket do servidor.
+ *
+ * Esta função define o descritor de arquivo do socket do servidor para um novo valor.
+ *
+ * @param newSocket O novo valor do descritor de arquivo do socket do servidor.
+ */
 void Server::setSocket(int newSocket)
 {
-	this->_socket = newSocket;
+    this->_socket = newSocket; // Define o descritor de arquivo do socket do servidor
 }
 
+/**
+ * @brief Define a estrutura sockaddr_in do servidor.
+ *
+ * Esta função define a estrutura sockaddr_in que representa o endereço do servidor para um novo valor.
+ *
+ * @param newAddress O novo valor da estrutura sockaddr_in do servidor.
+ */
 void Server::setAddress(struct sockaddr_in newAddress)
 {
-	this->_address = newAddress;
+    this->_address = newAddress; // Define a estrutura sockaddr_in do servidor
 }
 
-bool	Server::isValidPort(char *str)
+/**
+ * @brief Verifica se uma porta é válida.
+ *
+ * Esta função verifica se uma string representa uma porta válida.
+ *
+ * @param str A string contendo a porta a ser verificada.
+ * @return Retorna true se a porta for válida, false caso contrário.
+ */
+bool Server::isValidPort(char *str)
 {
-	for (size_t i = 0; i < strlen(str); i++)
-		if (!isdigit(str[i]))
-			return false;
-	return true;
+    // Verifica se cada caractere na string é um dígito
+    for (size_t i = 0; i < strlen(str); i++)
+        if (!isdigit(str[i]))
+            return false; // Retorna false se encontrar um caractere que não é um dígito
+    return true; // Retorna true se todos os caracteres forem dígitos
 }
 
 /**
@@ -71,68 +109,135 @@ int Server::createSocket(void)
     return serverSocket; // Retorna o descritor de arquivo do socket do servidor
 }
 
+/**
+ * @brief Cria uma estrutura sockaddr_in para o servidor.
+ *
+ * Esta função cria e configura uma estrutura sockaddr_in para representar o endereço do servidor.
+ *
+ * @param port A porta do servidor.
+ * @return Retorna a estrutura sockaddr_in configurada.
+ */
 struct sockaddr_in Server::createAddress(int port)
 {
-	struct sockaddr_in serverAddress;
+    // Cria uma estrutura sockaddr_in para o endereço do servidor
+    struct sockaddr_in serverAddress;
 
-	memset(&serverAddress, 0, sizeof(serverAddress));
-	serverAddress.sin_family = AF_INET;
-	serverAddress.sin_addr.s_addr = INADDR_ANY;
-	serverAddress.sin_port = htons(port);
+    // Limpa a estrutura de endereço
+    memset(&serverAddress, 0, sizeof(serverAddress));
 
-	return serverAddress;
+    // Define a família de endereços para IPv4
+    serverAddress.sin_family = AF_INET;
+
+    // Define o endereço IP como INADDR_ANY, permitindo conexões em todos os interfaces de rede
+    serverAddress.sin_addr.s_addr = INADDR_ANY;
+
+    // Define a porta do servidor, convertendo para o formato de rede
+    serverAddress.sin_port = htons(port);
+
+    return serverAddress; // Retorna a estrutura sockaddr_in configurada
 }
 
-void	Server::getAddressInfo(void)
+/**
+ * @brief Obtém informações de endereço do servidor.
+ *
+ * Esta função obtém e exibe o endereço IP local do servidor.
+ */
+void Server::getAddressInfo(void)
 {
-	char hostname[256];
-	if (gethostname(hostname, sizeof(hostname)) == -1)
-	{
-		cerr << "Erro ao obter o nome do host." << endl;
-		return ;
-	}
+    char hostname[256];
+    // Obtém o nome do host local
+    if (gethostname(hostname, sizeof(hostname)) == -1)
+    {
+        cerr << "Erro ao obter o nome do host." << endl;
+        return; // Retorna se ocorrer um erro ao obter o nome do host
+    }
 
-	struct hostent *host_info = gethostbyname(hostname);
-	if (host_info == NULL || host_info->h_addr_list[0] == NULL)
-	{
-		cerr << "Erro ao obter o endereço IP." << endl;
-		return ;
-	}
+    // Obtém as informações do host usando o nome do host
+    struct hostent *host_info = gethostbyname(hostname);
+    if (host_info == NULL || host_info->h_addr_list[0] == NULL)
+    {
+        cerr << "Erro ao obter o endereço IP." << endl;
+        return; // Retorna se ocorrer um erro ao obter o endereço IP
+    }
 
-	char *ip_address = inet_ntoa(*((struct in_addr *)host_info->h_addr_list[0]));
-	cout << "Endereço IP local do servidor: " << ip_address << endl;
+    // Converte o endereço IP para uma representação de string
+    char *ip_address = inet_ntoa(*((struct in_addr *)host_info->h_addr_list[0]));
+
+    // Exibe o endereço IP local do servidor
+    cout << "Endereço IP local do servidor: " << ip_address << endl;
 }
 
+/**
+ * @brief Inicia o servidor.
+ *
+ * Esta função inicia o servidor, configurando o socket e o endereço para comunicação.
+ *
+ * @param str Uma string contendo a porta do servidor.
+ * @return Retorna true se o servidor foi iniciado com sucesso,
+ *         false caso contrário.
+ */
 bool Server::start(char* str)
 {
-	if (!isValidPort(str))
-			return false;
-	this->_port = atoi(str);
-	this->_socket = createSocket();
-	this->_address = createAddress(this->_port);
-	return true;
+    // Verifica se a porta fornecida é válida
+    if (!isValidPort(str))
+        return false; // Retorna false se a porta não for válida
+
+    // Converte a porta de string para inteiro
+    this->_port = atoi(str);
+
+    // Cria o socket do servidor
+    this->_socket = createSocket();
+
+    // Cria o endereço do servidor usando a porta fornecida
+    this->_address = createAddress(this->_port);
+
+    return true; // Retorna true se o servidor foi iniciado com sucesso
 }
 
-bool	Server::bindSocket(const int& serverSocket, const struct sockaddr_in& serverAddress)
+/**
+ * @brief Associa o socket do servidor a um endereço específico.
+ *
+ * Esta função associa o socket do servidor a um endereço IP e número de porta específicos.
+ *
+ * @param serverSocket O descritor de arquivo do socket do servidor.
+ * @param serverAddress A estrutura sockaddr_in contendo o endereço IP e número de porta do servidor.
+ * @return Retorna true se o socket foi associado ao endereço com sucesso,
+ *         false caso contrário.
+ */
+bool Server::bindSocket(const int& serverSocket, const struct sockaddr_in& serverAddress)
 {
-	if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1)
-	{
-		cerr << "Erro ao associar o socket ao endereço." << endl;
-		close(serverSocket);
-		return false;
-	}
-	return true;
+    // Associa o socket ao endereço IP e número de porta específicos
+    if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1)
+    {
+        cerr << "Erro ao associar o socket ao endereço." << endl;
+        close(serverSocket);
+        return false; // Retorna false em caso de erro
+    }
+
+    return true; // Retorna true se bem-sucedido
 }
 
-bool	Server::checkConnections(const int& serverSocket)
+/**
+ * @brief Verifica as conexões do servidor.
+ *
+ * Esta função configura o socket do servidor para entrar no modo de escuta
+ * para aceitar conexões de entrada dos clientes.
+ *
+ * @param serverSocket O descritor de arquivo do socket do servidor.
+ * @return Retorna true se o socket foi colocado no modo de escuta com sucesso,
+ *         false caso contrário.
+ */
+bool Server::checkConnections(const int& serverSocket)
 {
-	if (listen(serverSocket, 5) == -1)
-	{
-		cerr << "Erro ao colocar o socket em modo de escuta." << endl;
-		close(serverSocket);
-		return false;
-	}
-	return true;
+    // Coloca o socket em modo de escuta
+    if (listen(serverSocket, 5) == -1)
+    {
+        cerr << "Erro ao colocar o socket em modo de escuta." << endl;
+        close(serverSocket);
+        return false; // Retorna false em caso de erro
+    }
+
+    return true; // Retorna true se bem-sucedido
 }
 
 void	Server::connectToClient(const int& serverSocket)
@@ -215,14 +320,30 @@ void	Server::connectToClient(const int& serverSocket)
 	close(serverSocket);
 }
 
-bool	Server::run(void)
+/**
+ * @brief Executa o servidor.
+ *
+ * Esta função inicia o servidor e executa as etapas necessárias para aceitar conexões dos clientes.
+ *
+ * @return Retorna true se o servidor foi iniciado e as conexões foram verificadas com sucesso,
+ *         false caso contrário.
+ */
+bool Server::run(void)
 {
-	if (getSocket() && bindSocket(getSocket(), getAddress()) && checkConnections(getSocket()))
-	{
-		getAddressInfo();
-		connectToClient(getSocket());
-		return true;
-	}
-	else
-		return false;
+    // Verifica se o socket do servidor está configurado, se está associado a um endereço válido
+    // e se as conexões foram verificadas com sucesso
+    if (getSocket() && bindSocket(getSocket(), getAddress()) && checkConnections(getSocket()))
+    {
+        // Obtém e exibe informações de endereço do servidor
+        getAddressInfo();
+
+        // Conecta-se com o cliente
+        connectToClient(getSocket());
+
+        return true; // Retorna true se todas as etapas foram concluídas com sucesso
+    }
+    else
+    {
+        return false; // Retorna false se alguma etapa falhou
+    }
 }
