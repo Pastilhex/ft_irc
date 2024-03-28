@@ -24,6 +24,11 @@ int Server::getSocket(void)
 	return this->_socket;
 }
 
+string Server::getHostname(void)
+{
+	return this->_hostname;
+}
+
 /**
  * @brief Obtém a estrutura sockaddr_in do servidor.
  *
@@ -47,6 +52,11 @@ struct sockaddr_in Server::getAddress(void)
 void Server::setSocket(int newSocket)
 {
 	this->_socket = newSocket;
+}
+
+void Server::setHostname(string hostname)
+{
+	this->_hostname = hostname;
 }
 
 /**
@@ -276,8 +286,10 @@ void	Server::connectToClient(const int& serverSocket)
 					{
                         // ToDo: adicionar canal na lista de canais junto com o user associado
                         // ToDo: retornar :hostname JOIN #nome_canal
-						std::string channel = message.substr(4);
+						//std::string channel = message.substr(4);
+						std::string channel = ":" + getHostname() + " JOIN " + "#ola" + "\r\n";
 						send(fds[i].fd, channel.c_str(), channel.size(), 0);
+						std::cout << channel << endl; 
 					}
 					else
 						std::cout << "Dados recebidos do cliente: " << std::string(buffer, bytesRead) << std::endl;
