@@ -295,8 +295,13 @@ void	Server::connectToClient(const int& serverSocket)
                         // ToDo: retornar :hostname JOIN #nome_canal
 						//std::string channel = message.substr(4);
 						// std::string channel = ":" + getHostname() + " JOIN " + "#ola" + "\r\n";
-						std::string channel = ":localhost 322 pastilhex #test 2 :Canal42\r\n";
-						send(fds[i].fd, channel.c_str(), channel.size(), 0);
+						//std::string channel= ":localhost 321 seu_nick :Lista de canais disponíveis:\r\n";
+						//send(fds[i].fd, channel.c_str(), channel.size(), 0);
+
+						std::string channel1 = ":localhost 322 pastilhex #test 2 :Canal42\r\n";
+						//std::string channel1 = ":localhost 322 seu_nick #canal1 10 :Descrição do Canal 1\r\n";
+						send(fds[i].fd, channel1.c_str(), channel1.size(), 0);
+						//std::string endOfList = ":localhost 323 seu_nick :End of /LIST\r\n";
 						//std::cout << channel << endl; 
 					}
 					else
