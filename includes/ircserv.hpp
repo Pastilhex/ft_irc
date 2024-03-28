@@ -16,24 +16,24 @@
 using namespace std;
 
 #include <iostream>
-#include <cstring>
 #include <cstdlib>
+#include <map>
+#include <vector>
+#include <string>
+#include <cstring>
 #include <cerrno>
 #include <cctype>
+#include <unistd.h>
+#include <netdb.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/poll.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <unistd.h>
-#include <netdb.h>
-#include <vector>
-#include <fcntl.h>
-#include <string>
 #include "Server.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
-#include <map>
 
 void	sendWelcome(int clientSocket);
 

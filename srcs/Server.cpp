@@ -126,7 +126,7 @@ int Server::createSocket(void)
 	return serverSocket;
 }
 
-void    Server::createHostname(char* hostname)
+void    Server::createHostname(void)
 {
     char hostname[256];
     if (gethostname(hostname, sizeof(hostname)) == -1) {
@@ -336,7 +336,7 @@ bool Server::run(void)
 {
 	if (getSocket() && bindSocket(getSocket(), getAddress()) && checkConnections(getSocket()))
 	{
-		getHostname();
+		createHostname();
         getAddressInfo();
 		connectToClient(getSocket());
 		return true;

@@ -14,6 +14,7 @@
 # define _SERVER_
 
 #include "ircserv.hpp"
+class Channel;
 
 class Server {
 private:
@@ -36,7 +37,7 @@ public:
 	void setHostname(string hostname);
 
 	/* Methods */
-	void 				createHostname(char* hostname);
+	void 				createHostname(void);
 	int					createSocket(void);
 	struct sockaddr_in 	createAddress(int port);
 	static bool			isValidPort(char *str);
