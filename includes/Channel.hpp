@@ -17,27 +17,27 @@
 
 class Channel {
 private:
-	string	_name;
-	string	_topic;
-	string	_userMode;
+	std::string	_name;
+	std::string	_topic;
+	std::string	_userMode;
 	bool	_modeTopic;
 	bool	_modeAccess;
 	bool	_modePassword;
-	vector<pair<string, Client>	> _clients; // <"user":"pastilhex"> | <"operator":"Jhonata">
+	std::vector<std::pair<std::string, Client> > _clients; // <"user":"pastilhex"> | <"operator":"Jhonata">
 
 public:
 	/* Getters */
-	string	getName(void);
-	string	getTopic(void);
-	string	getUserMode(void);
+	std::string	getName(void);
+	std::string	getTopic(void);
+	std::string	getUserMode(void);
 	bool	getModeTopic(void);
 	bool	getModeAccess(void);
 	bool	getModePassword(void);
 
 	/* Setters */
-	void	setName(string name);
-	void	setTopic(string topic);
-	void	setUserMode(string usermode);
+	void	setName(std::string name);
+	void	setTopic(std::string topic);
+	void	setUserMode(std::string usermode);
 	void	setModeTopic(bool mode);
 	void	setModeAccess(bool mode);
 	void	setModePassword(bool mode);

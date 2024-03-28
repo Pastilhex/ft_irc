@@ -13,8 +13,6 @@
 #ifndef _IRC_
 # define _IRC_
 
-using namespace std;
-
 #include <iostream>
 #include <cstdlib>
 #include <map>

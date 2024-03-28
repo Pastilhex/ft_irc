@@ -17,17 +17,17 @@
 
 class Client {
 private:
-	string	_nick;
-	string	_username;
+	std::string	_nick;
+	std::string	_username;
 
 public:
 	/* Getters */
-	string getNick(void);
-	string getUsername(void);
+	std::string getNick(void);
+	std::string getUsername(void);
 
 	/* Setters */
-	void setNick(string nick);
-	void setUsername(string username);
+	void setNick(std::string nick);
+	void setUsername(std::string username);
 };
 
 #endif

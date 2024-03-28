@@ -24,7 +24,7 @@ int Server::getSocket(void)
 	return this->_socket;
 }
 
-string Server::getHostname(void)
+ std::string Server::getHostname(void)
 {
 	return this->_hostname;
 }
@@ -54,7 +54,7 @@ void Server::setSocket(int newSocket)
 	this->_socket = newSocket;
 }
 
-void Server::setHostname(string hostname)
+void Server::setHostname( std::string hostname)
 {
 	this->_hostname = hostname;
 }
@@ -75,9 +75,9 @@ void Server::setAddress(struct sockaddr_in newAddress)
 /**
  * @brief Verifica se uma porta é válida.
  *
- * Esta função verifica se uma string representa uma porta válida.
+ * Esta função verifica se uma  std::string representa uma porta válida.
  *
- * @param str A string contendo a porta a ser verificada.
+ * @param str A  std::string contendo a porta a ser verificada.
  * @return Retorna true se a porta for válida, false caso contrário.
  */
 
@@ -105,7 +105,7 @@ int Server::createSocket(void)
 
 	if (serverSocket == -1)
 	{
-		cerr << "Erro ao criar o socket." << endl;
+		std::cerr << "Erro ao criar o socket." << std::endl;
 		return -1;
 	}
 
@@ -133,7 +133,7 @@ void    Server::createHostname(void)
         std::cerr << "Erro ao obter o nome do host." << std::endl;
         return ;
     }
-    this->setHostname((string)hostname);	
+    this->setHostname(( std::string)hostname);	
     std::cout << "Nome do servidor: " << hostname << std::endl;
 }
 
@@ -167,18 +167,18 @@ void Server::getAddressInfo(void)
 
 	if (gethostname(hostname, sizeof(hostname)) == -1)
 	{
-		cerr << "Erro ao obter o nome do host." << endl;
+		std::cerr << "Erro ao obter o nome do host." << std::endl;
 		return;
 	}
 
 	struct hostent *host_info = gethostbyname(hostname);
 	if (host_info == NULL || host_info->h_addr_list[0] == NULL)
 	{
-		cerr << "Erro ao obter o endereço IP." << endl;
+		std::cerr << "Erro ao obter o endereço IP." << std::endl;
 		return;
 	}
 	char *ip_address = inet_ntoa(*((struct in_addr *)host_info->h_addr_list[0]));
-	cout << "Endereço IP local do servidor: " << ip_address << endl;
+	std::cout << "Endereço IP local do servidor: " << ip_address << std::endl;
 }
 
 /**
@@ -186,7 +186,7 @@ void Server::getAddressInfo(void)
  *
  * Esta função inicia o servidor, configurando o socket e o endereço para comunicação.
  *
- * @param str Uma string contendo a porta do servidor.
+ * @param str Uma  std::string contendo a porta do servidor.
  * @return Retorna true se o servidor foi iniciado com sucesso,
  *         false caso contrário.
  */
@@ -214,7 +214,7 @@ bool Server::bindSocket(const int& serverSocket, const struct sockaddr_in& serve
 {
 	if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1)
 	{
-		cerr << "Erro ao associar o socket ao endereço." << endl;
+		std::cerr << "Erro ao associar o socket ao endereço." << std::endl;
 		close(serverSocket);
 		return false;
 	}
@@ -236,7 +236,7 @@ bool Server::checkConnections(const int& serverSocket)
 {
 	if (listen(serverSocket, 5) == -1)
 	{
-		cerr << "Erro ao colocar o socket em modo de escuta." << endl;
+		std::cerr << "Erro ao colocar o socket em modo de escuta." << std::endl;
 		close(serverSocket);
 		return false;
 	}
@@ -268,7 +268,7 @@ void	Server::connectToClient(const int& serverSocket)
 			int clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressSize);
 			if (clientSocket == -1)
 			{
-				cerr << "Erro ao aceitar conexão do cliente." << endl;
+				 std::cerr << "Erro ao aceitar conexão do cliente." << std::endl;
 				close(serverSocket);
 				return ;
 			}
