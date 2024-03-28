@@ -13,6 +13,8 @@
 #ifndef _IRC_
 # define _IRC_
 
+using namespace std;
+
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
@@ -31,17 +33,8 @@
 #include "Server.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
+#include <map>
 
-using namespace std;
-
-int		ft_getServerSocket(void);
-struct	sockaddr_in ft_getServerAddress(int port);
-bool	ft_bindSocketAddress(int& socket, struct sockaddr_in& addr);
-bool	ft_listenConnections(int& serverSocket);
-bool	ft_isValidPort(char *str);
-void	ft_connectClient(int& serverSocket);
-void	ft_getAddressInfo(void);
 void	sendWelcome(int clientSocket);
-
 
 #endif

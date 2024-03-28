@@ -17,11 +17,17 @@
 
 class Client {
 private:
-	// string	_nick;
-	// string	_password;
-	// string	_channel;
-public:
+	string	_nick;
+	string	_username;
 
+public:
+	/* Getters */
+	string getNick(void);
+	string getUsername(void);
+
+	/* Setters */
+	void setNick(string nick);
+	void setUsername(string username);
 };
 
 #endif

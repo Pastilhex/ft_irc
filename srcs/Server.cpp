@@ -126,6 +126,17 @@ int Server::createSocket(void)
 	return serverSocket;
 }
 
+void    Server::createHostname(char* hostname)
+{
+    char hostname[256];
+    if (gethostname(hostname, sizeof(hostname)) == -1) {
+        std::cerr << "Erro ao obter o nome do host." << std::endl;
+        return ;
+    }
+    this->setHostname((string)hostname);	
+    std::cout << "Nome do servidor: " << hostname << std::endl;
+}
+
 /**
  * @brief Cria uma estrutura sockaddr_in para o servidor.
  *
@@ -297,12 +308,12 @@ void	Server::connectToClient(const int& serverSocket)
 					}
 					else if (message.substr(0, 4) == "JOIN")
 					{
-						std::string channelJoin = ":localhost JOIN #canal2\r\n";
+						std::string channelJoin = ":pastilhex JOIN #canal2\r\n";
 						send(fds[i].fd, channelJoin.c_str(), channelJoin.size(), 0);
-						std::string topicMessage = ":localhost 332 pastilhex #canal2 :Descrição do Canal 2\r\n";
-    					send(fds[i].fd, topicMessage.c_str(), topicMessage.size(), 0);
-						std::string modeCommand = "MODE #canal2 +nt\r\n";
-						send(fds[i].fd, modeCommand.c_str(), modeCommand.size(), 0);
+						// std::string topicMessage = ":localhost 332 pastilhex #canal2 :Descrição do Canal 2\r\n";
+    					// send(fds[i].fd, topicMessage.c_str(), topicMessage.size(), 0);
+						// std::string modeCommand = "MODE #canal2 +nt\r\n";
+						// send(fds[i].fd, modeCommand.c_str(), modeCommand.size(), 0);
 					}
 					else
 						std::cout << "Dados recebidos do cliente: " << std::string(buffer, bytesRead) << std::endl;
@@ -325,7 +336,8 @@ bool Server::run(void)
 {
 	if (getSocket() && bindSocket(getSocket(), getAddress()) && checkConnections(getSocket()))
 	{
-		getAddressInfo();
+		getHostname();
+        getAddressInfo();
 		connectToClient(getSocket());
 		return true;
 	}
