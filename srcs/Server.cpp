@@ -291,18 +291,18 @@ void	Server::connectToClient(const int& serverSocket)
 					std::string message(buffer, bytesRead);
 					if (message.substr(0, 4) == "LIST")
 					{
-                        // ToDo: adicionar canal na lista de canais junto com o user associado
-                        // ToDo: retornar :hostname JOIN #nome_canal
-						//std::string channel = message.substr(4);
-						// std::string channel = ":" + getHostname() + " JOIN " + "#ola" + "\r\n";
-						//std::string channel= ":localhost 321 seu_nick :Lista de canais disponíveis:\r\n";
-						//send(fds[i].fd, channel.c_str(), channel.size(), 0);
-
-						std::string channel1 = ":localhost 322 pastilhex #test 2 :Canal42\r\n";
-						//std::string channel1 = ":localhost 322 seu_nick #canal1 10 :Descrição do Canal 1\r\n";
+						std::string channel1 = ":localhost 322 pastilhex #canal2 3 :Canal 42\r\n";
 						send(fds[i].fd, channel1.c_str(), channel1.size(), 0);
 						//std::string endOfList = ":localhost 323 seu_nick :End of /LIST\r\n";
-						//std::cout << channel << endl; 
+					}
+					else if (message.substr(0, 4) == "JOIN")
+					{
+						std::string channelJoin = ":localhost JOIN #canal2\r\n";
+						send(fds[i].fd, channelJoin.c_str(), channelJoin.size(), 0);
+						std::string topicMessage = ":localhost 332 pastilhex #canal2 :Descrição do Canal 2\r\n";
+    					send(fds[i].fd, topicMessage.c_str(), topicMessage.size(), 0);
+						std::string modeCommand = "MODE #canal2 +nt\r\n";
+						send(fds[i].fd, modeCommand.c_str(), modeCommand.size(), 0);
 					}
 					else
 						std::cout << "Dados recebidos do cliente: " << std::string(buffer, bytesRead) << std::endl;
