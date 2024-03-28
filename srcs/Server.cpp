@@ -113,8 +113,15 @@ int Server::createSocket(void)
 	{
 		std::cerr << "Erro ao definir modo não-bloqueante para o socket do servidor." << std::endl;
 		close(serverSocket);
-		return 1;
+		return -1;
 	}
+
+    int optval = 1;
+    if ((setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval))) == -1)
+    {
+		std::cerr << "Erro ao reutilizar o socket do servidor." << std::endl;
+        return -1;
+    }
 
 	return serverSocket;
 }
@@ -282,14 +289,15 @@ void	Server::connectToClient(const int& serverSocket)
 				else
 				{
 					std::string message(buffer, bytesRead);
-					if (message.substr(0, 4) == "JOIN")
+					if (message.substr(0, 4) == "LIST")
 					{
                         // ToDo: adicionar canal na lista de canais junto com o user associado
                         // ToDo: retornar :hostname JOIN #nome_canal
 						//std::string channel = message.substr(4);
-						std::string channel = ":" + getHostname() + " JOIN " + "#ola" + "\r\n";
+						// std::string channel = ":" + getHostname() + " JOIN " + "#ola" + "\r\n";
+						std::string channel = ":localhost 322 pastilhex #test 2 :Canal42\r\n";
 						send(fds[i].fd, channel.c_str(), channel.size(), 0);
-						std::cout << channel << endl; 
+						//std::cout << channel << endl; 
 					}
 					else
 						std::cout << "Dados recebidos do cliente: " << std::string(buffer, bytesRead) << std::endl;
