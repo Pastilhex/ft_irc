@@ -1,5 +1,5 @@
 NAME = ircserv
-SRC = main.cpp srcs/ft_messages.cpp srcs/Server.cpp
+SRC = main.cpp srcs/ft_messages.cpp srcs/Server.cpp srcs/Client.cpp
 
 OBJ = $(SRC:.cpp=.o)
 CXX = c++
