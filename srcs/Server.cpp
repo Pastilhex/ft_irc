@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/27 22:32:18 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/03/29 00:15:08 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int Server::getSocket(void)
 	return this->_socket;
 }
 
- std::string Server::getHostname(void)
+std::string Server::getHostname(void)
 {
 	return this->_hostname;
 }
@@ -36,10 +36,14 @@ int Server::getSocket(void)
  *
  * @return Retorna a estrutura sockaddr_in do servidor.
  */
-
 struct sockaddr_in Server::getAddress(void)
 {
-	return this->_address; // Retorna a estrutura sockaddr_in do servidor
+	return this->_address;
+}
+
+std::string Server::getPassword(void)
+{
+	return this->_password;
 }
 
 /**
@@ -66,7 +70,6 @@ void Server::setHostname( std::string hostname)
  *
  * @param newAddress O novo valor da estrutura sockaddr_in do servidor.
  */
-
 void Server::setAddress(struct sockaddr_in newAddress)
 {
 	this->_address = newAddress;
@@ -80,7 +83,6 @@ void Server::setAddress(struct sockaddr_in newAddress)
  * @param str A  std::string contendo a porta a ser verificada.
  * @return Retorna true se a porta for válida, false caso contrário.
  */
-
 bool Server::isValidPort(char *str)
 {
 	for (size_t i = 0; i < strlen(str); i++)
@@ -98,7 +100,6 @@ bool Server::isValidPort(char *str)
  *         -1 se ocorrer um erro ao criar o socket,
  *         1 se ocorrer um erro ao definir o modo não-bloqueante para o socket.
  */
-
 int Server::createSocket(void)
 {
 	int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -161,24 +162,22 @@ struct sockaddr_in Server::createAddress(int port)
  *
  * Esta função obtém e exibe o endereço IP local do servidor.
  */
-void Server::getAddressInfo(void)
+std::string	Server::getAddressInfo(void)
 {
 	char hostname[256];
-
 	if (gethostname(hostname, sizeof(hostname)) == -1)
 	{
 		std::cerr << "Erro ao obter o nome do host." << std::endl;
-		return;
 	}
 
 	struct hostent *host_info = gethostbyname(hostname);
 	if (host_info == NULL || host_info->h_addr_list[0] == NULL)
 	{
 		std::cerr << "Erro ao obter o endereço IP." << std::endl;
-		return;
 	}
+
 	char *ip_address = inet_ntoa(*((struct in_addr *)host_info->h_addr_list[0]));
-	std::cout << "Endereço IP local do servidor: " << ip_address << std::endl;
+	return ip_address;
 }
 
 /**
@@ -231,7 +230,6 @@ bool Server::bindSocket(const int& serverSocket, const struct sockaddr_in& serve
  * @return Retorna true se o socket foi colocado no modo de escuta com sucesso,
  *         false caso contrário.
  */
-
 bool Server::checkConnections(const int& serverSocket)
 {
 	if (listen(serverSocket, 5) == -1)
@@ -278,7 +276,6 @@ void	Server::connectToClient(const int& serverSocket)
 			clientPoll.revents = 0;
 			fds.push_back(clientPoll);
 
-			sendWelcome(clientSocket);
 		}
 		for (size_t i = 1; i < fds.size(); ++i)
 		{
@@ -316,7 +313,17 @@ void	Server::connectToClient(const int& serverSocket)
 						// send(fds[i].fd, modeCommand.c_str(), modeCommand.size(), 0);
 					}
 					else
-						std::cout << "Dados recebidos do cliente: " << std::string(buffer, bytesRead) << std::endl;
+					{
+						Client client;
+						client.getClientLoginData(buffer, bytesRead);
+						std::string serverPassword = message.substr(message.find("PASS ") + 5, message.find_first_of("\r\n"));
+						
+						if (getPassword() == serverPassword)
+						{
+							sendWelcome(fds[i].fd, client);
+							// std::cout << "Dados recebidos do cliente: " << std::string(buffer, bytesRead) << std::endl;
+						}
+					}
 				}
 			}
 		}

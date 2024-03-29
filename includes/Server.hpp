@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/26 23:04:23 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/03/29 00:11:10 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #include "ircserv.hpp"
 class Channel;
+class Client;
 
 class Server {
 private:
@@ -30,6 +31,7 @@ public:
 	int getSocket(void);
 	struct sockaddr_in getAddress(void);
 	std::string getHostname(void);
+	std::string getPassword(void);
 
 	/* Setters */
 	void setSocket(int newSocket);
@@ -41,13 +43,15 @@ public:
 	int					createSocket(void);
 	struct sockaddr_in 	createAddress(int port);
 	static bool			isValidPort(char *str);
-	void				getAddressInfo(void);
+	std::string				getAddressInfo(void);
 	bool				start(char* str);
 	bool				bindSocket(const int& serverSocket, const struct sockaddr_in& serverAddress);
 	bool				run(void);
 	bool				checkConnections(const int& serverSocket);
 	void				connectToClient(const int& serverSocket);
+	void				sendWelcome(int clientSocket, Client& client);
 
 };
+
 
 #endif

@@ -1,7 +1,7 @@
 NAME = ircserv
 SRC = main.cpp srcs/ft_messages.cpp srcs/Server.cpp srcs/Client.cpp
-
-OBJ = $(SRC:.cpp=.o)
+OBJDIR = objs
+OBJ = $(addprefix $(OBJDIR)/, $(SRC:.cpp=.o))
 CXX = c++
 CFLAGS = -Wall -Werror -Wextra -std=c++98 -g
 
@@ -10,11 +10,13 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	$(CXX) $(CFLAGS) $(OBJ) -o $(NAME)
 
-%.o: %.cpp
-	$(CXX) $(CFLAGS) -c $^ -o $@
+$(OBJDIR)/%.o: %.cpp
+	mkdir -p $(@D)
+	$(CXX) $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -f $(NAME)
+	rm -rf $(OBJDIR)
 
 fclean: clean
 	rm -f $(OBJ)

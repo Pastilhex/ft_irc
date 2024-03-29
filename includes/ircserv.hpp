@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ircserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 06:36:04 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/26 22:13:22 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/03/29 00:03:09 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,5 @@
 #include "Server.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
-
-void	sendWelcome(int clientSocket);
 
 #endif
