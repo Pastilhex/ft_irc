@@ -22,10 +22,14 @@ private:
 	std::string	_password;		// channel password
 	std::string	_userMode;		// user ou operator +o/-o
 	bool	_modeTopic;			// Premissão para mudar tópico <sim/não>
-	bool	_modePrivateAccess; // Public or Private channel <sim/não>
+	bool	_isPrivate; // Public or Private channel <sim/não>
 	std::vector<std::pair<std::string, Client> > _clients; // <"user":"pastilhex"> | <"operator":"Jhonata">
 
 public:
+
+	/* Constructors*/
+	Channel(std::string name, bool _isPrivate);
+	
 	/* Getters */
 	std::string	getName(void);
 	std::string	getTopic(void);

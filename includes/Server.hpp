@@ -32,6 +32,7 @@ public:
 	struct sockaddr_in getAddress(void);
 	std::string getHostname(void);
 	std::string getPassword(void);
+	std::map<std::string, Channel> getChannels(void);
 
 	/* Setters */
 	void setSocket(int newSocket);
