@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/29 10:29:08 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/03/29 11:11:01 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -300,7 +300,7 @@ void	Server::connectToClient(const int& serverSocket)
 					std::string message(buffer, bytesRead);
 					if (message.substr(0, 4) == "LIST")
 					{
-						std::string channel1 = ":localhost 322 pastilhex #canal2 3 :Canal 42\r\n";
+						std::string channel1 = ":localhost 322 pastilhex #canal2 13 :Canal 42\r\n";
 						send(fds[i].fd, channel1.c_str(), channel1.size(), 0);
 						//std::string endOfList = ":localhost 323 seu_nick :End of /LIST\r\n";
 					}
