@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/29 12:58:34 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/03/29 14:08:47 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,11 +243,12 @@ bool Server::checkConnections(const int& serverSocket)
 
 void	Server::connectToClient(const int& serverSocket)
 {
-	Client client;
+	Client	client;
+	bool	welcomeMessage = false;
 	struct sockaddr_in clientAddress;
 	socklen_t clientAddressSize = sizeof(clientAddress);
 
-	pollfd serverPoll;
+	pollfd	serverPoll;
 	serverPoll.fd = serverSocket;
 	serverPoll.events = POLLIN;
 	serverPoll.revents = 0;
@@ -256,6 +257,7 @@ void	Server::connectToClient(const int& serverSocket)
 	fds.push_back(serverPoll);
 	while (true)
 	{
+		
 		int activity = poll(fds.data(), fds.size(), -1);
 		if (activity == -1)
 		{
@@ -276,7 +278,7 @@ void	Server::connectToClient(const int& serverSocket)
 			clientPoll.events = POLLIN;
 			clientPoll.revents = 0;
 			fds.push_back(clientPoll);
-			sendWelcome(clientSocket, client);
+			
 		}
 		for (size_t i = 1; i < fds.size(); ++i)
 		{
@@ -297,6 +299,7 @@ void	Server::connectToClient(const int& serverSocket)
 				}
 				else
 				{
+
 					std::string message(buffer, bytesRead);
 					client.getClientLoginData(buffer, bytesRead);
 					if (message.find("LIST") != std::string::npos)
@@ -317,6 +320,13 @@ void	Server::connectToClient(const int& serverSocket)
 					else
 					{
 						std::cout << "Dados recebidos do cliente: " << std::string(buffer, bytesRead) << std::endl;
+					}
+
+					std::string tmpNick = client.getNick(), tmpUser = client.getUsername();
+					if (!tmpNick.empty() && !tmpUser.empty() && welcomeMessage == false)
+					{
+						sendWelcome(fds[i].fd, client);
+						welcomeMessage = true;
 					}
 				}
 			}

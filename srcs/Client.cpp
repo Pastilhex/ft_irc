@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/29 13:34:36 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/03/29 14:04:45 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,18 +48,10 @@ void	Client::getClientLoginData(char* buffer, int bytesRead)
 	if ((message.find("NICK") != std::string::npos) || (message.find("USER") != std::string::npos) || (message.find("PASS") != std::string::npos))
 	{
 		if (message.find("NICK") != std::string::npos)
-		{
 			setNick(message.substr(message.find("NICK ") + 5, message.find("\r", message.find("NICK ") + 5) - (message.find("NICK ") + 5)));
-		}
-
 		if (message.find("USER") != std::string::npos)
-		{
-			setUsername(message.substr(message.find("USER ") + 5, message.find("\r", message.find("USER ") + 5) - (message.find("USER ") + 5)));
-		}
-
+			setUsername(message.substr(message.find("USER ") + 5, message.find(" ", message.find("USER ") + 5) - (message.find("USER ") + 5)));
 		if (message.find("PASS") != std::string::npos)
-		{
 			setTmpPassword(message.substr(message.find("PASS ") + 5, message.find("\r", message.find("PASS ") + 5) - (message.find("PASS ") + 5)));
-		}
 	}
 }
