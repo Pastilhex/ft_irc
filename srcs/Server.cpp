@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/29 11:11:01 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/03/29 12:58:34 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,6 +243,7 @@ bool Server::checkConnections(const int& serverSocket)
 
 void	Server::connectToClient(const int& serverSocket)
 {
+	Client client;
 	struct sockaddr_in clientAddress;
 	socklen_t clientAddressSize = sizeof(clientAddress);
 
@@ -270,7 +271,6 @@ void	Server::connectToClient(const int& serverSocket)
 				close(serverSocket);
 				return ;
 			}
-			Client client;
 			pollfd clientPoll;
 			clientPoll.fd = clientSocket;
 			clientPoll.events = POLLIN;
@@ -298,13 +298,14 @@ void	Server::connectToClient(const int& serverSocket)
 				else
 				{
 					std::string message(buffer, bytesRead);
-					if (message.substr(0, 4) == "LIST")
+					client.getClientLoginData(buffer, bytesRead);
+					if (message.find("LIST") != std::string::npos)
 					{
 						std::string channel1 = ":localhost 322 pastilhex #canal2 13 :Canal 42\r\n";
 						send(fds[i].fd, channel1.c_str(), channel1.size(), 0);
 						//std::string endOfList = ":localhost 323 seu_nick :End of /LIST\r\n";
 					}
-					else if (message.substr(0, 4) == "JOIN")
+					else if (message.find("JOIN") != std::string::npos)
 					{
 						std::string channelJoin = ":pastilhex JOIN #canal2\r\n";
 						send(fds[i].fd, channelJoin.c_str(), channelJoin.size(), 0);
@@ -315,8 +316,7 @@ void	Server::connectToClient(const int& serverSocket)
 					}
 					else
 					{
-
-						// std::cout << "Dados recebidos do cliente: " << std::string(buffer, bytesRead) << std::endl;
+						std::cout << "Dados recebidos do cliente: " << std::string(buffer, bytesRead) << std::endl;
 					}
 				}
 			}
