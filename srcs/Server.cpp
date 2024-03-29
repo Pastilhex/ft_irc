@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/29 00:15:08 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/03/29 10:29:08 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,7 +162,7 @@ struct sockaddr_in Server::createAddress(int port)
  *
  * Esta função obtém e exibe o endereço IP local do servidor.
  */
-std::string	Server::getAddressInfo(void)
+std::string	Server::getAddressIP(void)
 {
 	char hostname[256];
 	if (gethostname(hostname, sizeof(hostname)) == -1)
@@ -270,12 +270,13 @@ void	Server::connectToClient(const int& serverSocket)
 				close(serverSocket);
 				return ;
 			}
+			Client client;
 			pollfd clientPoll;
 			clientPoll.fd = clientSocket;
 			clientPoll.events = POLLIN;
 			clientPoll.revents = 0;
 			fds.push_back(clientPoll);
-
+			sendWelcome(clientSocket, client);
 		}
 		for (size_t i = 1; i < fds.size(); ++i)
 		{
@@ -314,15 +315,8 @@ void	Server::connectToClient(const int& serverSocket)
 					}
 					else
 					{
-						Client client;
-						client.getClientLoginData(buffer, bytesRead);
-						std::string serverPassword = message.substr(message.find("PASS ") + 5, message.find_first_of("\r\n"));
-						
-						if (getPassword() == serverPassword)
-						{
-							sendWelcome(fds[i].fd, client);
-							// std::cout << "Dados recebidos do cliente: " << std::string(buffer, bytesRead) << std::endl;
-						}
+
+						// std::cout << "Dados recebidos do cliente: " << std::string(buffer, bytesRead) << std::endl;
 					}
 				}
 			}
@@ -344,7 +338,7 @@ bool Server::run(void)
 	if (getSocket() && bindSocket(getSocket(), getAddress()) && checkConnections(getSocket()))
 	{
 		createHostname();
-        getAddressInfo();
+        std::cout << "Endereço IP do servidor: " + getAddressIP() << std::endl;
 		connectToClient(getSocket());
 		return true;
 	}

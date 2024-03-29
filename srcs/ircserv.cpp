@@ -1,16 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_messages.cpp                                    :+:      :+:    :+:   */
+/*   ircserv.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 13:07:13 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/29 00:05:05 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/03/29 10:54:06 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
+
+std::string getCurrentDateTime()
+{
+    char buffer[80];
+    std::time_t rawtime;
+    std::tm* timeinfo;
+
+    std::time(&rawtime);
+    timeinfo = std::localtime(&rawtime);
+
+    std::strftime(buffer, 80, "%H:%M:%S %b %d %Y", timeinfo);
+
+    return std::string(buffer);
+}
 
 /**
  * @brief Envia uma mensagem de boas-vindas para o cliente.
@@ -22,8 +36,10 @@
  */
 void	Server::sendWelcome(int clientSocket, Client &client)
 {
-    std::string welcome = ":localhost 001 pastilhex :Welcome to the Internet Relay Network, " + getHostname() + "!" + client.getUsername() + "@" + getHostname() + "!" + getAddressInfo() + "\r\n";
-
+    std::string welcome = ":localhost 001 pastilhex :Welcome to the Internet Relay Network, " + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + "!" + getAddressIP() + "\r\n";
+	welcome += ":localhost 002 pastilhex :Your host is " + getHostname() + ", running version FT_IRC_42Porto_v1.0\r\n";
+	welcome += ":localhost 003 pastilhex :This server was created " + getCurrentDateTime() + "\r\n";
+	
 	// 001: Welcome to the Internet Relay Network, [seu_nick]!user@host
 	// 002: Your host is irc.server.com, running version UnrealIRCd-5.2.1
 	// 003: This server was created [data]

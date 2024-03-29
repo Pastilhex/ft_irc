@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/29 00:24:23 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/03/29 10:04:08 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,6 @@ void	Client::getClientLoginData(char* buffer, int bytesRead)
 	if (message.substr(0, 12) != "CAP LS 302\r\n")
 	{
 		setNick(message.substr(message.find("NICK ") + 17, message.find_first_of("\r\n")));
-		
 		std::cout << getNick() << std::endl;
 	}
 }

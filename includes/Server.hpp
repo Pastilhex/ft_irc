@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/29 00:11:10 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/03/29 10:12:11 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ public:
 	int					createSocket(void);
 	struct sockaddr_in 	createAddress(int port);
 	static bool			isValidPort(char *str);
-	std::string				getAddressInfo(void);
+	std::string			getAddressIP(void);
 	bool				start(char* str);
 	bool				bindSocket(const int& serverSocket, const struct sockaddr_in& serverAddress);
 	bool				run(void);
