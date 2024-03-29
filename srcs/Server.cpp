@@ -3,14 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: luiza < lpicoli-@student.42porto.com>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/29 14:08:47 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/03/29 20:12:37 by luiza            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
+
+void ft_print(std::string str)
+{
+	std::cout << str << std::endl;
+}
 
 /**
  * @brief Obtém o descritor de arquivo do socket do servidor.
@@ -44,6 +49,11 @@ struct sockaddr_in Server::getAddress(void)
 std::string Server::getPassword(void)
 {
 	return this->_password;
+}
+
+std::map<std::string, Channel> Server::getChannels(void)
+{
+	return this->_channels;
 }
 
 /**
@@ -302,21 +312,49 @@ void	Server::connectToClient(const int& serverSocket)
 
 					std::string message(buffer, bytesRead);
 					client.getClientLoginData(buffer, bytesRead);
+
 					if (message.find("LIST") != std::string::npos)
 					{
-						std::string channel1 = ":localhost 322 pastilhex #canal2 13 :Canal 42\r\n";
-						send(fds[i].fd, channel1.c_str(), channel1.size(), 0);
+						//std::string channel1 = ":localhost 322 pastilhex #canal2 13 :Canal 42\r\n";
+						//send(fds[i].fd, channel1.c_str(), channel1.size(), 0);
+						
+						ft_print("entrou no list");
+						 for (std::map<std::string, Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+						{
+							// 'it->first' é a chave (nome do canal)
+							// 'it->second' é o valor (objeto Channel)
+
+							std::string channel_name = it->first;
+							 size_t pos = channel_name.find('\n');
+    						if (pos != std::string::npos) {
+								channel_name.erase(pos, 1);
+							}
+							
+							std::string channel = ":localhost 322 pastilhex #" + channel_name + " 13 :Description here\r\n";
+							send(fds[i].fd, channel.c_str(), channel.size(), 0);
+							ft_print(channel_name);
+						}
+						
 						//std::string endOfList = ":localhost 323 seu_nick :End of /LIST\r\n";
 					}
 					else if (message.find("JOIN") != std::string::npos)
 					{
-						std::string channelJoin = ":pastilhex JOIN #canal2\r\n";
-						send(fds[i].fd, channelJoin.c_str(), channelJoin.size(), 0);
-						// std::string topicMessage = ":localhost 332 pastilhex #canal2 :Descrição do Canal 2\r\n";
-    					// send(fds[i].fd, topicMessage.c_str(), topicMessage.size(), 0);
-						// std::string modeCommand = "MODE #canal2 +nt\r\n";
-						// send(fds[i].fd, modeCommand.c_str(), modeCommand.size(), 0);
-					}
+						size_t pos_cmd = message.find("JOIN");
+						if (pos_cmd != std::string::npos) {
+
+							size_t pos_channel = message.find_first_not_of(" \n\r\t", pos_cmd + 4); 
+							
+							std::string channel_name = message.substr(pos_channel + 1);
+							if(!(message[pos_channel] == '#' || (message[pos_channel] == '&')))
+								ft_print("Not a valid channel name, try with '#' or '&'");
+							if(message[pos_channel] == '#')
+								_channels.insert(std::make_pair(channel_name, Channel(channel_name, false)));
+							else if(message[pos_channel] == '&')
+								_channels.insert(std::make_pair(channel_name, Channel(channel_name, true)));
+							ft_print("Channel joined: ");
+							ft_print(channel_name);
+						}	
+       				}
 					else
 					{
 						std::cout << "Dados recebidos do cliente: " << std::string(buffer, bytesRead) << std::endl;
@@ -334,6 +372,8 @@ void	Server::connectToClient(const int& serverSocket)
 	}
 	close(serverSocket);
 }
+
+
 
 /**
  * @brief Executa o servidor.

@@ -12,6 +12,13 @@
 
 #include "../includes/ircserv.hpp"
 
+
+Channel::Channel(std::string name, bool isPrivate)
+{
+    this->_name = name;
+    this->_isPrivate = isPrivate;
+}
+
 /**
  * @brief Get the name of the channel.
  *
@@ -69,7 +76,7 @@ bool Channel::getModeTopic(void)
  */
 bool Channel::getModePrivateAccess(void)
 {
-    return this->_modePrivateAccess;
+    return this->_isPrivate;
 }
 
 /**
@@ -120,5 +127,5 @@ void Channel::setModeTopic(bool mode)
  */
 void Channel::setModePrivateAccess(bool mode)
 {
-    this->_modePrivateAccess = mode;	
+    this->_isPrivate = mode;	
 }
