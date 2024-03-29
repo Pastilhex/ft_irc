@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: luiza < lpicoli-@student.42porto.com>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/29 14:08:47 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/03/29 20:12:37 by luiza            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -317,17 +317,22 @@ void	Server::connectToClient(const int& serverSocket)
 					{
 						//std::string channel1 = ":localhost 322 pastilhex #canal2 13 :Canal 42\r\n";
 						//send(fds[i].fd, channel1.c_str(), channel1.size(), 0);
-
+						
+						ft_print("entrou no list");
 						 for (std::map<std::string, Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it)
 						{
 							// 'it->first' é a chave (nome do canal)
 							// 'it->second' é o valor (objeto Channel)
 
 							std::string channel_name = it->first;
-							std::string channel = ":localhost 322 pastilhex #channel_name 13 :Description here\r\n";
+							 size_t pos = channel_name.find('\n');
+    						if (pos != std::string::npos) {
+								channel_name.erase(pos, 1);
+							}
+							
+							std::string channel = ":localhost 322 pastilhex #" + channel_name + " 13 :Description here\r\n";
 							send(fds[i].fd, channel.c_str(), channel.size(), 0);
-							ft_print(channel);
-							ft_print(it->first);
+							ft_print(channel_name);
 						}
 						
 						//std::string endOfList = ":localhost 323 seu_nick :End of /LIST\r\n";
