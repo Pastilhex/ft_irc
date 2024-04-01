@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: luiza < lpicoli-@student.42porto.com>      +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/29 20:12:37 by luiza            ###   ########.fr       */
+/*   Updated: 2024/04/01 12:32:24 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -254,7 +254,7 @@ bool Server::checkConnections(const int& serverSocket)
 void	Server::connectToClient(const int& serverSocket)
 {
 	Client	client;
-	bool	welcomeMessage = false;
+	//bool	welcomeMessage = false;
 	struct sockaddr_in clientAddress;
 	socklen_t clientAddressSize = sizeof(clientAddress);
 
@@ -274,8 +274,11 @@ void	Server::connectToClient(const int& serverSocket)
 			std::cerr << "Erro ao chamar poll()." << std::endl;
 			break;
 		}
+
+		// verifica se a ligação estabelicida através do poll() é para o server(novo client) ou para um client(client já conectado)
 		if (fds[0].revents & POLLIN)
 		{
+			// aceita a nova ligação estabelecida com o server
 			int clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressSize);
 			if (clientSocket == -1)
 			{
@@ -283,13 +286,30 @@ void	Server::connectToClient(const int& serverSocket)
 				close(serverSocket);
 				return ;
 			}
+			
+			// declaração de um novo client (struct do tipo pollfd)
 			pollfd clientPoll;
 			clientPoll.fd = clientSocket;
 			clientPoll.events = POLLIN;
 			clientPoll.revents = 0;
+
+			// adicionamos o novo client ao vector<pollfd>
 			fds.push_back(clientPoll);
-			
+
+			// guardar msg recebida num buffer
+			char buffer[1024];
+			int bytesRead = recv(clientPoll.fd, buffer, sizeof(buffer), 0);
+			std::string message(buffer, bytesRead);
+
+			// processar os dados do novo host/client
+			client.getClientLoginData(buffer, bytesRead);
+
+			// se os dados foram processados com sucesso, enviar msg de boas vindas ao servidor
+			if (!client.getNick().empty() && !client.getUsername().empty())
+				sendWelcome(clientPoll.fd, client);
 		}
+
+		// verifica dentro do vector<pollfd> qual dos clients vai tratar dos dados
 		for (size_t i = 1; i < fds.size(); ++i)
 		{
 			if (fds[i].revents & POLLIN)
@@ -309,10 +329,7 @@ void	Server::connectToClient(const int& serverSocket)
 				}
 				else
 				{
-
 					std::string message(buffer, bytesRead);
-					client.getClientLoginData(buffer, bytesRead);
-
 					if (message.find("LIST") != std::string::npos)
 					{
 						//std::string channel1 = ":localhost 322 pastilhex #canal2 13 :Canal 42\r\n";
@@ -360,12 +377,6 @@ void	Server::connectToClient(const int& serverSocket)
 						std::cout << "Dados recebidos do cliente: " << std::string(buffer, bytesRead) << std::endl;
 					}
 
-					std::string tmpNick = client.getNick(), tmpUser = client.getUsername();
-					if (!tmpNick.empty() && !tmpUser.empty() && welcomeMessage == false)
-					{
-						sendWelcome(fds[i].fd, client);
-						welcomeMessage = true;
-					}
 				}
 			}
 		}
