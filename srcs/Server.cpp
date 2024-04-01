@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/01 17:02:15 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/01 22:52:21 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -263,7 +263,7 @@ bool Server::checkConnections(const int& serverSocket)
 
 void	Server::connectClient(const int& serverSocket)
 {
-	Client client; 
+	Client client;
 	struct sockaddr_in clientAddress;
 
 	pollfd	serverPoll;
@@ -342,24 +342,15 @@ void	Server::isNewClient(std::vector<pollfd>& fds, const int& serverSocket, stru
 
 		// guardar msg recebida num buffer
 		char buffer[2048];
-		int bytesRead = recv(clientPoll.fd, buffer, sizeof(buffer), 0);
-		std::string message(buffer, bytesRead);
+		while (client.getNick().empty() && client.getUsername().empty())
+		{
+			int bytesRead = recv(clientPoll.fd, buffer, sizeof(buffer), 0);
+			std::string message(buffer, bytesRead);
+			client.getClientLoginData(buffer, bytesRead);
+		}
 
-		// processar os dados do novo host/client
-		client.getClientLoginData(buffer, bytesRead);
-
-		// se os dados foram processados com sucesso, enviar msg de boas vindas ao servidor
 		if (!client.getNick().empty() && !client.getUsername().empty())
 			sendWelcome(clientPoll.fd, client);
-		else
-		{
-			bytesRead = recv(clientPoll.fd, buffer, sizeof(buffer), 0);
-			std::string missing(buffer, bytesRead);
-			client.getClientLoginData(buffer, bytesRead);
-
-			if (!client.getNick().empty() && !client.getUsername().empty())
-				sendWelcome(clientPoll.fd, client);
-		}
 	}
 }
 
@@ -403,8 +394,25 @@ void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, 
 
 			if(!(message[pos_channel] == '#' || (message[pos_channel] == '&')))
 				ft_print("Not a valid channel name, try with '#' or '&'");
+			
 			if(message[pos_channel] == '#' || message[pos_channel] == '&')
-				setChannel(channel_name, true);
+			{
+				std::map<std::string, Channel>& channels = getChannels();
+				std::map<std::string, Channel>::iterator it = channels.find(channel_name);
+				if (it == channels.end())
+				{
+					bool state = (message[pos_channel] == '#') ? false : true;
+					Channel channel = Channel(channel_name, state);
+					channel.setNewUser(client);
+					_channels.insert(std::make_pair(channel_name, channel));
+				}
+				else
+				{
+					Channel channel = it->second;
+					channel.setNewUser(client);
+				// setChannel(channel_name, true);
+				}
+			}
 
 			cmd_JOIN(fds[i].fd, client, channel_name);
 
@@ -422,7 +430,6 @@ void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, 
 		// char buffer[2048];
 		// int bytesRead = recv(fds[i].fd, buffer, sizeof(buffer), 0);
 		std::string message(buffer, bytesRead);
-	
 		std::string channel_name = message.substr(4, message.find("\r", 4) - 4);
 	
 		std::map<std::string, Channel>& channels = getChannels();
@@ -451,7 +458,7 @@ void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, 
 	}
 	else
 	{
-		std::cout << "Os dados recebidos do cliente não foram processados: " << std::string(buffer, bytesRead) << std::endl;
+		std::cout << "Os dados recebidos do cliente não processados: " << std::string(buffer, bytesRead) << std::endl;
 	}
 }
 

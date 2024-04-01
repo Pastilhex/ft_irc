@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:41:57 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/01 16:41:14 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/01 22:32:28 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,4 +139,9 @@ void Channel::setModeTopic(bool mode)
 void Channel::setModePrivateAccess(bool mode)
 {
     this->_isPrivate = mode;	
+}
+
+void	Channel::setNewUser(Client client)
+{
+	this->_clients.push_back(std::make_pair(client.getNick(), client));
 }

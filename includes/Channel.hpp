@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/01 16:41:17 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/01 22:23:00 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ public:
 	void			setUserMode(std::string usermode);
 	void			setModeTopic(bool mode);
 	void			setModePrivateAccess(bool mode);
+	void			setNewUser(Client client);
 };
 
 #endif
