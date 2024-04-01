@@ -6,11 +6,16 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/01 12:32:24 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/01 17:02:15 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
+
+Server::Server(std::string password)
+{
+	this->_password = password;
+}
 
 void ft_print(std::string str)
 {
@@ -51,9 +56,14 @@ std::string Server::getPassword(void)
 	return this->_password;
 }
 
-std::map<std::string, Channel> Server::getChannels(void)
+std::map<std::string, Channel>& Server::getChannels(void)
 {
 	return this->_channels;
+}
+
+void Server::setChannel(std::string channel_name, bool state)
+{
+	_channels.insert(std::make_pair(channel_name, Channel(channel_name, state)));
 }
 
 /**
@@ -251,12 +261,10 @@ bool Server::checkConnections(const int& serverSocket)
 	return true;
 }
 
-void	Server::connectToClient(const int& serverSocket)
+void	Server::connectClient(const int& serverSocket)
 {
-	Client	client;
-	//bool	welcomeMessage = false;
+	Client client; 
 	struct sockaddr_in clientAddress;
-	socklen_t clientAddressSize = sizeof(clientAddress);
 
 	pollfd	serverPoll;
 	serverPoll.fd = serverSocket;
@@ -267,7 +275,7 @@ void	Server::connectToClient(const int& serverSocket)
 	fds.push_back(serverPoll);
 	while (true)
 	{
-		
+
 		int activity = poll(fds.data(), fds.size(), -1);
 		if (activity == -1)
 		{
@@ -275,46 +283,16 @@ void	Server::connectToClient(const int& serverSocket)
 			break;
 		}
 
-		// verifica se a ligação estabelicida através do poll() é para o server(novo client) ou para um client(client já conectado)
-		if (fds[0].revents & POLLIN)
-		{
-			// aceita a nova ligação estabelecida com o server
-			int clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressSize);
-			if (clientSocket == -1)
-			{
-				 std::cerr << "Erro ao aceitar conexão do cliente." << std::endl;
-				close(serverSocket);
-				return ;
-			}
-			
-			// declaração de um novo client (struct do tipo pollfd)
-			pollfd clientPoll;
-			clientPoll.fd = clientSocket;
-			clientPoll.events = POLLIN;
-			clientPoll.revents = 0;
-
-			// adicionamos o novo client ao vector<pollfd>
-			fds.push_back(clientPoll);
-
-			// guardar msg recebida num buffer
-			char buffer[1024];
-			int bytesRead = recv(clientPoll.fd, buffer, sizeof(buffer), 0);
-			std::string message(buffer, bytesRead);
-
-			// processar os dados do novo host/client
-			client.getClientLoginData(buffer, bytesRead);
-
-			// se os dados foram processados com sucesso, enviar msg de boas vindas ao servidor
-			if (!client.getNick().empty() && !client.getUsername().empty())
-				sendWelcome(clientPoll.fd, client);
-		}
+		// Verifica se é um novo client
+		isNewClient(fds, serverSocket, clientAddress, client);
 
 		// verifica dentro do vector<pollfd> qual dos clients vai tratar dos dados
 		for (size_t i = 1; i < fds.size(); ++i)
 		{
 			if (fds[i].revents & POLLIN)
 			{
-				char buffer[1024];
+				
+				char buffer[2048];
 				int bytesRead = recv(fds[i].fd, buffer, sizeof(buffer), 0);
 				if (bytesRead == -1)
 				{
@@ -329,54 +307,7 @@ void	Server::connectToClient(const int& serverSocket)
 				}
 				else
 				{
-					std::string message(buffer, bytesRead);
-					if (message.find("LIST") != std::string::npos)
-					{
-						//std::string channel1 = ":localhost 322 pastilhex #canal2 13 :Canal 42\r\n";
-						//send(fds[i].fd, channel1.c_str(), channel1.size(), 0);
-						
-						ft_print("entrou no list");
-						 for (std::map<std::string, Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it)
-						{
-							// 'it->first' é a chave (nome do canal)
-							// 'it->second' é o valor (objeto Channel)
-
-							std::string channel_name = it->first;
-							 size_t pos = channel_name.find('\n');
-    						if (pos != std::string::npos) {
-								channel_name.erase(pos, 1);
-							}
-							
-							std::string channel = ":localhost 322 pastilhex #" + channel_name + " 13 :Description here\r\n";
-							send(fds[i].fd, channel.c_str(), channel.size(), 0);
-							ft_print(channel_name);
-						}
-						
-						//std::string endOfList = ":localhost 323 seu_nick :End of /LIST\r\n";
-					}
-					else if (message.find("JOIN") != std::string::npos)
-					{
-						size_t pos_cmd = message.find("JOIN");
-						if (pos_cmd != std::string::npos) {
-
-							size_t pos_channel = message.find_first_not_of(" \n\r\t", pos_cmd + 4); 
-							
-							std::string channel_name = message.substr(pos_channel + 1);
-							if(!(message[pos_channel] == '#' || (message[pos_channel] == '&')))
-								ft_print("Not a valid channel name, try with '#' or '&'");
-							if(message[pos_channel] == '#')
-								_channels.insert(std::make_pair(channel_name, Channel(channel_name, false)));
-							else if(message[pos_channel] == '&')
-								_channels.insert(std::make_pair(channel_name, Channel(channel_name, true)));
-							ft_print("Channel joined: ");
-							ft_print(channel_name);
-						}	
-       				}
-					else
-					{
-						std::cout << "Dados recebidos do cliente: " << std::string(buffer, bytesRead) << std::endl;
-					}
-
+					processMsg(client, fds, buffer, bytesRead, i);
 				}
 			}
 		}
@@ -384,6 +315,178 @@ void	Server::connectToClient(const int& serverSocket)
 	close(serverSocket);
 }
 
+void	Server::isNewClient(std::vector<pollfd>& fds, const int& serverSocket, struct sockaddr_in& clientAddress, Client& client)
+{
+	socklen_t	clientAddressSize = sizeof(clientAddress);
+
+	// verifica se a ligação estabelicida através do poll() é para o server(novo client) ou para um client(client já conectado)
+	if (fds[0].revents & POLLIN)
+	{
+		// aceita a nova ligação estabelecida com o server
+		int clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressSize);
+		if (clientSocket == -1)
+		{
+			std::cerr << "Erro ao aceitar conexão do cliente." << std::endl;
+			close(serverSocket);
+			return ;
+		}
+		
+		// declaração de um novo client_fd (struct do tipo pollfd)
+		pollfd clientPoll;
+		clientPoll.fd = clientSocket;
+		clientPoll.events = POLLIN;
+		clientPoll.revents = 0;
+
+		// adicionamos o novo client_fd ao vector<pollfd>
+		fds.push_back(clientPoll);
+
+		// guardar msg recebida num buffer
+		char buffer[2048];
+		int bytesRead = recv(clientPoll.fd, buffer, sizeof(buffer), 0);
+		std::string message(buffer, bytesRead);
+
+		// processar os dados do novo host/client
+		client.getClientLoginData(buffer, bytesRead);
+
+		// se os dados foram processados com sucesso, enviar msg de boas vindas ao servidor
+		if (!client.getNick().empty() && !client.getUsername().empty())
+			sendWelcome(clientPoll.fd, client);
+		else
+		{
+			bytesRead = recv(clientPoll.fd, buffer, sizeof(buffer), 0);
+			std::string missing(buffer, bytesRead);
+			client.getClientLoginData(buffer, bytesRead);
+
+			if (!client.getNick().empty() && !client.getUsername().empty())
+				sendWelcome(clientPoll.fd, client);
+		}
+	}
+}
+
+void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, int bytesRead, int i)
+{
+	// std::map<std::string, Channel>& listChannels = getChannels();
+	std::string message(buffer, bytesRead);
+
+	if (message.find("LIST") != std::string::npos)
+	{
+
+		//std::string channel1 = ":localhost 322 pastilhex #canal2 13 :Canal 42\r\n";
+		//send(fds[i].fd, channel1.c_str(), channel1.size(), 0);
+
+		ft_print("entrou no list");
+		for (std::map<std::string, Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+		{
+			// 'it->first' é a chave (nome do canal)
+			// 'it->second' é o valor (objeto Channel)
+
+			std::string channel_name = it->first;
+				size_t pos = channel_name.find('\n');
+			if (pos != std::string::npos) {
+				channel_name.erase(pos, 1);
+			}
+			
+			std::string channel = ":localhost 322 pastilhex #" + channel_name + " 13 :Description here\r\n";
+			send(fds[i].fd, channel.c_str(), channel.size(), 0);
+			ft_print(channel_name);
+		}
+		
+		//std::string endOfList = ":localhost 323 seu_nick :End of /LIST\r\n";
+	}
+	else if (message.find("JOIN") != std::string::npos)
+	{
+		size_t pos_cmd = message.find("JOIN");
+		if (pos_cmd != std::string::npos)
+		{
+			size_t pos_channel = message.find_first_not_of(" \n\r\t", pos_cmd + 4); 
+			std::string channel_name = message.substr(pos_channel + 1, message.find("\r", pos_channel + 1) - (pos_channel + 1));
+
+			if(!(message[pos_channel] == '#' || (message[pos_channel] == '&')))
+				ft_print("Not a valid channel name, try with '#' or '&'");
+			if(message[pos_channel] == '#' || message[pos_channel] == '&')
+				setChannel(channel_name, true);
+
+			cmd_JOIN(fds[i].fd, client, channel_name);
+
+			ft_print("Channel joined: ");
+			ft_print(channel_name);
+		}
+	}
+	else if (message.find("WHO") != std::string::npos)
+	{
+		// :irc.server.com 352 user1 #42Porto ~user1 host1 irc.server.com user1 H :0 real name1
+		// :irc.server.com 352 user2 #42Porto ~user2 host2 irc.server.com user2 H :0 real name2
+		// :irc.server.com 352 user3 #42Porto ~user3 host3 irc.server.com user3 H :0 real name3
+		// :irc.server.com 315 user1 #42Porto :End of /WHO list.
+
+		// char buffer[2048];
+		// int bytesRead = recv(fds[i].fd, buffer, sizeof(buffer), 0);
+		std::string message(buffer, bytesRead);
+	
+		std::string channel_name = message.substr(4, message.find("\r", 4) - 4);
+	
+		std::map<std::string, Channel>& channels = getChannels();
+		std::map<std::string, Channel>::iterator it = channels.find(channel_name);
+		if (it != channels.end())
+		{
+			// Obtém a lista de usuários do canal
+			const std::vector<std::pair<std::string, Client> >& users = it->second.getUsers();
+			
+			// Itera sobre os usuários do canal
+			for (size_t i = 0; i < users.size(); ++i)
+			{
+				// Aqui você pode acessar cada par chave-valor no vetor de usuários do canal
+				// A chave do par é o nickname do usuário e o valor é o objeto Client associado
+				std::string nickname = users[i].first;
+				std::string whoMsg = ":" + getHostname() + " 352 " + client.getNick() + " " + channel_name + " " + nickname + " " + "clientHost" + " "  + getHostname() + " " + nickname + " H :0 real name1";
+				std::cout << whoMsg << std::endl;
+				if (send(fds[i].fd, whoMsg.c_str(), whoMsg.length(), 0) == -1)
+				{
+					std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
+				}
+			}
+			// :irc.server.com 315 user1 #42Porto :End of /WHO list.
+		
+		}
+	}
+	else
+	{
+		std::cout << "Os dados recebidos do cliente não foram processados: " << std::string(buffer, bytesRead) << std::endl;
+	}
+}
+
+void Server::cmd_JOIN(int clientSocket, Client &client, std::string channel_name)
+{
+	// (void) client;
+	// Acede à lista de canais
+	std::map<std::string, Channel>&	channels = getChannels();
+
+	std::map<std::string, Channel>::iterator it = channels.find(channel_name);
+	if (it != channels.end())
+	{
+		// Acede ao canal com o nome [channel_name]
+		Channel& channel = it->second;
+
+		// Contabiliza o número de utilizadores presentes no canal
+		//int users = channel.getNbrUsers();
+
+		// Acede ao tópico do canal escolhido
+		std::string topic = channel.getTopic();
+
+		// Cria a msg a enviar ao Client
+		std::string joinMsg = ":" + client.getNick() + " JOIN " + channel_name + "\r\n";
+		// std::string joinMsg = ":pastilhex JOIN #canal2\r\n";
+		std::cout << joinMsg << std::endl;
+		if (send(clientSocket, joinMsg.c_str(), joinMsg.length(), 0) == -1)
+		{
+			std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
+		}
+	}
+	else
+	{
+		std::cout << "Canal não encontrado" << std::endl;
+	}
+}
 
 
 /**
@@ -400,8 +503,52 @@ bool Server::run(void)
 	{
 		createHostname();
         std::cout << "Endereço IP do servidor: " + getAddressIP() << std::endl;
-		connectToClient(getSocket());
+		connectClient(getSocket());
 		return true;
 	}
 	return false;
+}
+
+/**
+ * @brief Envia uma mensagem de boas-vindas para o cliente.
+ *
+ * Esta função envia uma mensagem de boas-vindas para o cliente conectado ao servidor.
+ * A mensagem contém informações sobre o servidor e uma saudação ao cliente.
+ *
+ * @param clientSocket O descritor de arquivo do socket do cliente.
+ */
+void	Server::sendWelcome(int clientSocket, Client &client)
+{
+    std::string welcome = ":localhost 001 pastilhex :Welcome to the Internet Relay Network, " + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + "!" + getAddressIP() + "\r\n";
+	welcome += ":localhost 002 pastilhex :Your host is " + getHostname() + ", running version FT_IRC_42Porto_v1.0\r\n";
+	welcome += ":localhost 003 pastilhex :This server was created " + getCurrentDateTime() + "\r\n";
+	
+	// 001: Welcome to the Internet Relay Network, [seu_nick]!user@host
+	// 002: Your host is irc.server.com, running version UnrealIRCd-5.2.1
+	// 003: This server was created [data]
+	// 004: irc.server.com UnrealIRCd-5.2.1 [modos de servidor suportados]
+	// 005: [lista de recursos suportados pelo servidor]
+	// 375: - irc.server.com Message of the Day -
+	// 375: Welcome to irc.server.com, the best IRC network out there!
+	// 375: Rules: No spamming, no flooding, be respectful to others.
+	// 376: End of /MOTD command.
+
+	// * Connected. Now logging in.
+	// * *** Looking up your ident...
+	// * *** Looking up your hostname...
+	// * *** Could not resolve your hostname: Domain not found; using your IP address (188.250.216.53) instead.
+	// * Capabilities supported: inspircd.org/poison inspircd.org/standard-replies multi-prefix setname userhost-in-names 
+	// * Capabilities requested: multi-prefix setname userhost-in-names 
+	// * *** If you are having problems connecting due to registration timeouts type /quote PONG xaAJQBRIW~ or /raw PONG xaAJQBRIW~ now.
+	// * Capabilities acknowledged: multi-prefix setname userhost-in-names
+	// * *** Ident lookup timed out, using ~ivo instead.
+
+	// * Welcome to the ChatJunkies IRC Network pastilhex!~ivo@188.250.216.53
+	// * Your host is chatjunkies.org, running version InspIRCd-3
+	// * This server was created 19:20:48 Jun 16 2023
+	
+	if (send(clientSocket, welcome.c_str(), welcome.length(), 0) == -1)
+	{
+		std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
+	}
 }

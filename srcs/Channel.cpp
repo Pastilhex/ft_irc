@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:41:57 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/29 11:49:07 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/01 16:41:14 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,17 @@ Channel::Channel(std::string name, bool isPrivate)
     this->_name = name;
     this->_isPrivate = isPrivate;
 }
+
+int Channel::getNbrUsers(void)
+{
+	return this->_clients.size();
+}
+
+const std::vector<std::pair<std::string, Client> > Channel::getUsers(void)
+{
+	return this->_clients;
+}
+
 
 /**
  * @brief Get the name of the channel.

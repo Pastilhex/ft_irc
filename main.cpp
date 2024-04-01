@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/23 17:28:47 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/26 23:04:15 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/01 14:19:04 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int main(int argc, char* argv[])
 {
-	Server	server;
+	Server	server("pass");
 
 	if (argc == 3)
 	{

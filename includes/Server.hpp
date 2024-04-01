@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/03/29 13:52:22 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/01 16:02:23 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,17 +27,21 @@ private:
 	std::map<std::string, Channel> _channels; // <"Canal42":"objeto_canal"
 
 public:
+	/* Constructors*/
+	Server(std::string password);
+
 	/* Getters */
-	int getSocket(void);
-	struct sockaddr_in getAddress(void);
-	std::string getHostname(void);
-	std::string getPassword(void);
-	std::map<std::string, Channel> getChannels(void);
+	int 							getSocket(void);
+	struct sockaddr_in 				getAddress(void);
+	std::string 					getHostname(void);
+	std::string 					getPassword(void);
+	std::map<std::string, Channel>&	getChannels(void);
 
 	/* Setters */
-	void setSocket(int newSocket);
-	void setAddress(struct sockaddr_in newAddress);
-	void setHostname(std::string hostname);
+	void 	setSocket(int newSocket);
+	void 	setAddress(struct sockaddr_in newAddress);
+	void 	setHostname(std::string hostname);
+	void	setChannel(std::string, bool);
 
 	/* Methods */
 	void 				createHostname(void);
@@ -49,9 +53,11 @@ public:
 	bool				bindSocket(const int& serverSocket, const struct sockaddr_in& serverAddress);
 	bool				run(void);
 	bool				checkConnections(const int& serverSocket);
-	void				connectToClient(const int& serverSocket);
+	void				connectClient(const int& serverSocket);
 	void				sendWelcome(int clientSocket, Client& client);
-
+	void				isNewClient(std::vector<pollfd>& fds, const int& serverSocket, struct sockaddr_in& clientAddress, Client& client);
+	void				processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, int bytesRead, int i);
+	void				cmd_JOIN(int clientSocket, Client &client, std::string channel_name);
 };
 
 
