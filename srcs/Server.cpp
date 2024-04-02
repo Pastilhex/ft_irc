@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/01 22:52:21 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/02 07:49:12 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -292,7 +292,7 @@ void	Server::connectClient(const int& serverSocket)
 			if (fds[i].revents & POLLIN)
 			{
 				
-				char buffer[2048];
+				char buffer[1024];
 				int bytesRead = recv(fds[i].fd, buffer, sizeof(buffer), 0);
 				if (bytesRead == -1)
 				{
@@ -341,7 +341,7 @@ void	Server::isNewClient(std::vector<pollfd>& fds, const int& serverSocket, stru
 		fds.push_back(clientPoll);
 
 		// guardar msg recebida num buffer
-		char buffer[2048];
+		char buffer[1024];
 		while (client.getNick().empty() && client.getUsername().empty())
 		{
 			int bytesRead = recv(clientPoll.fd, buffer, sizeof(buffer), 0);
@@ -415,9 +415,8 @@ void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, 
 			}
 
 			cmd_JOIN(fds[i].fd, client, channel_name);
+			fds[i].revents = 0;
 
-			ft_print("Channel joined: ");
-			ft_print(channel_name);
 		}
 	}
 	else if (message.find("WHO") != std::string::npos)
@@ -427,10 +426,10 @@ void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, 
 		// :irc.server.com 352 user3 #42Porto ~user3 host3 irc.server.com user3 H :0 real name3
 		// :irc.server.com 315 user1 #42Porto :End of /WHO list.
 
-		// char buffer[2048];
+		// char buffer[1024];
 		// int bytesRead = recv(fds[i].fd, buffer, sizeof(buffer), 0);
-		std::string message(buffer, bytesRead);
-		std::string channel_name = message.substr(4, message.find("\r", 4) - 4);
+		// std::string message(buffer, bytesRead);
+		std::string channel_name = message.substr(message.find("WHO ") + 4, message.find("\r", message.find("WHO ") + 4) - 4);
 	
 		std::map<std::string, Channel>& channels = getChannels();
 		std::map<std::string, Channel>::iterator it = channels.find(channel_name);
@@ -440,12 +439,13 @@ void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, 
 			const std::vector<std::pair<std::string, Client> >& users = it->second.getUsers();
 			
 			// Itera sobre os usuários do canal
-			for (size_t i = 0; i < users.size(); ++i)
+			for (size_t j = 0; j < users.size(); ++j)
 			{
 				// Aqui você pode acessar cada par chave-valor no vetor de usuários do canal
 				// A chave do par é o nickname do usuário e o valor é o objeto Client associado
-				std::string nickname = users[i].first;
-				std::string whoMsg = ":" + getHostname() + " 352 " + client.getNick() + " " + channel_name + " " + nickname + " " + "clientHost" + " "  + getHostname() + " " + nickname + " H :0 real name1";
+				std::string nickname = users[j].first;
+				// std::string whoMsg = ":" + getHostname() + " 353 " + nickname + " #" + channel_name + " ~" + nickname + " " + "clientHost" + " "  + getHostname() + " " + nickname + " H :0 real name1\r\n";
+				std::string whoMsg = ":localhost 353 pastilhex = #42Porto :@pastilhex\r\n:localhost 315 pastilhex #42Porto :End of /WHO list.";
 				std::cout << whoMsg << std::endl;
 				if (send(fds[i].fd, whoMsg.c_str(), whoMsg.length(), 0) == -1)
 				{
@@ -453,7 +453,7 @@ void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, 
 				}
 			}
 			// :irc.server.com 315 user1 #42Porto :End of /WHO list.
-		
+			fds[i].revents = 0;
 		}
 	}
 	else
