@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/02 07:49:12 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/02 15:33:01 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -356,16 +356,10 @@ void	Server::isNewClient(std::vector<pollfd>& fds, const int& serverSocket, stru
 
 void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, int bytesRead, int i)
 {
-	// std::map<std::string, Channel>& listChannels = getChannels();
 	std::string message(buffer, bytesRead);
 
 	if (message.find("LIST") != std::string::npos)
 	{
-
-		//std::string channel1 = ":localhost 322 pastilhex #canal2 13 :Canal 42\r\n";
-		//send(fds[i].fd, channel1.c_str(), channel1.size(), 0);
-
-		ft_print("entrou no list");
 		for (std::map<std::string, Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it)
 		{
 			// 'it->first' é a chave (nome do canal)
@@ -381,10 +375,8 @@ void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, 
 			send(fds[i].fd, channel.c_str(), channel.size(), 0);
 			ft_print(channel_name);
 		}
-		
-		//std::string endOfList = ":localhost 323 seu_nick :End of /LIST\r\n";
 	}
-	else if (message.find("JOIN") != std::string::npos)
+	if (message.find("JOIN") != std::string::npos)
 	{
 		size_t pos_cmd = message.find("JOIN");
 		if (pos_cmd != std::string::npos)
@@ -419,40 +411,28 @@ void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, 
 
 		}
 	}
-	else if (message.find("WHO") != std::string::npos)
+	if (message.find("WHO") != std::string::npos)
 	{
-		// :irc.server.com 352 user1 #42Porto ~user1 host1 irc.server.com user1 H :0 real name1
-		// :irc.server.com 352 user2 #42Porto ~user2 host2 irc.server.com user2 H :0 real name2
-		// :irc.server.com 352 user3 #42Porto ~user3 host3 irc.server.com user3 H :0 real name3
-		// :irc.server.com 315 user1 #42Porto :End of /WHO list.
-
-		// char buffer[1024];
-		// int bytesRead = recv(fds[i].fd, buffer, sizeof(buffer), 0);
-		// std::string message(buffer, bytesRead);
 		std::string channel_name = message.substr(message.find("WHO ") + 4, message.find("\r", message.find("WHO ") + 4) - 4);
-	
 		std::map<std::string, Channel>& channels = getChannels();
 		std::map<std::string, Channel>::iterator it = channels.find(channel_name);
 		if (it != channels.end())
 		{
-			// Obtém a lista de usuários do canal
 			const std::vector<std::pair<std::string, Client> >& users = it->second.getUsers();
-			
-			// Itera sobre os usuários do canal
+			std::string whoMsg = ":" + getHostname() + " 353 " + client.getNick() + " = " + channel_name + " :";
 			for (size_t j = 0; j < users.size(); ++j)
 			{
-				// Aqui você pode acessar cada par chave-valor no vetor de usuários do canal
-				// A chave do par é o nickname do usuário e o valor é o objeto Client associado
 				std::string nickname = users[j].first;
-				// std::string whoMsg = ":" + getHostname() + " 353 " + nickname + " #" + channel_name + " ~" + nickname + " " + "clientHost" + " "  + getHostname() + " " + nickname + " H :0 real name1\r\n";
-				std::string whoMsg = ":localhost 353 pastilhex = #42Porto :@pastilhex\r\n:localhost 315 pastilhex #42Porto :End of /WHO list.";
-				std::cout << whoMsg << std::endl;
-				if (send(fds[i].fd, whoMsg.c_str(), whoMsg.length(), 0) == -1)
-				{
-					std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
-				}
+				whoMsg += nickname;
+				if (j + 1 < users.size())
+					whoMsg += " ";
 			}
-			// :irc.server.com 315 user1 #42Porto :End of /WHO list.
+			whoMsg += "\r\n:" + getHostname() + " 366 " + client.getNick() + " " + channel_name + " :End of Names list.\r\n";
+			std::cout << whoMsg << std::endl;
+			if (send(fds[i].fd, whoMsg.c_str(), whoMsg.length(), 0) == -1)
+			{
+				std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
+			}
 			fds[i].revents = 0;
 		}
 	}
