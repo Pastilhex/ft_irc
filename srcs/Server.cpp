@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/03 07:20:19 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/03 20:37:24 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -359,6 +359,11 @@ void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, 
 	std::string message(buffer, bytesRead);
 	std::cout << "<<: " << std::string(buffer, bytesRead) << std::endl;
 
+	if (message.find("MODE") != std::string::npos)
+	{
+		
+	}
+
 	if (message.find("LIST") != std::string::npos)
 	{
 		for (std::map<std::string, Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it)
@@ -374,104 +379,121 @@ void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, 
 			
 			std::string channel = ":localhost 322 pastilhex #" + channel_name + " 13 :Description here\r\n";
 			send(fds[i].fd, channel.c_str(), channel.size(), 0);
-			std::cout << ">>: " << std::endl;
+			std::cout << ">> " << std::endl;
 		}
 	}
 	
 	if (message.find("JOIN") != std::string::npos)
 	{
-		JOIN(fds[i].fd, client, message);
+		// JOIN(fds[i].fd, client, message);
+		size_t posCmd = message.find("JOIN");
+		if (posCmd != std::string::npos)
+		{
+			size_t posChannel = message.find_first_not_of(" \n\r\t", posCmd + 4); 
+			std::string channelName = message.substr(posChannel + 1, message.find("\r", posChannel + 1) - (posChannel + 1));
+
+			if(!(message[posChannel] == '#' || (message[posChannel] == '&')))
+				std::cout << ("Not a valid channel name, try with '#' or '&'") << std::endl;
+			
+			std::map<std::string, Channel>& channels = getChannels();		// Criar uma ligação com a lista de canais
+			std::map<std::string, Channel>::iterator it = channels.find(channelName);
+			if(message[posChannel] == '#' || message[posChannel] == '&')
+			{
+				if (it == channels.end())
+				{
+					bool state = (message[posChannel] == '#') ? false : true;
+					Channel channel = Channel(channelName, state);
+					channel.setNewUser(client);
+					channel.AddOperator(client.getNick());
+					_channels.insert(std::make_pair(channelName, channel));	// Fazer um setter para esta função
+				}
+				else
+				{
+					Channel channel = it->second;
+					channel.setNewUser(client);
+				}
+			}
+
+			std::map<std::string, Channel>::iterator newIt = channels.find(channelName);
+			if (newIt != channels.end())
+			{
+				// std::string joinMsg = ":pastilhex JOIN #canal2\r\n";
+				
+				Channel& channel = newIt->second;
+				std::string topic = channel.getTopic();
+				std::string joinMsg = ":" + client.getNick() + " JOIN " + message[posChannel] + channelName + " :" + topic + "\r\n";
+				std::cout << joinMsg << std::endl;
+				if (send(fds[i].fd, joinMsg.c_str(), joinMsg.length(), 0) == -1)
+				{
+					std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
+				}
+			}
+			else
+			{
+				std::cout << "Canal não encontrado" << std::endl;
+			}
+		}
 		fds[i].revents = 0;
 	}
 	
 	if (message.find("WHO") != std::string::npos)
 	{
-		std::size_t whoPos = message.find("WHO ") + 4;
-		std::string channel_name = message.substr(whoPos, message.find("\r", whoPos) - 4);
+
+		std::string channelName = message.substr(message.find("WHO") + 5, message.find("\r", message.find("WHO") + 5) - (message.find("WHO") + 5));
+
 		std::map<std::string, Channel>& channels = getChannels();
-		std::map<std::string, Channel>::iterator it = channels.find(channel_name);
+		std::map<std::string, Channel>::iterator it = channels.find(channelName);
+
+		bool channelPrivacy = it->second.getModePrivateAccess();
+		std::string privacy = (channelPrivacy) ? "@" : "#";
+
 		if (it != channels.end())
 		{
+			std::string whoMsg = ":" + getHostname() + " 353 " + client.getNick() + " = " + privacy + channelName + " :";
 			const std::map<std::string, Client>& users = it->second.getUsers();
-			std::string whoMsg = ":" + getHostname() + " 353 " + client.getNick() + " = " + channel_name + " :";
-			std::map<std::string, Client>::const_iterator user_it;
-			for (user_it = users.begin(); user_it != users.end(); ++user_it)
+			std::map<std::string, Client>::const_iterator user_it = users.begin();
+			while (user_it != users.end())
 			{
 				std::string nickname = user_it->first;
+				std::vector<std::string> opList = it->second.getOperators();
+				std::vector<std::string>::iterator op_it = opList.begin();
+				while (op_it != opList.end())
+				{
+					if (nickname.find(*op_it,1))
+					{
+						nickname = *op_it;
+						break; // Interrompe o loop assim que encontrar uma correspondência
+					}
+					++op_it;
+				}
 				whoMsg += nickname;
 				if (++user_it != users.end())
-				{
 					whoMsg += " ";
-					--user_it;
-				}
-				else
-				{
-					--user_it;
-				}
 			}
-			whoMsg += "\r\n:" + getHostname() + " 366 " + client.getNick() + " " + channel_name + " :End of Names list.\r\n";
-			std::cout << ">>: WHO " << whoMsg << std::endl;
+			whoMsg += "\r\n:" + getHostname() + " 366 " + client.getNick() + " " + privacy + channelName + " :End of Names list.\r\n";
+			std::cout << whoMsg << std::endl;
 			if (send(fds[i].fd, whoMsg.c_str(), whoMsg.length(), 0) == -1)
 			{
 				std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
 			}
 			fds[i].revents = 0;
 		}
+
+	}
+
+	if ((message.find("NICK") != std::string::npos) || (message.find("USER") != std::string::npos) || (message.find("PASS") != std::string::npos))
+	{
+		client.getClientLoginData(buffer, bytesRead);
 	}
 
 }
 
 void Server::JOIN(int clientSocket, Client &client, std::string message)
 {
-	size_t pos_cmd = message.find("JOIN");
-	if (pos_cmd != std::string::npos)
-	{
-		size_t pos_channel = message.find_first_not_of(" \n\r\t", pos_cmd + 4); 
-		std::string channel_name = message.substr(pos_channel + 1, message.find("\r", pos_channel + 1) - (pos_channel + 1));
-
-		if(!(message[pos_channel] == '#' || (message[pos_channel] == '&')))
-			std::cout << ("Not a valid channel name, try with '#' or '&'") << std::endl;
-		
-		if(message[pos_channel] == '#' || message[pos_channel] == '&')
-		{
-			std::map<std::string, Channel>& channels = getChannels();
-			std::map<std::string, Channel>::iterator it = channels.find(channel_name);
-			if (it == channels.end())
-			{
-				bool state = (message[pos_channel] == '#') ? false : true;
-				Channel channel = Channel(channel_name, state);
-				channel.setNewUser(client);
-				_channels.insert(std::make_pair(channel_name, channel));	// Fazer um setter para esta função
-				channel.AddOperator(client.getNick());						// Verificar pq não está a guardar o nick
-			}
-			else
-			{
-				Channel channel = it->second;
-				channel.setNewUser(client);
-			}
-		}
-
-		std::map<std::string, Channel>&	channels = getChannels();
-		std::map<std::string, Channel>::iterator it = channels.find(channel_name);
-		if (it != channels.end())
-		{
-			Channel& channel = it->second;
-			std::string topic = channel.getTopic();
-			std::string joinMsg = ":" + client.getNick() + " JOIN " + channel_name + "\r\n";
-			std::cout << ">>: JOIN " << joinMsg << std::endl;
-			if (send(clientSocket, joinMsg.c_str(), joinMsg.length(), 0) == -1)
-			{
-				std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
-			}
-		}
-		else
-		{
-			std::cout << "Canal não encontrado" << std::endl;
-		}
-
-	}
+	(void)clientSocket;
+	(void)client;
+	(void)message;
 }
-
 
 /**
  * @brief Executa o servidor.
@@ -493,6 +515,38 @@ bool Server::run(void)
 	return false;
 }
 
+std::string Server::getOpNick(std::string& channelName, std::string clientName)
+{
+	std::map<std::string, Channel>::iterator channelIt = _channels.find(channelName);
+	if (channelIt != _channels.end())
+	{
+		Channel& channel = channelIt->second;
+		for (size_t i = 0; i < channel.getOperators().size(); ++i)
+		{
+			size_t found = channel.getOperators()[i].find(clientName, 1);
+			if (found != std::string::npos)
+				return channel.getOperators()[i];
+		}
+	}
+	return "";
+}
+
+std::string Server::getClientNick(std::string& channelName, std::string& clientName)
+{
+	std::map<std::string, Channel>::iterator channelIt = _channels.find(channelName);
+	if (channelIt != _channels.end())
+	{
+		Channel& channel = channelIt->second;
+		std::map<std::string, Client>::iterator clientIt = channel.getUsers().find(clientName);
+		if (clientIt != channel.getUsers().end())
+		{
+			Client& client = clientIt->second;
+			return client.getNick();
+		}
+	}
+	return "";
+}
+
 /**
  * @brief Envia uma mensagem de boas-vindas para o cliente.
  *
@@ -506,6 +560,17 @@ void	Server::sendWelcome(int clientSocket, Client &client)
     std::string welcome = ":localhost 001 pastilhex :Welcome to the Internet Relay Network, " + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + "!" + getAddressIP() + "\r\n";
 	welcome += ":localhost 002 pastilhex :Your host is " + getHostname() + ", running version FT_IRC_42Porto_v1.0\r\n";
 	welcome += ":localhost 003 pastilhex :This server was created " + getCurrentDateTime() + "\r\n";
+	welcome += ":localhost 372 pastilhex :███████╗████████╗    ██╗██████╗  ██████╗\r\n";
+	welcome += ":localhost 372 pastilhex :██╔════╝╚══██╔══╝    ██║██╔══██╗██╔════╝\r\n";
+	welcome += ":localhost 372 pastilhex :█████╗     ██║       ██║██████╔╝██║     \r\n";
+	welcome += ":localhost 372 pastilhex :██╔══╝     ██║       ██║██╔══██╗██║     \r\n";
+	welcome += ":localhost 372 pastilhex :██║        ██║ ████╗ ██║██║  ██║╚██████╗\r\n";
+	welcome += ":localhost 372 pastilhex :╚═╝        ╚═╝  ╚══╝ ╚═╝╚═╝  ╚═╝ ╚═════╝\r\n";
+	welcome += ":localhost 372 pastilhex :Project by:  ialves-m  lpicoli  jhogonca\r\n";
+	welcome += ":localhost 376 pastilhex :End of /MOTD command.\r\n";
+                                        
+
+
 	
 	// 001: Welcome to the Internet Relay Network, [seu_nick]!user@host
 	// 002: Your host is irc.server.com, running version UnrealIRCd-5.2.1

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:41:57 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/03 07:13:03 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/03 16:21:56 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int Channel::getNbrUsers(void)
 	return this->_clients.size();
 }
 
-const std::map<std::string, Client> Channel::getUsers(void)
+std::map<std::string, Client> Channel::getUsers(void)
 {
 	return this->_clients;
 }
@@ -146,7 +146,7 @@ void	Channel::setNewUser(Client client)
 	this->_clients.insert(std::make_pair(client.getNick(), client));
 }
 
-void	Channel::AddOperator(std::string nickname)
+void	Channel::AddOperator(const std::string& nickname)
 {
 	std::vector<std::string>::iterator it;
 	bool	Op_flag = false;
@@ -160,7 +160,7 @@ void	Channel::AddOperator(std::string nickname)
 		}
 	}
 	if (!Op_flag)
-		this->_operators.push_back(nickname);
+		this->_operators.push_back("@" + nickname);
 }
 
 void	Channel::RemoveOperator(std::string nickname)
@@ -174,4 +174,9 @@ void	Channel::RemoveOperator(std::string nickname)
 			this->_operators.erase(it);
 		}
 	}
+}
+
+std::vector<std::string> Channel::getOperators(void)
+{
+	return this->_operators;
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/03 07:12:46 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/03 18:33:37 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,15 +32,15 @@ public:
 	Channel(std::string name, bool _isPrivate);
 	
 	/* Getters */
-	std::string		getName(void);
-	std::string		getTopic(void);
-	std::string		getPassword(void);
-	std::string		getUserMode(void);
-	bool			getModeTopic(void);
-	bool			getModePrivateAccess(void);
-	int				getNbrUsers(void);
-	const std::map<std::string, Client> getUsers(void);
-	std::vector<std::string> getOperators;
+	std::string						getName(void);
+	std::string						getTopic(void);
+	std::string						getPassword(void);
+	std::string						getUserMode(void);
+	bool							getModeTopic(void);
+	bool							getModePrivateAccess(void);
+	int								getNbrUsers(void);
+	std::map<std::string, Client> 	getUsers(void);
+	std::vector<std::string> 		getOperators(void);
 	
 
 	/* Setters */
@@ -50,7 +50,7 @@ public:
 	void			setModeTopic(bool mode);
 	void			setModePrivateAccess(bool mode);
 	void			setNewUser(Client client);
-	void			AddOperator(std::string);
+	void			AddOperator(const std::string&);
 	void			RemoveOperator(std::string);
 };
 
