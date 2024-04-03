@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/02 15:33:01 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/03 07:20:19 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -357,6 +357,7 @@ void	Server::isNewClient(std::vector<pollfd>& fds, const int& serverSocket, stru
 void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, int bytesRead, int i)
 {
 	std::string message(buffer, bytesRead);
+	std::cout << "<<: " << std::string(buffer, bytesRead) << std::endl;
 
 	if (message.find("LIST") != std::string::npos)
 	{
@@ -373,62 +374,43 @@ void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, 
 			
 			std::string channel = ":localhost 322 pastilhex #" + channel_name + " 13 :Description here\r\n";
 			send(fds[i].fd, channel.c_str(), channel.size(), 0);
-			ft_print(channel_name);
+			std::cout << ">>: " << std::endl;
 		}
 	}
+	
 	if (message.find("JOIN") != std::string::npos)
 	{
-		size_t pos_cmd = message.find("JOIN");
-		if (pos_cmd != std::string::npos)
-		{
-			size_t pos_channel = message.find_first_not_of(" \n\r\t", pos_cmd + 4); 
-			std::string channel_name = message.substr(pos_channel + 1, message.find("\r", pos_channel + 1) - (pos_channel + 1));
-
-			if(!(message[pos_channel] == '#' || (message[pos_channel] == '&')))
-				ft_print("Not a valid channel name, try with '#' or '&'");
-			
-			if(message[pos_channel] == '#' || message[pos_channel] == '&')
-			{
-				std::map<std::string, Channel>& channels = getChannels();
-				std::map<std::string, Channel>::iterator it = channels.find(channel_name);
-				if (it == channels.end())
-				{
-					bool state = (message[pos_channel] == '#') ? false : true;
-					Channel channel = Channel(channel_name, state);
-					channel.setNewUser(client);
-					_channels.insert(std::make_pair(channel_name, channel));
-				}
-				else
-				{
-					Channel channel = it->second;
-					channel.setNewUser(client);
-				// setChannel(channel_name, true);
-				}
-			}
-
-			cmd_JOIN(fds[i].fd, client, channel_name);
-			fds[i].revents = 0;
-
-		}
+		JOIN(fds[i].fd, client, message);
+		fds[i].revents = 0;
 	}
+	
 	if (message.find("WHO") != std::string::npos)
 	{
-		std::string channel_name = message.substr(message.find("WHO ") + 4, message.find("\r", message.find("WHO ") + 4) - 4);
+		std::size_t whoPos = message.find("WHO ") + 4;
+		std::string channel_name = message.substr(whoPos, message.find("\r", whoPos) - 4);
 		std::map<std::string, Channel>& channels = getChannels();
 		std::map<std::string, Channel>::iterator it = channels.find(channel_name);
 		if (it != channels.end())
 		{
-			const std::vector<std::pair<std::string, Client> >& users = it->second.getUsers();
+			const std::map<std::string, Client>& users = it->second.getUsers();
 			std::string whoMsg = ":" + getHostname() + " 353 " + client.getNick() + " = " + channel_name + " :";
-			for (size_t j = 0; j < users.size(); ++j)
+			std::map<std::string, Client>::const_iterator user_it;
+			for (user_it = users.begin(); user_it != users.end(); ++user_it)
 			{
-				std::string nickname = users[j].first;
+				std::string nickname = user_it->first;
 				whoMsg += nickname;
-				if (j + 1 < users.size())
+				if (++user_it != users.end())
+				{
 					whoMsg += " ";
+					--user_it;
+				}
+				else
+				{
+					--user_it;
+				}
 			}
 			whoMsg += "\r\n:" + getHostname() + " 366 " + client.getNick() + " " + channel_name + " :End of Names list.\r\n";
-			std::cout << whoMsg << std::endl;
+			std::cout << ">>: WHO " << whoMsg << std::endl;
 			if (send(fds[i].fd, whoMsg.c_str(), whoMsg.length(), 0) == -1)
 			{
 				std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
@@ -436,42 +418,57 @@ void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, 
 			fds[i].revents = 0;
 		}
 	}
-	else
-	{
-		std::cout << "Os dados recebidos do cliente não processados: " << std::string(buffer, bytesRead) << std::endl;
-	}
+
 }
 
-void Server::cmd_JOIN(int clientSocket, Client &client, std::string channel_name)
+void Server::JOIN(int clientSocket, Client &client, std::string message)
 {
-	// (void) client;
-	// Acede à lista de canais
-	std::map<std::string, Channel>&	channels = getChannels();
-
-	std::map<std::string, Channel>::iterator it = channels.find(channel_name);
-	if (it != channels.end())
+	size_t pos_cmd = message.find("JOIN");
+	if (pos_cmd != std::string::npos)
 	{
-		// Acede ao canal com o nome [channel_name]
-		Channel& channel = it->second;
+		size_t pos_channel = message.find_first_not_of(" \n\r\t", pos_cmd + 4); 
+		std::string channel_name = message.substr(pos_channel + 1, message.find("\r", pos_channel + 1) - (pos_channel + 1));
 
-		// Contabiliza o número de utilizadores presentes no canal
-		//int users = channel.getNbrUsers();
-
-		// Acede ao tópico do canal escolhido
-		std::string topic = channel.getTopic();
-
-		// Cria a msg a enviar ao Client
-		std::string joinMsg = ":" + client.getNick() + " JOIN " + channel_name + "\r\n";
-		// std::string joinMsg = ":pastilhex JOIN #canal2\r\n";
-		std::cout << joinMsg << std::endl;
-		if (send(clientSocket, joinMsg.c_str(), joinMsg.length(), 0) == -1)
+		if(!(message[pos_channel] == '#' || (message[pos_channel] == '&')))
+			std::cout << ("Not a valid channel name, try with '#' or '&'") << std::endl;
+		
+		if(message[pos_channel] == '#' || message[pos_channel] == '&')
 		{
-			std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
+			std::map<std::string, Channel>& channels = getChannels();
+			std::map<std::string, Channel>::iterator it = channels.find(channel_name);
+			if (it == channels.end())
+			{
+				bool state = (message[pos_channel] == '#') ? false : true;
+				Channel channel = Channel(channel_name, state);
+				channel.setNewUser(client);
+				_channels.insert(std::make_pair(channel_name, channel));	// Fazer um setter para esta função
+				channel.AddOperator(client.getNick());						// Verificar pq não está a guardar o nick
+			}
+			else
+			{
+				Channel channel = it->second;
+				channel.setNewUser(client);
+			}
 		}
-	}
-	else
-	{
-		std::cout << "Canal não encontrado" << std::endl;
+
+		std::map<std::string, Channel>&	channels = getChannels();
+		std::map<std::string, Channel>::iterator it = channels.find(channel_name);
+		if (it != channels.end())
+		{
+			Channel& channel = it->second;
+			std::string topic = channel.getTopic();
+			std::string joinMsg = ":" + client.getNick() + " JOIN " + channel_name + "\r\n";
+			std::cout << ">>: JOIN " << joinMsg << std::endl;
+			if (send(clientSocket, joinMsg.c_str(), joinMsg.length(), 0) == -1)
+			{
+				std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
+			}
+		}
+		else
+		{
+			std::cout << "Canal não encontrado" << std::endl;
+		}
+
 	}
 }
 

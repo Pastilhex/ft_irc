@@ -48,5 +48,6 @@
 		"cerrno": "cpp",
 		"map": "cpp",
 		"ctime": "cpp"
-	}
+	},
+	"editor.fontVariations": false
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:41:57 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/01 22:32:28 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/03 07:13:03 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int Channel::getNbrUsers(void)
 	return this->_clients.size();
 }
 
-const std::vector<std::pair<std::string, Client> > Channel::getUsers(void)
+const std::map<std::string, Client> Channel::getUsers(void)
 {
 	return this->_clients;
 }
@@ -143,5 +143,35 @@ void Channel::setModePrivateAccess(bool mode)
 
 void	Channel::setNewUser(Client client)
 {
-	this->_clients.push_back(std::make_pair(client.getNick(), client));
+	this->_clients.insert(std::make_pair(client.getNick(), client));
+}
+
+void	Channel::AddOperator(std::string nickname)
+{
+	std::vector<std::string>::iterator it;
+	bool	Op_flag = false;
+
+	for (it = this->_operators.begin(); it != this->_operators.end(); ++it)
+	{
+		if (*it == nickname)
+		{
+			std::cout << "Operator already in this channel list" << std::endl;
+			Op_flag = true;
+		}
+	}
+	if (!Op_flag)
+		this->_operators.push_back(nickname);
+}
+
+void	Channel::RemoveOperator(std::string nickname)
+{
+	std::vector<std::string>::iterator it;
+
+	for (it = this->_operators.begin(); it != this->_operators.end(); ++it)
+	{
+		if (*it == nickname)
+		{
+			this->_operators.erase(it);
+		}
+	}
 }

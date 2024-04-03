@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/01 16:02:23 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/03 06:50:24 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ public:
 	void				sendWelcome(int clientSocket, Client& client);
 	void				isNewClient(std::vector<pollfd>& fds, const int& serverSocket, struct sockaddr_in& clientAddress, Client& client);
 	void				processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, int bytesRead, int i);
-	void				cmd_JOIN(int clientSocket, Client &client, std::string channel_name);
+	void				JOIN(int clientSocket, Client &client, std::string message);
 };
 
 
