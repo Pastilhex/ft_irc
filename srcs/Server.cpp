@@ -414,7 +414,7 @@ void Server::JOIN(int clientSocket, Client &client, std::string message)
 	if (posCmd != std::string::npos)
 	{
 		size_t posChannel = message.find_first_not_of(" \n\r\t", posCmd + 4); 
-		std::string channelName = message.substr(posChannel + 1, message.find("\r", posChannel + 1) - (posChannel + 1));
+		std::string channelName = message.substr(posChannel + 1, message.find_first_not_of(" \n\r\t", posChannel + 1) - (posChannel + 1));
 
 		if(!(message[posChannel] == '#' || (message[posChannel] == '&')))
 			std::cout << ("Not a valid channel name, try with '#' or '&'") << std::endl;
@@ -486,7 +486,8 @@ void Server::WHO(int clientSocket, Client &client, std::string channelName)
 			std::vector<std::string>::iterator op_it = opList.begin();
 			while (op_it != opList.end())
 			{
-				if (nickname.find(*op_it, 1) != std::string::npos) // esta condição não está a funcionar bem
+				
+				if ((*op_it).find(nickname, 1) != std::string::npos) // esta condição não está a funcionar bem
 				{
 					nickname = *op_it;
 					break; // Interrompe o loop assim que encontrar uma correspondência

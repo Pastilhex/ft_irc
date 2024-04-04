@@ -58,10 +58,10 @@ void	Client::getClientLoginData(char* buffer, int bytesRead)
 	if ((message.find("NICK") != std::string::npos) || (message.find("USER") != std::string::npos) || (message.find("PASS") != std::string::npos))
 	{
 		if (message.find("NICK") != std::string::npos)
-			setNick(message.substr(message.find("NICK ") + 5, message.find("\r", message.find("NICK ") + 5) - (message.find("NICK ") + 5)));
+			setNick(message.substr(message.find("NICK ") + 5, message.find_first_of(" \n\r\t", message.find("NICK ") + 5) - (message.find("NICK ") + 5)));
 		if (message.find("USER") != std::string::npos)
-			setUsername(message.substr(message.find("USER ") + 5, message.find("\r", message.find("USER ") + 5) - (message.find("USER ") + 5)));
+			setUsername(message.substr(message.find("USER ") + 5, message.find_first_of(" \n\r\t", message.find("USER ") + 5) - (message.find("USER ") + 5)));
 		if (message.find("PASS") != std::string::npos)
-			setTmpPassword(message.substr(message.find("PASS ") + 5, message.find("\r", message.find("PASS ") + 5) - (message.find("PASS ") + 5)));
+			setTmpPassword(message.substr(message.find("PASS ") + 5, message.find_first_of(" \n\r\t", message.find("PASS ") + 5) - (message.find("PASS ") + 5)));
 	}
 }
