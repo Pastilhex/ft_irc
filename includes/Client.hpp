@@ -21,6 +21,7 @@ private:
 	std::string	_serverPassword;
 	std::string	_tmpPassword;
 	std::string	_username;
+	int			_socket;
 
 public:
 
@@ -28,15 +29,17 @@ public:
 	Client(void);
 	
 	/* Getters */
-	std::string getNick(void);
+	std::string getNick(void) const;
 	std::string getUsername(void);
 	std::string getTmpPassword(void);
-	
+	int			getSocket(void);
+
 	/* Setters */
 	void setNick(std::string nick);
 	void setUsername(std::string username);
 	void setTmpPassword(std::string pass);
 	void setNewClient(Client &client);
+	void setSocket(int fd);
 
 	/* Methods */
 	void	getClientLoginData(char* buffer, int bytesRead);

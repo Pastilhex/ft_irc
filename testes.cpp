@@ -51,7 +51,7 @@ public:
 
 };
 
-std::string Client:: getNick(void)
+const std::string Client:: getNick(void)
 {
 	return (this->_nick);
 }

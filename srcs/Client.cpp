@@ -22,7 +22,7 @@ void Client::setNewClient(Client &client)
 	client._username.clear();
 }
 
-std::string Client::getNick(void)
+ std::string Client::getNick(void) const
 {
 	return (this->_nick);
 }
@@ -35,6 +35,16 @@ std::string Client::getUsername(void)
 std::string Client::getTmpPassword(void)
 {
 	return this->_tmpPassword;
+}
+
+void Client::setSocket(int fd)
+{
+	this->_socket = fd;
+}
+
+int Client::getSocket()
+{
+	return this->_socket;
 }
 
 void Client::setNick(std::string nick)

@@ -34,7 +34,7 @@ int Server::getSocket(void)
 	return this->_socket;
 }
 
-std::string Server::getHostname(void)
+std::string Server::getHostname(void) const
 {
 	return this->_hostname;
 }
@@ -278,6 +278,7 @@ void	Server::connectClient(const int& serverSocket)
 	{
 
 		int activity = poll(fds.data(), fds.size(), -1);
+
 		if (activity == -1)
 		{
 			std::cerr << "Erro ao chamar poll()." << std::endl;
@@ -324,17 +325,18 @@ void	Server::isNewClient(std::vector<pollfd>& fds, const int& serverSocket, stru
 	if (fds[0].revents & POLLIN)
 	{
 		// aceita a nova ligação estabelecida com o server
-		int clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressSize);
-		if (clientSocket == -1)
+		client.setSocket(accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressSize));
+		if (client.getSocket() == -1)
 		{
 			std::cerr << "Erro ao aceitar conexão do cliente." << std::endl;
 			close(serverSocket);
 			return ;
 		}
 
+		
 		// declaração de um novo client_fd (struct do tipo pollfd)
 		pollfd clientPoll;
-		clientPoll.fd = clientSocket;
+		clientPoll.fd = client.getSocket();
 		clientPoll.events = POLLIN;
 		clientPoll.revents = 0;
 
@@ -346,7 +348,7 @@ void	Server::isNewClient(std::vector<pollfd>& fds, const int& serverSocket, stru
 
 		// guardar msg recebida num buffer
 		char buffer[1024];
-		while (client.getNick().empty() && client.getUsername().empty())
+		while (client.getNick().empty() || client.getUsername().empty())
 		{
 			int bytesRead = recv(clientPoll.fd, buffer, sizeof(buffer), 0);
 			std::string message(buffer, bytesRead);
@@ -414,7 +416,7 @@ void Server::JOIN(int clientSocket, Client &client, std::string message)
 	if (posCmd != std::string::npos)
 	{
 		size_t posChannel = message.find_first_not_of(" \n\r\t", posCmd + 4); 
-		std::string channelName = message.substr(posChannel + 1, message.find_first_not_of(" \n\r\t", posChannel + 1) - (posChannel + 1));
+		std::string channelName = message.substr(posChannel + 1, message.find_first_of(" \n\r\t", posChannel + 1) - (posChannel + 1));
 
 		if(!(message[posChannel] == '#' || (message[posChannel] == '&')))
 			std::cout << ("Not a valid channel name, try with '#' or '&'") << std::endl;
@@ -433,14 +435,13 @@ void Server::JOIN(int clientSocket, Client &client, std::string message)
 			}
 			else
 			{
-				// std::map<std::string, Channel>& channels = this->_channels;
 				std::map<std::string, Channel>::iterator in = channels.begin();
 				if (in != channels.end())
 				{
 					if (in->first.find(channelName) != std::string::npos)
 						in->second.setNewUser(client);
 				}
-				WHO(clientSocket, client, channelName);
+				SendWhoToAll(client, channelName);
 			}
 		}
 
@@ -465,9 +466,25 @@ void Server::JOIN(int clientSocket, Client &client, std::string message)
 	}
 }
 
-void Server::WHO(int clientSocket, Client &client, std::string channelName)
+void Server::SendWhoToAll(Client client, std::string channelName)
 {
+	(void)client;
+	std::map<std::string, Channel> channels = getChannels();
+	std::map<std::string, Channel>::iterator it = channels.find(channelName);
+	if (it != channels.end())
+	{
+		std::map<std::string, Client>& users = it->second.getUsers();
+		std::map<std::string, Client>::iterator user_it = users.begin();
+		while (user_it != users.end())
+		{
+			WHO(user_it->second.getSocket(), user_it->second, channelName);
+			++user_it;
+		}
+	}
+}
 
+void Server::WHO(int clientSocket, const Client client, std::string channelName)
+{
 	std::map<std::string, Channel>& channels = getChannels();
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
 

@@ -33,7 +33,7 @@ public:
 	/* Getters */
 	int 							getSocket(void);
 	struct sockaddr_in 				getAddress(void);
-	std::string 					getHostname(void);
+	std::string 					getHostname(void) const;
 	std::string 					getPassword(void);
 	std::map<std::string, Channel>&	getChannels(void);
 
@@ -45,7 +45,7 @@ public:
 
 	/* Commands */
 	void				JOIN(int clientSocket, Client &client, std::string message);
-	void				WHO(int clientSocket, Client &client, std::string channelName);
+	void				WHO(int clientSocket, const Client client, std::string channelName);
 	
 	/* Methods */
 	void 				createHostname(void);
@@ -63,6 +63,7 @@ public:
 	void				processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, int bytesRead, int i);
     std::string			getClientNick(std::string& channelName, std::string& clientName);
     std::string			getOpNick(std::string& channelName, std::string clientName);
+	void				SendWhoToAll(Client client, std::string channelName);
 
 };
 

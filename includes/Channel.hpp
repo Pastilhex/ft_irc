@@ -39,7 +39,7 @@ public:
 	bool							getModeTopic(void);
 	bool							getModePrivateAccess(void);
 	int								getNbrUsers(void);
-	std::map<std::string, Client> 	getUsers(void);
+	std::map<std::string, Client>& 	getUsers(void);
 	std::vector<std::string> 		getOperators(void);
 	
 

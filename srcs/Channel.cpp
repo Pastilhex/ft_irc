@@ -24,7 +24,7 @@ int Channel::getNbrUsers(void)
 	return this->_clients.size();
 }
 
-std::map<std::string, Client> Channel::getUsers(void)
+std::map<std::string, Client>& Channel::getUsers(void)
 {
 	return this->_clients;
 }
