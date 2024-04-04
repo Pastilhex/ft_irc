@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #ifndef _IRC_
-# define _IRC_
+#define _IRC_
 
 #include <iostream>
 #include <cstdlib>
@@ -35,6 +35,5 @@
 #include <ctime>
 
 std::string getCurrentDateTime();
-
 
 #endif

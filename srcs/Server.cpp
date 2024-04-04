@@ -383,7 +383,7 @@ void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, 
 				channel_name.erase(pos, 1);
 			}
 			
-			std::string channel = ":localhost 322 pastilhex #" + channel_name + " 13 :Description here\r\n";
+			std::string channel = ":localhost 322 user_standard #" + channel_name + " 13 :Description here\r\n";
 			send(fds[i].fd, channel.c_str(), channel.size(), 0);
 			std::cout << ">> " << std::endl;
 		}
@@ -413,7 +413,8 @@ void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, 
 void Server::JOIN(int clientSocket, Client &client, std::string message)
 {
 	size_t posCmd = message.find("JOIN");
-	if (posCmd != std::string::npos)
+	size_t posCmdLower = message.find("join");
+	if (posCmd != std::string::npos || posCmdLower != std::string::npos)
 	{
 		size_t posChannel = message.find_first_not_of(" \n\r\t", posCmd + 4); 
 		std::string channelName = message.substr(posChannel + 1, message.find_first_of(" \n\r\t", posChannel + 1) - (posChannel + 1));
