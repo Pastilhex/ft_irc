@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/03 20:37:24 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/04 08:26:50 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -264,6 +264,7 @@ bool Server::checkConnections(const int& serverSocket)
 void	Server::connectClient(const int& serverSocket)
 {
 	Client client;
+	// memset(&client, 0, sizeof(client));
 	struct sockaddr_in clientAddress;
 
 	pollfd	serverPoll;
@@ -330,12 +331,15 @@ void	Server::isNewClient(std::vector<pollfd>& fds, const int& serverSocket, stru
 			close(serverSocket);
 			return ;
 		}
-		
+
 		// declaração de um novo client_fd (struct do tipo pollfd)
 		pollfd clientPoll;
 		clientPoll.fd = clientSocket;
 		clientPoll.events = POLLIN;
 		clientPoll.revents = 0;
+
+		// Limpa os dados de client antes de preencher com novos dados
+		client.setNewClient(client);
 
 		// adicionamos o novo client_fd ao vector<pollfd>
 		fds.push_back(clientPoll);
@@ -382,117 +386,124 @@ void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, 
 			std::cout << ">> " << std::endl;
 		}
 	}
-	
+
 	if (message.find("JOIN") != std::string::npos)
 	{
-		// JOIN(fds[i].fd, client, message);
-		size_t posCmd = message.find("JOIN");
-		if (posCmd != std::string::npos)
-		{
-			size_t posChannel = message.find_first_not_of(" \n\r\t", posCmd + 4); 
-			std::string channelName = message.substr(posChannel + 1, message.find("\r", posChannel + 1) - (posChannel + 1));
-
-			if(!(message[posChannel] == '#' || (message[posChannel] == '&')))
-				std::cout << ("Not a valid channel name, try with '#' or '&'") << std::endl;
-			
-			std::map<std::string, Channel>& channels = getChannels();		// Criar uma ligação com a lista de canais
-			std::map<std::string, Channel>::iterator it = channels.find(channelName);
-			if(message[posChannel] == '#' || message[posChannel] == '&')
-			{
-				if (it == channels.end())
-				{
-					bool state = (message[posChannel] == '#') ? false : true;
-					Channel channel = Channel(channelName, state);
-					channel.setNewUser(client);
-					channel.AddOperator(client.getNick());
-					_channels.insert(std::make_pair(channelName, channel));	// Fazer um setter para esta função
-				}
-				else
-				{
-					Channel channel = it->second;
-					channel.setNewUser(client);
-				}
-			}
-
-			std::map<std::string, Channel>::iterator newIt = channels.find(channelName);
-			if (newIt != channels.end())
-			{
-				// std::string joinMsg = ":pastilhex JOIN #canal2\r\n";
-				
-				Channel& channel = newIt->second;
-				std::string topic = channel.getTopic();
-				std::string joinMsg = ":" + client.getNick() + " JOIN " + message[posChannel] + channelName + " :" + topic + "\r\n";
-				std::cout << joinMsg << std::endl;
-				if (send(fds[i].fd, joinMsg.c_str(), joinMsg.length(), 0) == -1)
-				{
-					std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
-				}
-			}
-			else
-			{
-				std::cout << "Canal não encontrado" << std::endl;
-			}
-		}
+		JOIN(fds[i].fd, client, message);
 		fds[i].revents = 0;
 	}
-	
+
 	if (message.find("WHO") != std::string::npos)
 	{
-
 		std::string channelName = message.substr(message.find("WHO") + 5, message.find("\r", message.find("WHO") + 5) - (message.find("WHO") + 5));
-
-		std::map<std::string, Channel>& channels = getChannels();
-		std::map<std::string, Channel>::iterator it = channels.find(channelName);
-
-		bool channelPrivacy = it->second.getModePrivateAccess();
-		std::string privacy = (channelPrivacy) ? "@" : "#";
-
-		if (it != channels.end())
-		{
-			std::string whoMsg = ":" + getHostname() + " 353 " + client.getNick() + " = " + privacy + channelName + " :";
-			const std::map<std::string, Client>& users = it->second.getUsers();
-			std::map<std::string, Client>::const_iterator user_it = users.begin();
-			while (user_it != users.end())
-			{
-				std::string nickname = user_it->first;
-				std::vector<std::string> opList = it->second.getOperators();
-				std::vector<std::string>::iterator op_it = opList.begin();
-				while (op_it != opList.end())
-				{
-					if (nickname.find(*op_it,1))
-					{
-						nickname = *op_it;
-						break; // Interrompe o loop assim que encontrar uma correspondência
-					}
-					++op_it;
-				}
-				whoMsg += nickname;
-				if (++user_it != users.end())
-					whoMsg += " ";
-			}
-			whoMsg += "\r\n:" + getHostname() + " 366 " + client.getNick() + " " + privacy + channelName + " :End of Names list.\r\n";
-			std::cout << whoMsg << std::endl;
-			if (send(fds[i].fd, whoMsg.c_str(), whoMsg.length(), 0) == -1)
-			{
-				std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
-			}
-			fds[i].revents = 0;
-		}
-
+		WHO(fds[i].fd, client, channelName);
+		fds[i].revents = 0;
 	}
 
 	if ((message.find("NICK") != std::string::npos) || (message.find("USER") != std::string::npos) || (message.find("PASS") != std::string::npos))
 	{
 		client.getClientLoginData(buffer, bytesRead);
+		fds[i].revents = 0;
 	}
 
 }
 
 void Server::JOIN(int clientSocket, Client &client, std::string message)
 {
-	(void)clientSocket;
-	(void)client;
-	(void)message;
+	size_t posCmd = message.find("JOIN");
+	if (posCmd != std::string::npos)
+	{
+		size_t posChannel = message.find_first_not_of(" \n\r\t", posCmd + 4); 
+		std::string channelName = message.substr(posChannel + 1, message.find("\r", posChannel + 1) - (posChannel + 1));
+
+		if(!(message[posChannel] == '#' || (message[posChannel] == '&')))
+			std::cout << ("Not a valid channel name, try with '#' or '&'") << std::endl;
+
+		std::map<std::string, Channel>& channels = getChannels();		// Criar uma ligação com a lista de canais
+		std::map<std::string, Channel>::iterator it = channels.find(channelName);
+		if(message[posChannel] == '#' || message[posChannel] == '&')
+		{
+			if (it == channels.end())
+			{
+				bool state = (message[posChannel] == '#') ? false : true;
+				Channel channel = Channel(channelName, state);
+				channel.setNewUser(client);
+				channel.AddOperator(client.getNick());
+				_channels.insert(std::make_pair(channelName, channel));	// Fazer um setter para esta função
+			}
+			else
+			{
+				// std::map<std::string, Channel>& channels = this->_channels;
+				std::map<std::string, Channel>::iterator in = channels.begin();
+				if (in != channels.end())
+				{
+					if (in->first.find(channelName) != std::string::npos)
+						in->second.setNewUser(client);
+				}
+				WHO(clientSocket, client, channelName);
+			}
+		}
+
+		std::map<std::string, Channel>::iterator newIt = channels.find(channelName);
+		if (newIt != channels.end())
+		{
+			// std::string joinMsg = ":pastilhex JOIN #canal2\r\n";
+
+			Channel& channel = newIt->second;
+			std::string topic = channel.getTopic();
+			std::string joinMsg = ":" + client.getNick() + " JOIN " + message[posChannel] + channelName + " :" + topic + "\r\n";
+			std::cout << joinMsg << std::endl;
+			if (send(clientSocket, joinMsg.c_str(), joinMsg.length(), 0) == -1)
+			{
+				std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
+			}
+		}
+		else
+		{
+			std::cout << "Canal não encontrado" << std::endl;
+		}
+	}
+}
+
+void Server::WHO(int clientSocket, Client &client, std::string channelName)
+{
+
+	std::map<std::string, Channel>& channels = getChannels();
+	std::map<std::string, Channel>::iterator it = channels.find(channelName);
+
+	bool channelPrivacy = it->second.getModePrivateAccess();
+	std::string privacy = (channelPrivacy) ? "@" : "#";
+
+	if (it != channels.end())
+	{
+		std::string whoMsg = ":" + getHostname() + " 353 " + client.getNick() + " = " + privacy + channelName + " :";
+		const std::map<std::string, Client>& users = it->second.getUsers();
+		std::map<std::string, Client>::const_iterator user_it = users.begin();
+		while (user_it != users.end())
+		{
+			std::string nickname = user_it->first;
+			std::vector<std::string> opList = it->second.getOperators();
+			std::vector<std::string>::iterator op_it = opList.begin();
+			while (op_it != opList.end())
+			{
+				if (nickname.find(*op_it, 1) != std::string::npos) // esta condição não está a funcionar bem
+				{
+					nickname = *op_it;
+					break; // Interrompe o loop assim que encontrar uma correspondência
+				}
+				++op_it;
+			}
+			whoMsg += nickname;
+			if (++user_it != users.end())
+				whoMsg += " ";
+		}
+		whoMsg += "\r\n:" + getHostname() + " 366 " + client.getNick() + " " + privacy + channelName + " :End of Names list.\r\n";
+		std::cout << whoMsg << std::endl;
+		if (send(clientSocket, whoMsg.c_str(), whoMsg.length(), 0) == -1)
+		{
+			std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
+		}
+	}
 }
 
 /**

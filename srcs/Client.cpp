@@ -3,14 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/03 20:48:43 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/04 05:43:36 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
+
+Client::Client(void) {}
+
+void Client::setNewClient(Client &client)
+{
+	client._nick.clear();
+	client._serverPassword.clear();
+	client._tmpPassword.clear();
+	client._username.clear();
+}
 
 std::string Client::getNick(void)
 {
