@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/04 07:47:35 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/06 23:04:44 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ public:
 	/* Commands */
 	void				JOIN(int clientSocket, Client &client, std::string message);
 	void				WHO(int clientSocket, const Client client, std::string channelName);
+	void 				MODE(std::string message, Client client);
 	
 	/* Methods */
 	void 				createHostname(void);

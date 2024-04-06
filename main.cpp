@@ -6,7 +6,7 @@
 /*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/23 17:28:47 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/06 22:16:18 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/06 23:24:55 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ void signalHandler(int signum)
 {
 	if (signum == SIGINT)
 	{
+		std::endl(std::cout);
 		Utils::logMessage("SIGINT received. Exiting...", EXIT_SUCCESS);
 		exit(EXIT_SUCCESS);
 	}
@@ -33,5 +34,7 @@ int main(int argc, char* argv[])
 		}
 		close(server.getSocket());
 	}
+	else
+		return (Utils::logMessage("Usage: ./ircserv <port> <password>", 1));
 	return 0;
 }

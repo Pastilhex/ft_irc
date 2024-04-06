@@ -4,11 +4,14 @@ int Utils::logMessage(const std::string &message, int level)
 {
 	std::string logTime = getCurrentDateTimeAsString();
 
-	if (level == EXIT_SUCCESS)
-		std::cout << GREEN << "[INFO] " << logTime << " " << message << RESET << std::endl;
-	else
-		std::cerr << RED << "[ERROR] " \
+	if (level == EXIT_SUCCESS) {
+		std::cout << GREEN << "[INFO] " << RESET \
+		<< logTime << " " << message << std::endl;
+	}
+	else {
+		std::cerr << RED << "[ERROR] " << RESET \
 		<< getCurrentDateTimeAsString() << " " << message << RESET << std::endl;
+	}
 	return level;
 }
 

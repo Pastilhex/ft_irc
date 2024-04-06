@@ -28,7 +28,7 @@ Functions Used:
 - [x] inet_ntoa
 - [x] send
 - [x] recv
-- [ ] signal, sigaction
+- [x] signal, sigaction
 - [ ] lseek
 - [ ] fstat
 - [ ] fcntl
