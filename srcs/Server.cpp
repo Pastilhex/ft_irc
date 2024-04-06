@@ -6,7 +6,7 @@
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/04 08:26:50 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/05 22:15:34 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ std::string Server::getPassword(void)
 	return this->_password;
 }
 
-std::map<std::string, Channel>& Server::getChannels(void)
+std::map<std::string, Channel> &Server::getChannels(void)
 {
 	return this->_channels;
 }
@@ -78,7 +78,7 @@ void Server::setSocket(int newSocket)
 	this->_socket = newSocket;
 }
 
-void Server::setHostname( std::string hostname)
+void Server::setHostname(std::string hostname)
 {
 	this->_hostname = hostname;
 }
@@ -137,25 +137,26 @@ int Server::createSocket(void)
 		return -1;
 	}
 
-    int optval = 1;
-    if ((setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval))) == -1)
-    {
+	int optval = 1;
+	if ((setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval))) == -1)
+	{
 		std::cerr << "Erro ao reutilizar o socket do servidor." << std::endl;
-        return -1;
-    }
+		return -1;
+	}
 
 	return serverSocket;
 }
 
-void    Server::createHostname(void)
+void Server::createHostname(void)
 {
-    char hostname[256];
-    if (gethostname(hostname, sizeof(hostname)) == -1) {
-        std::cerr << "Erro ao obter o nome do host." << std::endl;
-        return ;
-    }
-    this->setHostname(( std::string)hostname);	
-    std::cout << "Nome do servidor: " << hostname << std::endl;
+	char hostname[256];
+	if (gethostname(hostname, sizeof(hostname)) == -1)
+	{
+		std::cerr << "Erro ao obter o nome do host." << std::endl;
+		return;
+	}
+	this->setHostname((std::string)hostname);
+	std::cout << "Nome do servidor: " << hostname << std::endl;
 }
 
 /**
@@ -182,7 +183,7 @@ struct sockaddr_in Server::createAddress(int port)
  *
  * Esta função obtém e exibe o endereço IP local do servidor.
  */
-std::string	Server::getAddressIP(void)
+std::string Server::getAddressIP(void)
 {
 	char hostname[256];
 	if (gethostname(hostname, sizeof(hostname)) == -1)
@@ -209,7 +210,7 @@ std::string	Server::getAddressIP(void)
  * @return Retorna true se o servidor foi iniciado com sucesso,
  *         false caso contrário.
  */
-bool Server::start(char* str)
+bool Server::start(char *str)
 {
 	if (!isValidPort(str))
 		return false;
@@ -229,7 +230,7 @@ bool Server::start(char* str)
  * @return Retorna true se o socket foi associado ao endereço com sucesso,
  *         false caso contrário.
  */
-bool Server::bindSocket(const int& serverSocket, const struct sockaddr_in& serverAddress)
+bool Server::bindSocket(const int &serverSocket, const struct sockaddr_in &serverAddress)
 {
 	if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1)
 	{
@@ -250,7 +251,7 @@ bool Server::bindSocket(const int& serverSocket, const struct sockaddr_in& serve
  * @return Retorna true se o socket foi colocado no modo de escuta com sucesso,
  *         false caso contrário.
  */
-bool Server::checkConnections(const int& serverSocket)
+bool Server::checkConnections(const int &serverSocket)
 {
 	if (listen(serverSocket, 5) == -1)
 	{
@@ -261,13 +262,13 @@ bool Server::checkConnections(const int& serverSocket)
 	return true;
 }
 
-void	Server::connectClient(const int& serverSocket)
+void Server::connectClient(const int &serverSocket)
 {
 	Client client;
 	// memset(&client, 0, sizeof(client));
 	struct sockaddr_in clientAddress;
 
-	pollfd	serverPoll;
+	pollfd serverPoll;
 	serverPoll.fd = serverSocket;
 	serverPoll.events = POLLIN;
 	serverPoll.revents = 0;
@@ -293,7 +294,7 @@ void	Server::connectClient(const int& serverSocket)
 		{
 			if (fds[i].revents & POLLIN)
 			{
-				
+
 				char buffer[1024];
 				int bytesRead = recv(fds[i].fd, buffer, sizeof(buffer), 0);
 				if (bytesRead == -1)
@@ -317,9 +318,9 @@ void	Server::connectClient(const int& serverSocket)
 	close(serverSocket);
 }
 
-void	Server::isNewClient(std::vector<pollfd>& fds, const int& serverSocket, struct sockaddr_in& clientAddress, Client& client)
+void Server::isNewClient(std::vector<pollfd> &fds, const int &serverSocket, struct sockaddr_in &clientAddress, Client &client)
 {
-	socklen_t	clientAddressSize = sizeof(clientAddress);
+	socklen_t clientAddressSize = sizeof(clientAddress);
 
 	// verifica se a ligação estabelicida através do poll() é para o server(novo client) ou para um client(client já conectado)
 	if (fds[0].revents & POLLIN)
@@ -330,10 +331,9 @@ void	Server::isNewClient(std::vector<pollfd>& fds, const int& serverSocket, stru
 		{
 			std::cerr << "Erro ao aceitar conexão do cliente." << std::endl;
 			close(serverSocket);
-			return ;
+			return;
 		}
 
-		
 		// declaração de um novo client_fd (struct do tipo pollfd)
 		pollfd clientPoll;
 		clientPoll.fd = client.getSocket();
@@ -360,30 +360,32 @@ void	Server::isNewClient(std::vector<pollfd>& fds, const int& serverSocket, stru
 	}
 }
 
-void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, int bytesRead, int i)
+void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, int bytesRead, int i)
 {
 	std::string message(buffer, bytesRead);
 	std::cout << "<<: " << std::string(buffer, bytesRead) << std::endl;
 
 	if (message.find("MODE") != std::string::npos)
 	{
-		
 	}
 
 	if (message.find("LIST") != std::string::npos)
 	{
 		for (std::map<std::string, Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it)
 		{
-			// 'it->first' é a chave (nome do canal)
-			// 'it->second' é o valor (objeto Channel)
 
 			std::string channel_name = it->first;
-				size_t pos = channel_name.find('\n');
-			if (pos != std::string::npos) {
+			size_t pos = channel_name.find('\n');
+			if (pos != std::string::npos)
+			{
 				channel_name.erase(pos, 1);
 			}
 			
-			std::string channel = ":localhost 322 user_standard #" + channel_name + " 13 :Description here\r\n";
+			int nbrUser = it->second.getNbrUsers();
+			char nbrUserStr[20]; // Tamanho suficiente para armazenar um inteiro
+			sprintf(nbrUserStr, "%d", nbrUser); // Formatar o inteiro como uma string
+			
+			std::string channel = ":localhost 322 user_standard #" + channel_name + " " + std::string(nbrUserStr) + " :Description here\r\n";
 			send(fds[i].fd, channel.c_str(), channel.size(), 0);
 			std::cout << ">> " << std::endl;
 		}
@@ -407,7 +409,6 @@ void	Server::processMsg(Client& client, std::vector<pollfd>& fds, char* buffer, 
 		client.getClientLoginData(buffer, bytesRead);
 		fds[i].revents = 0;
 	}
-
 }
 
 void Server::JOIN(int clientSocket, Client &client, std::string message)
@@ -416,15 +417,15 @@ void Server::JOIN(int clientSocket, Client &client, std::string message)
 	size_t posCmdLower = message.find("join");
 	if (posCmd != std::string::npos || posCmdLower != std::string::npos)
 	{
-		size_t posChannel = message.find_first_not_of(" \n\r\t", posCmd + 4); 
+		size_t posChannel = message.find_first_not_of(" \n\r\t", posCmd + 4);
 		std::string channelName = message.substr(posChannel + 1, message.find_first_of(" \n\r\t", posChannel + 1) - (posChannel + 1));
 
-		if(!(message[posChannel] == '#' || (message[posChannel] == '&')))
+		if (!(message[posChannel] == '#' || (message[posChannel] == '&')))
 			std::cout << ("Not a valid channel name, try with '#' or '&'") << std::endl;
 
-		std::map<std::string, Channel>& channels = getChannels();		// Criar uma ligação com a lista de canais
+		std::map<std::string, Channel> &channels = getChannels(); // Criar uma ligação com a lista de canais
 		std::map<std::string, Channel>::iterator it = channels.find(channelName);
-		if(message[posChannel] == '#' || message[posChannel] == '&')
+		if (message[posChannel] == '#' || message[posChannel] == '&')
 		{
 			if (it == channels.end())
 			{
@@ -432,7 +433,7 @@ void Server::JOIN(int clientSocket, Client &client, std::string message)
 				Channel channel = Channel(channelName, state);
 				channel.setNewUser(client);
 				channel.AddOperator(client.getNick());
-				_channels.insert(std::make_pair(channelName, channel));	// Fazer um setter para esta função
+				_channels.insert(std::make_pair(channelName, channel)); // Fazer um setter para esta função
 			}
 			else
 			{
@@ -451,7 +452,7 @@ void Server::JOIN(int clientSocket, Client &client, std::string message)
 		{
 			// std::string joinMsg = ":pastilhex JOIN #canal2\r\n";
 
-			Channel& channel = newIt->second;
+			Channel &channel = newIt->second;
 			std::string topic = channel.getTopic();
 			std::string joinMsg = ":" + client.getNick() + " JOIN " + message[posChannel] + channelName + " :" + topic + "\r\n";
 			std::cout << joinMsg << std::endl;
@@ -474,7 +475,7 @@ void Server::SendWhoToAll(Client client, std::string channelName)
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
 	if (it != channels.end())
 	{
-		std::map<std::string, Client>& users = it->second.getUsers();
+		std::map<std::string, Client> &users = it->second.getUsers();
 		std::map<std::string, Client>::iterator user_it = users.begin();
 		while (user_it != users.end())
 		{
@@ -486,7 +487,7 @@ void Server::SendWhoToAll(Client client, std::string channelName)
 
 void Server::WHO(int clientSocket, const Client client, std::string channelName)
 {
-	std::map<std::string, Channel>& channels = getChannels();
+	std::map<std::string, Channel> &channels = getChannels();
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
 
 	bool channelPrivacy = it->second.getModePrivateAccess();
@@ -495,7 +496,7 @@ void Server::WHO(int clientSocket, const Client client, std::string channelName)
 	if (it != channels.end())
 	{
 		std::string whoMsg = ":" + getHostname() + " 353 " + client.getNick() + " = " + privacy + channelName + " :";
-		const std::map<std::string, Client>& users = it->second.getUsers();
+		const std::map<std::string, Client> &users = it->second.getUsers();
 		std::map<std::string, Client>::const_iterator user_it = users.begin();
 		while (user_it != users.end())
 		{
@@ -504,7 +505,7 @@ void Server::WHO(int clientSocket, const Client client, std::string channelName)
 			std::vector<std::string>::iterator op_it = opList.begin();
 			while (op_it != opList.end())
 			{
-				
+
 				if ((*op_it).find(nickname, 1) != std::string::npos) // esta condição não está a funcionar bem
 				{
 					nickname = *op_it;
@@ -538,19 +539,19 @@ bool Server::run(void)
 	if (getSocket() && bindSocket(getSocket(), getAddress()) && checkConnections(getSocket()))
 	{
 		createHostname();
-        std::cout << "Endereço IP do servidor: " + getAddressIP() << std::endl;
+		std::cout << "Endereço IP do servidor: " + getAddressIP() << std::endl;
 		connectClient(getSocket());
 		return true;
 	}
 	return false;
 }
 
-std::string Server::getOpNick(std::string& channelName, std::string clientName)
+std::string Server::getOpNick(std::string &channelName, std::string clientName)
 {
 	std::map<std::string, Channel>::iterator channelIt = _channels.find(channelName);
 	if (channelIt != _channels.end())
 	{
-		Channel& channel = channelIt->second;
+		Channel &channel = channelIt->second;
 		for (size_t i = 0; i < channel.getOperators().size(); ++i)
 		{
 			size_t found = channel.getOperators()[i].find(clientName, 1);
@@ -561,16 +562,16 @@ std::string Server::getOpNick(std::string& channelName, std::string clientName)
 	return "";
 }
 
-std::string Server::getClientNick(std::string& channelName, std::string& clientName)
+std::string Server::getClientNick(std::string &channelName, std::string &clientName)
 {
 	std::map<std::string, Channel>::iterator channelIt = _channels.find(channelName);
 	if (channelIt != _channels.end())
 	{
-		Channel& channel = channelIt->second;
+		Channel &channel = channelIt->second;
 		std::map<std::string, Client>::iterator clientIt = channel.getUsers().find(clientName);
 		if (clientIt != channel.getUsers().end())
 		{
-			Client& client = clientIt->second;
+			Client &client = clientIt->second;
 			return client.getNick();
 		}
 	}
@@ -585,9 +586,9 @@ std::string Server::getClientNick(std::string& channelName, std::string& clientN
  *
  * @param clientSocket O descritor de arquivo do socket do cliente.
  */
-void	Server::sendWelcome(int clientSocket, Client &client)
+void Server::sendWelcome(int clientSocket, Client &client)
 {
-    std::string welcome = ":localhost 001 pastilhex :Welcome to the Internet Relay Network, " + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + "!" + getAddressIP() + "\r\n";
+	std::string welcome = ":localhost 001 pastilhex :Welcome to the Internet Relay Network, " + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + "!" + getAddressIP() + "\r\n";
 	welcome += ":localhost 002 pastilhex :Your host is " + getHostname() + ", running version FT_IRC_42Porto_v1.0\r\n";
 	welcome += ":localhost 003 pastilhex :This server was created " + getCurrentDateTime() + "\r\n";
 	welcome += ":localhost 372 pastilhex :███████╗████████╗    ██╗██████╗  ██████╗\r\n";
@@ -598,10 +599,7 @@ void	Server::sendWelcome(int clientSocket, Client &client)
 	welcome += ":localhost 372 pastilhex :╚═╝        ╚═╝  ╚══╝ ╚═╝╚═╝  ╚═╝ ╚═════╝\r\n";
 	welcome += ":localhost 372 pastilhex :Project by:  ialves-m  lpicoli  jhogonca\r\n";
 	welcome += ":localhost 376 pastilhex :End of /MOTD command.\r\n";
-                                        
 
-
-	
 	// 001: Welcome to the Internet Relay Network, [seu_nick]!user@host
 	// 002: Your host is irc.server.com, running version UnrealIRCd-5.2.1
 	// 003: This server was created [data]
@@ -616,8 +614,8 @@ void	Server::sendWelcome(int clientSocket, Client &client)
 	// * *** Looking up your ident...
 	// * *** Looking up your hostname...
 	// * *** Could not resolve your hostname: Domain not found; using your IP address (188.250.216.53) instead.
-	// * Capabilities supported: inspircd.org/poison inspircd.org/standard-replies multi-prefix setname userhost-in-names 
-	// * Capabilities requested: multi-prefix setname userhost-in-names 
+	// * Capabilities supported: inspircd.org/poison inspircd.org/standard-replies multi-prefix setname userhost-in-names
+	// * Capabilities requested: multi-prefix setname userhost-in-names
 	// * *** If you are having problems connecting due to registration timeouts type /quote PONG xaAJQBRIW~ or /raw PONG xaAJQBRIW~ now.
 	// * Capabilities acknowledged: multi-prefix setname userhost-in-names
 	// * *** Ident lookup timed out, using ~ivo instead.
@@ -625,7 +623,7 @@ void	Server::sendWelcome(int clientSocket, Client &client)
 	// * Welcome to the ChatJunkies IRC Network pastilhex!~ivo@188.250.216.53
 	// * Your host is chatjunkies.org, running version InspIRCd-3
 	// * This server was created 19:20:48 Jun 16 2023
-	
+
 	if (send(clientSocket, welcome.c_str(), welcome.length(), 0) == -1)
 	{
 		std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
