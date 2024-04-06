@@ -1,5 +1,5 @@
 NAME = ircserv
-SRC = main.cpp srcs/ircserv.cpp srcs/Server.cpp srcs/Channel.cpp srcs/Client.cpp
+SRC = main.cpp srcs/ircserv.cpp srcs/Server.cpp srcs/Channel.cpp srcs/Client.cpp srcs/Utils.cpp
 OBJDIR = objs
 OBJ = $(addprefix $(OBJDIR)/, $(SRC:.cpp=.o))
 CXX = c++
