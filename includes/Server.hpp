@@ -50,6 +50,7 @@ public:
 	void JOIN(int clientSocket, Client &client, std::string message);
 	void WHO(int clientSocket, const Client client, std::string channelName);
 	void PART(Client &client, std::string channelName);
+  void MODE(std::string message, Client client);
 
 	void Send_WHO_toAll(Client client, std::string channelName);
 	void Send_PRIVMSG_toChannel(Client client, std::string channelName);

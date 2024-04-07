@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/07 11:32:00 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/06 23:52:38 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -471,6 +471,18 @@ void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, 
 		// PART #canalX :Até logo, pessoal!
 		std::string channelName = getInput(message, "PART");
 		PART(client, channelName);
+		fds[i].revents = 0;
+	}
+	if (message.find("QUIT") != std::string::npos)
+	{
+		close(fds[i].fd); // Fecha a conexão com o cliente
+		// Envie uma mensagem de saída para todos os usuarios dos canais que o cliente estava
+		// Remova o cliente de todos os canais
+		fds.erase(fds.begin() + i); // Remova o cliente do vector<pollfd>
+	}
+	if (message.find("MODE") != std::string::npos)
+	{
+		MODE(message, client);
 		fds[i].revents = 0;
 	}
 }
