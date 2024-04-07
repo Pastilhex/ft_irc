@@ -185,20 +185,84 @@ struct sockaddr_in Server::createAddress(int port)
  */
 std::string Server::getAddressIP(void)
 {
+	// char hostname[256];
+	// if (gethostname(hostname, sizeof(hostname)) == -1)
+	// {
+	// 	std::cerr << "Erro ao obter o nome do host." << std::endl;
+	// }
+
+	// struct hostent *host_info = gethostbyname(hostname);
+	// if (host_info == NULL || host_info->h_addr_list[0] == NULL)
+	// {
+	// 	std::cerr << "Erro ao obter o endereço IP." << std::endl;
+	// }
+
+	// char *ip_address = inet_ntoa(*((struct in_addr *)host_info->h_addr_list[0]));
+
 	char hostname[256];
-	if (gethostname(hostname, sizeof(hostname)) == -1)
+	char *ipAddress;
+
+	// Obtém o nome do host local
+	if (gethostname(hostname, sizeof(hostname)) != 0)
 	{
-		std::cerr << "Erro ao obter o nome do host." << std::endl;
+		std::cerr << "Erro ao obter o nome do host local" << std::endl;
 	}
 
-	struct hostent *host_info = gethostbyname(hostname);
-	if (host_info == NULL || host_info->h_addr_list[0] == NULL)
+	// Obtém as informações do host local
+	struct hostent *host = gethostbyname(hostname);
+	if (host == NULL)
 	{
-		std::cerr << "Erro ao obter o endereço IP." << std::endl;
+		std::cerr << "Erro ao obter informações do host local" << std::endl;
 	}
 
-	char *ip_address = inet_ntoa(*((struct in_addr *)host_info->h_addr_list[0]));
-	return ip_address;
+	// Extrai o endereço IPv4 local do host
+	struct in_addr **addr_list = reinterpret_cast<struct in_addr **>(host->h_addr_list);
+	if (addr_list[0] != NULL)
+	{
+		// Converte o endereço IP local para uma string
+		ipAddress = inet_ntoa(*addr_list[0]);
+	}
+	else
+	{
+		std::cerr << "Nenhum endereço IP encontrado para o host local" << std::endl;
+	}
+	return ipAddress;
+}
+
+bool Server::addClientToGlobalUsers(Client client)
+{
+	typedef std::map<std::string, Client> ClientMap;
+	std::pair<ClientMap::iterator, bool> result = this->_globalUsers.insert(std::make_pair(client.getNick(), client));
+
+	if (result.second)
+		return true;
+	else
+		return false;
+}
+
+void Server::removeClientFromGlobalUsers(Client client)
+{
+	std::map<std::string, Client>::iterator it_begin = this->_globalUsers.begin();
+	std::map<std::string, Client>::iterator it_end = this->_globalUsers.end();
+	for (std::map<std::string, Client>::iterator &it = it_begin; it != it_end; ++it)
+	{
+		if (client.getNick() == it->first)
+		{
+			this->_globalUsers.erase(it);
+		}
+	}
+}
+
+Client &Server::getClientBySocket(int socket, Client &client)
+{
+	std::map<std::string, Client>::iterator it_begin = _globalUsers.begin();
+	std::map<std::string, Client>::iterator it_end = _globalUsers.end();
+	for (std::map<std::string, Client>::iterator &it = it_begin; it != it_end; ++it)
+	{
+		if (it->second.getSocket() == socket)
+			return it->second;
+	}
+	return client;
 }
 
 /**
@@ -265,7 +329,6 @@ bool Server::checkConnections(const int &serverSocket)
 void Server::connectClient(const int &serverSocket)
 {
 	Client client;
-	// memset(&client, 0, sizeof(client));
 	struct sockaddr_in clientAddress;
 
 	pollfd serverPoll;
@@ -294,7 +357,7 @@ void Server::connectClient(const int &serverSocket)
 		{
 			if (fds[i].revents & POLLIN)
 			{
-
+				client = getClientBySocket(fds[i].fd, client);
 				char buffer[1024];
 				int bytesRead = recv(fds[i].fd, buffer, sizeof(buffer), 0);
 				if (bytesRead == -1)
@@ -355,6 +418,15 @@ void Server::isNewClient(std::vector<pollfd> &fds, const int &serverSocket, stru
 			client.getClientLoginData(buffer, bytesRead);
 		}
 
+		// Adiciona o client à lista global de usuarios
+		if (!addClientToGlobalUsers(client))
+		if (client.getSocket() == -1)
+		{
+			std::cerr << "Erro ao aceitar a conexão com o nick: " + client.getNick() + "." << std::endl;
+			close(serverSocket);
+			return;
+		}
+
 		if (!client.getNick().empty() && !client.getUsername().empty())
 			sendWelcome(clientPoll.fd, client);
 	}
@@ -363,50 +435,42 @@ void Server::isNewClient(std::vector<pollfd> &fds, const int &serverSocket, stru
 void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, int bytesRead, int i)
 {
 	std::string message(buffer, bytesRead);
-	std::cout << "<<: " << std::string(buffer, bytesRead) << std::endl;
+	std::cout << "<<:\n" << std::string(buffer, bytesRead) << std::endl;
 
-	if (message.find("MODE") != std::string::npos)
+	if (isCMD(message, "NICK") || isCMD(message, "USER ") || isCMD(message, "PASS"))
+	{
+		client.getClientLoginData(buffer, bytesRead);
+		fds[i].revents = 0;
+	}
+
+	if (isCMD(message, "MODE"))
 	{
 	}
 
-	if (message.find("LIST") != std::string::npos)
+	if (isCMD(message, "WHO"))
 	{
-		for (std::map<std::string, Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it)
-		{
-
-			std::string channel_name = it->first;
-			size_t pos = channel_name.find('\n');
-			if (pos != std::string::npos)
-			{
-				channel_name.erase(pos, 1);
-			}
-			
-			int nbrUser = it->second.getNbrUsers();
-			char nbrUserStr[20]; // Tamanho suficiente para armazenar um inteiro
-			sprintf(nbrUserStr, "%d", nbrUser); // Formatar o inteiro como uma string
-			
-			std::string channel = ":localhost 322 user_standard #" + channel_name + " " + std::string(nbrUserStr) + " :Description here\r\n";
-			send(fds[i].fd, channel.c_str(), channel.size(), 0);
-			std::cout << ">> " << std::endl;
-		}
+		std::string channelName = getInput(message, "WHO ");
+		WHO(fds[i].fd, client, channelName);
+		fds[i].revents = 0;
 	}
 
-	if (message.find("JOIN") != std::string::npos)
+	if (isCMD(message, "LIST"))
+	{
+		LIST(fds[i].fd, client, message);
+		fds[i].revents = 0;
+	}
+
+	if (isCMD(message, "JOIN"))
 	{
 		JOIN(fds[i].fd, client, message);
 		fds[i].revents = 0;
 	}
 
-	if (message.find("WHO") != std::string::npos)
+	if (isCMD(message, "PART"))
 	{
-		std::string channelName = message.substr(message.find("WHO") + 5, message.find("\r", message.find("WHO") + 5) - (message.find("WHO") + 5));
-		WHO(fds[i].fd, client, channelName);
-		fds[i].revents = 0;
-	}
-
-	if ((message.find("NICK") != std::string::npos) || (message.find("USER") != std::string::npos) || (message.find("PASS") != std::string::npos))
-	{
-		client.getClientLoginData(buffer, bytesRead);
+		// PART #canalX :Até logo, pessoal!
+		std::string channelName = getInput(message, "PART");
+		PART(client, channelName);
 		fds[i].revents = 0;
 	}
 	if (message.find("QUIT") != std::string::npos)
@@ -420,6 +484,63 @@ void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, 
 	{
 		MODE(message, client);
 		fds[i].revents = 0;
+	}
+}
+
+void Server::Send_PRIVMSG_toChannel(Client client, std::string channelName)
+{
+	(void)client;
+	std::map<std::string, Channel> channels = getChannels();
+	std::map<std::string, Channel>::iterator it = channels.find(channelName);
+	if (it != channels.end())
+	{
+		std::map<std::string, Client> &users = it->second.getUsers();
+		std::map<std::string, Client>::iterator user_it = users.begin();
+		while (user_it != users.end())
+		{
+			WHO(user_it->second.getSocket(), user_it->second, channelName);
+			++user_it;
+		}
+	}
+}
+
+void Server::Send_WHO_toAll(Client client, std::string channelName)
+{
+	(void)client;
+	std::map<std::string, Channel> channels = getChannels();
+	std::map<std::string, Channel>::iterator it = channels.find(channelName);
+	if (it != channels.end())
+	{
+		std::map<std::string, Client> &users = it->second.getUsers();
+		std::map<std::string, Client>::iterator user_it = users.begin();
+		while (user_it != users.end())
+		{
+			WHO(user_it->second.getSocket(), user_it->second, channelName);
+			++user_it;
+		}
+		return;
+	}
+}
+
+void Server::LIST(int clientSocket, Client &client, std::string message)
+{
+	(void)message;
+	(void)client;
+	for (std::map<std::string, Channel>::iterator it = this->_channels.begin(); it != this->_channels.end(); ++it)
+	{
+		std::string channel_name = it->first;
+		size_t pos = channel_name.find('\n');
+		if (pos != std::string::npos)
+		{
+			channel_name.erase(pos, 1);
+		}
+		int nbrUser = it->second.getNbrUsers();
+		char nbrUserStr[20];				// Tamanho suficiente para armazenar um inteiro
+		sprintf(nbrUserStr, "%d", nbrUser); // Formatar o inteiro como uma string
+		std::string channel = ":" + this->getHostname() + " 322 " + client.getNick() + " #" + channel_name + " " + std::string(nbrUserStr) + " :" + it->second.getTopic() + "\r\n";
+		channel += ":" + this->getHostname() + " 323 " + client.getNick() + " :End of /LIST\r\n";
+		send(clientSocket, channel.c_str(), channel.size(), 0);
+		std::cout << ">> " + channel << std::endl;
 	}
 }
 
@@ -439,6 +560,16 @@ void Server::JOIN(int clientSocket, Client &client, std::string message)
 		std::map<std::string, Channel>::iterator it = channels.find(channelName);
 		if (message[posChannel] == '#' || message[posChannel] == '&')
 		{
+			for (it = channels.begin(); it != channels.end(); ++it)
+			{
+				if (it->first == channelName)
+				{
+					it->second.setNewUser(client);
+					Send_WHO_toAll(client, channelName);
+					break;
+				}
+			}
+
 			if (it == channels.end())
 			{
 				bool state = (message[posChannel] == '#') ? false : true;
@@ -446,53 +577,30 @@ void Server::JOIN(int clientSocket, Client &client, std::string message)
 				channel.setNewUser(client);
 				channel.AddOperator(client.getNick());
 				_channels.insert(std::make_pair(channelName, channel)); // Fazer um setter para esta função
+				// removeClientFromGlobalUsers(client);
 			}
 			else
 			{
-				std::map<std::string, Channel>::iterator in = channels.begin();
-				if (in != channels.end())
-				{
-					if (in->first.find(channelName) != std::string::npos)
-						in->second.setNewUser(client);
-				}
-				SendWhoToAll(client, channelName);
+				// std::map<std::string, Channel>::iterator in = channels.begin();
+				// removeClientFromGlobalUsers(client);
 			}
 		}
 
 		std::map<std::string, Channel>::iterator newIt = channels.find(channelName);
 		if (newIt != channels.end())
 		{
-			// std::string joinMsg = ":pastilhex JOIN #canal2\r\n";
-
 			Channel &channel = newIt->second;
 			std::string topic = channel.getTopic();
 			std::string joinMsg = ":" + client.getNick() + " JOIN " + message[posChannel] + channelName + " :" + topic + "\r\n";
 			std::cout << joinMsg << std::endl;
 			if (send(clientSocket, joinMsg.c_str(), joinMsg.length(), 0) == -1)
 			{
-				std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
+				std::cerr << "Erro ao entrar no canal." << std::endl;
 			}
 		}
 		else
 		{
 			std::cout << "Canal não encontrado" << std::endl;
-		}
-	}
-}
-
-void Server::SendWhoToAll(Client client, std::string channelName)
-{
-	(void)client;
-	std::map<std::string, Channel> channels = getChannels();
-	std::map<std::string, Channel>::iterator it = channels.find(channelName);
-	if (it != channels.end())
-	{
-		std::map<std::string, Client> &users = it->second.getUsers();
-		std::map<std::string, Client>::iterator user_it = users.begin();
-		while (user_it != users.end())
-		{
-			WHO(user_it->second.getSocket(), user_it->second, channelName);
-			++user_it;
 		}
 	}
 }
@@ -534,6 +642,56 @@ void Server::WHO(int clientSocket, const Client client, std::string channelName)
 		if (send(clientSocket, whoMsg.c_str(), whoMsg.length(), 0) == -1)
 		{
 			std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
+		}
+	}
+}
+
+void Server::PART(Client &client, std::string channelName)
+{
+	int isInChannels = 0;
+	std::map<std::string, Channel> &channels = getChannels();
+	std::map<std::string, Channel>::iterator channels_begin = channels.begin();
+	std::map<std::string, Channel>::iterator channels_end = channels.end();
+
+	for (std::map<std::string, Channel>::iterator &it = channels_begin; it != channels_end; ++it)
+	{
+		std::map<std::string, Client> &users = it->second.getUsers();
+		const std::map<std::string, Client>::iterator &users_it = users.begin();
+		while (users_it != users.end())
+		{
+			if (users_it->second.getNick() == client.getNick())
+			{
+				isInChannels++;
+				break;
+			}
+		}
+	}
+	if (isInChannels == 1)
+	{
+		std::map<std::string, Channel> &channels = getChannels();
+		std::map<std::string, Channel>::iterator channels_begin = channels.begin();
+		std::map<std::string, Channel>::iterator channels_end = channels.end();
+
+		for (std::map<std::string, Channel>::iterator &it = channels_begin; it != channels_end; ++it)
+		{
+			std::map<std::string, Client> &users = it->second.getUsers();
+			const std::map<std::string, Client>::iterator &users_it = users.begin();
+			while (users_it != users.end())
+			{
+				if (users_it->second.getNick() == client.getNick())
+				{
+					// Adiciona o client à lista global de usuarios
+					
+					users.erase(users_it);
+					std::string leaveChannel = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + "!" + getAddressIP() + " PART #" + channelName + "\r\n";
+					std::cout << leaveChannel << std::endl;
+					if (send(client.getSocket(), leaveChannel.c_str(), leaveChannel.length(), 0) == -1)
+					{
+						std::cerr << "Erro ao enviar mensagem de saida de canal." << std::endl;
+					}
+					break;
+				}
+			}
 		}
 	}
 }
