@@ -47,7 +47,8 @@
 		"typeinfo": "cpp",
 		"cerrno": "cpp",
 		"map": "cpp",
-		"ctime": "cpp"
+		"ctime": "cpp",
+		"csignal": "cpp"
 	},
 	"editor.fontVariations": false
 }

@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 13:07:13 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/07 11:11:44 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/07 20:00:18 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,24 @@ bool isCMD(std::string message, std::string cmd)
 	return false;
 }
 
-std::string getInput(std::string message, std::string cmd)
+std::string getInputCmd(std::string message, std::string cmd)
 {
 	int msgSize = cmd.size() + 1;
 	return message.substr(message.find(cmd) + msgSize, message.find_first_of(" \n\r\t", message.find(cmd) + msgSize) - (message.find(cmd) + msgSize));
 }
+
+std::string getInputChannel(std::string message)
+{
+	int begin = message.find_first_of("#&") + 1;
+	int end = message.find_first_of(" \r\n", begin);
+	return message.substr(begin, end-begin);
+}
+
+std::string getMsgToSend(std::string message)
+{
+	int begin = message.find_first_of(":") + 1;
+	int end = message.find_last_of(" \r\n", begin);
+	return message.substr(begin, end-begin);
+}
+
+
