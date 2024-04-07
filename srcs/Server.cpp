@@ -487,6 +487,7 @@ void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, 
 	}
 }
 
+
 void Server::Send_PRIVMSG_toChannel(Client client, std::string channelName)
 {
 	(void)client;

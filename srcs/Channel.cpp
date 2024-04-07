@@ -24,6 +24,16 @@ int Channel::getNbrUsers(void)
 	return this->_clients.size();
 }
 
+/**
+ * @brief Get the users in the channel.
+ * 
+ * This function returns a reference to the map of users in the channel.
+ * The map is of type std::map<std::string, Client>, where the keys are
+ * strings representing the usernames and the values are instances of the
+ * Client class.
+ * 
+ * @return std::map<std::string, Client>& A reference to the map of users in the channel.
+ */
 std::map<std::string, Client>& Channel::getUsers(void)
 {
 	return this->_clients;
@@ -61,16 +71,6 @@ std::string Channel::getPassword(void)
 }
 
 /**
- * @brief Get the user mode of the channel.
- *
- * @return The user mode (user/operator) of the channel.
- */
-std::string Channel::getUserMode(void)
-{
-    return this->_userMode;
-}
-
-/**
  * @brief Get the mode status of the channel's topic.
  *
  * @return True if the topic can be edited, false if topic is locked.
@@ -81,6 +81,16 @@ bool Channel::getModeTopic(void)
 }
 
 /**
+ * @brief Get the mode status of the channel's topic.
+ *
+ * @return True if the topic is locked, false can be edited.
+ */
+bool Channel::getRestrictedTopic(void)
+{
+	return this->_restrictedTopic;
+}
+
+/**
  * @brief Get the mode status of private access to the channel.
  *
  * @return True if channel is in private access mode, false if channel is public.
@@ -88,6 +98,17 @@ bool Channel::getModeTopic(void)
 bool Channel::getModePrivateAccess(void)
 {
     return this->_isPrivate;
+}
+
+
+/**
+ * @brief Get the user limit of the channel.
+ * 
+ * @return int The user limit of the channel.
+ */
+int Channel::getUserLimit(void)
+{
+	return this->_userLimit;
 }
 
 /**
@@ -110,15 +131,6 @@ void Channel::setTopic(std::string topic)
     this->_topic = topic;
 }
 
-/**
- * @brief Set the user mode of the channel.
- *
- * @param usermode The user mode (user/operator) to set for the channel.
- */
-void Channel::setUserMode(std::string usermode)
-{
-    this->_userMode = usermode;
-}
 
 /**
  * @brief Set the mode status of the channel's topic.
@@ -141,11 +153,63 @@ void Channel::setModePrivateAccess(bool mode)
     this->_isPrivate = mode;	
 }
 
+/**
+ * @brief Adds a new user to the channel.
+ * 
+ * This function inserts a new user into the channel's list of clients.
+ * The user is inserted using their nickname as the key and the client object as the value.
+ * 
+ * @param client The client object representing the new user.
+ */
 void	Channel::setNewUser(Client client)
 {
 	this->_clients.insert(std::make_pair(client.getNick(), client));
 }
 
+
+/**
+ * @brief Sets the user limit for the channel.
+ * 
+ * This function sets the maximum number of users allowed in the channel.
+ * 
+ * @param limit The user limit for the channel.
+ */
+void Channel::setUserLimit(int limit)
+{
+	this->_userLimit = limit;
+}
+
+/**
+ * @brief Sets the password for the channel.
+ * 
+ * This function sets the password for the channel.
+ * 
+ * @param password The password to set for the channel.
+ */
+void Channel::setPassword(std::string password)
+{
+	this->_password = password;
+}
+
+/**
+ * @brief Set the restricted topic mode for the channel.
+ * 
+ * @param mode The mode to set for the restricted topic.
+ */
+void Channel::setRestrictedTopic(bool mode)
+{
+	this->_restrictedTopic = mode;
+}
+
+/**
+ * @brief Adds an operator to the channel's operator list.
+ * 
+ * This function adds the specified nickname to the channel's operator list, 
+ * if it is not already present. If the nickname is already in the list, 
+ * a message is printed to the console indicating that the operator is already in the list.
+ * 
+ * @param nickname The nickname of the operator to be added.
+ */
 void	Channel::AddOperator(const std::string& nickname)
 {
 	std::vector<std::string>::iterator it;
@@ -163,6 +227,13 @@ void	Channel::AddOperator(const std::string& nickname)
 		this->_operators.push_back("@" + nickname);
 }
 
+/**
+ * @brief Removes an operator from the channel.
+ * 
+ * This function removes the specified nickname from the list of operators in the channel.
+ * 
+ * @param nickname The nickname of the operator to be removed.
+ */
 void	Channel::RemoveOperator(std::string nickname)
 {
 	std::vector<std::string>::iterator it;
@@ -176,6 +247,11 @@ void	Channel::RemoveOperator(std::string nickname)
 	}
 }
 
+/**
+ * @brief Get the list of operators in the channel.
+ * 
+ * @return std::vector<std::string> The list of operators.
+ */
 std::vector<std::string> Channel::getOperators(void)
 {
 	return this->_operators;
