@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/07 20:00:43 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/08 11:53:21 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ public:
 	void LIST(int clientSocket, Client &client, std::string message);
 	void JOIN(int clientSocket, Client &client, std::string message);
 	void WHO(int clientSocket, const Client client, std::string channelName);
-	void PART(Client &client, std::string channelName);
+	void PART(std::string message, Client &client);
 	void MODE(std::string message, Client client);
 	void PONG(std::string message, Client client);
 
