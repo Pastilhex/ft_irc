@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/08 14:57:29 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/08 23:54:23 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -348,7 +348,9 @@ void Server::isNewClient(std::vector<pollfd> &fds, const int &serverSocket, stru
 void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, int bytesRead, int i)
 {
 	std::string message(buffer, bytesRead);
-	std::cout << message << std::endl;
+	if (!isCMD(message, "PING"))
+		std::cout << message << std::endl;
+
 	if (isCMD(message, "PING"))
 	{
 		PONG(message, client);
@@ -460,13 +462,11 @@ void Server::PONG(std::string message, Client client)
 {
 	int begin = message.find_first_of(" ") + 1;
 	int end = message.find_first_of(" \r\n", begin);
-	std::string msgToSend = "PONG " + /* this->getHostname() + " " + */ message.substr(begin, end - begin) + "\r\n";
+	std::string msgToSend = "PONG " + message.substr(begin, end - begin) + "\r\n";
 	if (send(client.getSocket(), msgToSend.c_str(), msgToSend.length(), 0) == -1)
 	{
 		std::cerr << "Erro ao enviar PONG." << std::endl;
 	}
-	else
-		std::cout << msgToSend << std::endl;
 }
 
 void Server::LIST(int clientSocket, Client &client, std::string message)
@@ -523,12 +523,6 @@ void Server::JOIN(int clientSocket, Client &client, std::string message)
 				channel.setNewUser(client);
 				channel.AddOperator(client.getNick());
 				_channels.insert(std::make_pair(channelName, channel)); // Fazer um setter para esta função
-																		// removeClientFromGlobalUsers(client);
-			}
-			else
-			{
-				// std::map<std::string, Channel>::iterator in = channels.begin();
-				// removeClientFromGlobalUsers(client);
 			}
 		}
 
@@ -555,10 +549,8 @@ void Server::WHO(int clientSocket, const Client client, std::string channelName)
 {
 	std::map<std::string, Channel> &channels = getChannels();
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
-
 	bool channelPrivacy = it->second.getModePrivateAccess();
 	std::string privacy = (channelPrivacy) ? "@" : "#";
-
 	if (it != channels.end())
 	{
 		std::string whoMsg = ":" + getHostname() + " 353 " + client.getNick() + " = " + privacy + channelName + " :";
@@ -571,8 +563,7 @@ void Server::WHO(int clientSocket, const Client client, std::string channelName)
 			std::vector<std::string>::iterator op_it = opList.begin();
 			while (op_it != opList.end())
 			{
-
-				if ((*op_it).find(nickname, 1) != std::string::npos) // esta condição não está a funcionar bem
+				if ((*op_it).find(nickname, 1) != std::string::npos)
 				{
 					nickname = *op_it;
 					break; // Interrompe o loop assim que encontrar uma correspondência
@@ -595,7 +586,6 @@ void Server::WHO(int clientSocket, const Client client, std::string channelName)
 void Server::PART(std::string message, Client &client)
 {
 	std::string channelName = getInputCmd(message, "PART ");
-
 	std::map<std::string, Channel> &channels = getChannels();
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
 	if (it != channels.end())
@@ -613,7 +603,6 @@ void Server::PART(std::string message, Client &client)
 				}
 				else
 				{	
-
 					users.erase(us);
 					std::cout << leaveChannel << std::endl;
 				}
@@ -636,36 +625,23 @@ void Server::PART(std::string message, Client &client)
 			}
 			++us;
 		}
-
-		// ESTE SCRIPT REMOVE O PRIVILEGIO DE OPERATOR SE O OPERATOR ABANDONAR A SALA
-		// std::map<std::string, Channel> &channels = getChannels();
-		// std::map<std::string, Channel>::iterator ch = channels.find(channelName);
-		// if (ch != channels.end()) // Note a correção para 'ch' em vez de 'it'
-		// {
-		// 	std::vector<std::string> &operators = ch->second.getOperators(); // Acessa os operadores do canal encontrado
-		// 	std::vector<std::string>::iterator op = operators.begin();
-		// 	for (; op != operators.end();)
-		// 	{
-		// 		size_t pos = op->find(client.getNick(), 1);
-		// 		if (pos != std::string::npos)
-		// 			op = operators.erase(op); // Atualiza o iterador após a remoção
-		// 		else
-		// 			++op; // Somente incrementa se não removido
-		// 	}
-		// }
-
 	}
 	else
 	{
-		// Canal com o nome de channelName não encontrado
 		std::cout << "Canal não encontrado." << std::endl;
 	}
 }
 
 void Server::KICK(std::string message, Client client)
 {
-	std::string channelName = getInputCmd(message, "PART ");
+	// KICK #42 ivo :bye
+	int channelBegin = message.find_first_of("#&");
+	int channelMiddle = message.find_first_of(" \r\n", channelBegin) + 1;
+	int channelEnd = message.find_first_of(" \r\n", channelMiddle);
+	std::string kickNick = message.substr(channelMiddle, channelEnd-channelMiddle);
 
+
+	std::string channelName = getInputCmd(message, "KICK ");
 	std::map<std::string, Channel> &channels = getChannels();
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
 	if (it != channels.end())
@@ -674,40 +650,25 @@ void Server::KICK(std::string message, Client client)
 		std::map<std::string, Client>::iterator us = users.begin();
 		while (us != users.end())
 		{
-			if (us->second.getNick() == client.getNick())
+			if (us->second.getNick() == kickNick)
 			{
-				std::string leaveChannel = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + "!" + getAddressIP() + " PART " + getInputCmd(message, "PART") + "\r\n";
+				std::string leaveChannel = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " " + message;
 				if (send(client.getSocket(), leaveChannel.c_str(), leaveChannel.length(), 0) == -1)
 				{
-					std::cerr << "Erro ao enviar mensagem de saída de canal." << std::endl;
+					std::cerr << "Erro ao enviar mensagem de KICK." << std::endl;
 				}
 				else
 				{	
-
 					users.erase(us);
 					std::cout << leaveChannel << std::endl;
-				}
-				if (it->second.getNbrUsers() == 0)
-				{
-					std::string closeChannel = ":" + getHostname() + " PART " + getInputCmd(message, "PART");
-					if (send(client.getSocket(), closeChannel.c_str(), closeChannel.length(), 0) == -1)
-					{
-						std::cerr << "Erro ao enviar mensagem de fecho de canal." << std::endl;
-					}
-					else
-					{
-						channels.erase(it);
-						std::cout << closeChannel << std::endl;
-					}
-				}
-				else
 					Send_WHO_toAll(client, channelName);
+				}
 				break;
 			}
 			++us;
 		}
+	}
 }
-
 
 bool Server::run(void)
 {
