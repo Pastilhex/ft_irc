@@ -406,6 +406,13 @@ void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, 
 		// Remova o cliente de todos os canais
 		fds.erase(fds.begin() + i); // Remova o cliente do vector<pollfd>
 	}
+
+	if (isCMD(message, "KICK"))
+	{
+		KICK(message, client);
+		fds[i].revents = 0;
+	}
+
 }
 
 void Server::Send_PRIVMSG_toChannel(std::string message, Client client)
@@ -654,6 +661,53 @@ void Server::PART(std::string message, Client &client)
 		std::cout << "Canal não encontrado." << std::endl;
 	}
 }
+
+void Server::KICK(std::string message, Client client)
+{
+	std::string channelName = getInputCmd(message, "PART ");
+
+	std::map<std::string, Channel> &channels = getChannels();
+	std::map<std::string, Channel>::iterator it = channels.find(channelName);
+	if (it != channels.end())
+	{
+		std::map<std::string, Client> &users = it->second.getUsers();
+		std::map<std::string, Client>::iterator us = users.begin();
+		while (us != users.end())
+		{
+			if (us->second.getNick() == client.getNick())
+			{
+				std::string leaveChannel = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + "!" + getAddressIP() + " PART " + getInputCmd(message, "PART") + "\r\n";
+				if (send(client.getSocket(), leaveChannel.c_str(), leaveChannel.length(), 0) == -1)
+				{
+					std::cerr << "Erro ao enviar mensagem de saída de canal." << std::endl;
+				}
+				else
+				{	
+
+					users.erase(us);
+					std::cout << leaveChannel << std::endl;
+				}
+				if (it->second.getNbrUsers() == 0)
+				{
+					std::string closeChannel = ":" + getHostname() + " PART " + getInputCmd(message, "PART");
+					if (send(client.getSocket(), closeChannel.c_str(), closeChannel.length(), 0) == -1)
+					{
+						std::cerr << "Erro ao enviar mensagem de fecho de canal." << std::endl;
+					}
+					else
+					{
+						channels.erase(it);
+						std::cout << closeChannel << std::endl;
+					}
+				}
+				else
+					Send_WHO_toAll(client, channelName);
+				break;
+			}
+			++us;
+		}
+}
+
 
 bool Server::run(void)
 {
