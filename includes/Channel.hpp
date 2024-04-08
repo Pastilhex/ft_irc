@@ -27,6 +27,7 @@ private:
 	int _userLimit;							// Limit of users in the channel
 	std::map<std::string, Client> _clients; // <"nick": obj > | <"Jhonata": client >
 	std::vector<std::string> _operators;	// Channels' operators - based on the nickname
+	std::vector<char> _modes;				// Channel modes
 
 public:
 	/* Constructors*/
@@ -43,6 +44,7 @@ public:
 	std::map<std::string, Client> &getUsers(void);
 	std::vector<std::string> getOperators(void);
 	int getUserLimit(void);
+	std::vector<char> getModes(void);
 
 	/* Setters */
 	void setName(std::string name);
@@ -53,6 +55,7 @@ public:
 	void setRestrictedTopic(bool mode);
 	void setUserLimit(int limit);
 	void setNewUser(Client client);
+	void setNewMode(char mode);
 	void setPassword(std::string password);
 	void AddOperator(const std::string &);
 	void RemoveOperator(std::string);

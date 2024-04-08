@@ -86,15 +86,7 @@ public:
 	
 	// Handles
 
-	/**
-	 * @brief Handles the operator mode command.
-	 * 
-	 * This function is responsible for handling the operator mode command. It takes in the mode command, an iterator to a channel in a map, and a vector of operators as parameters.
-	 * 
-	 * @param mode_cmd The mode command to handle.
-	 * @param it An iterator to a channel in a map.
-	 */
-	void	handleOperatorMode(const std::vector<std::string>& mode_cmd, std::map<std::string, Channel>::iterator it);
+	std::string handleOperatorMode(const std::vector<std::string>& mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag);
 	
 	/**
 	 * @brief Handles the private access mode for a channel.

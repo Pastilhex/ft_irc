@@ -111,6 +111,11 @@ int Channel::getUserLimit(void)
 	return this->_userLimit;
 }
 
+std::vector<char> Channel::getModes(void)
+{
+	return this->_modes;	
+}
+
 /**
  * @brief Set the name of the channel.
  *
@@ -166,6 +171,10 @@ void	Channel::setNewUser(Client client)
 	this->_clients.insert(std::make_pair(client.getNick(), client));
 }
 
+void Channel::setNewMode(char mode)
+{
+	this->_modes.push_back(mode);
+}
 
 /**
  * @brief Sets the user limit for the channel.
