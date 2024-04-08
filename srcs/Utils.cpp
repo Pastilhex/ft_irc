@@ -4,13 +4,15 @@ int Utils::logMessage(const std::string &message, int level)
 {
 	std::string logTime = getCurrentDateTimeAsString();
 
-	if (level == EXIT_SUCCESS) {
-		std::cout << GREEN << "[INFO] " << RESET \
-		<< logTime << " " << message << std::endl;
+	if (level == EXIT_SUCCESS)
+	{
+		std::cout << GREEN << "[INFO] " << RESET
+				  << logTime << " " << message << std::endl;
 	}
-	else {
-		std::cerr << RED << "[ERROR] " << RESET \
-		<< getCurrentDateTimeAsString() << " " << message << RESET << std::endl;
+	else
+	{
+		std::cerr << RED << "[ERROR] " << RESET
+				  << getCurrentDateTimeAsString() << " " << message << RESET << std::endl;
 	}
 	return level;
 }
@@ -27,7 +29,7 @@ bool Utils::hasNonDigits(const std::string &str)
 	return false;
 }
 
-void	Utils::signalHandler(int signum)
+void Utils::signalHandler(int signum)
 {
 	if (signum == SIGINT)
 	{
@@ -107,37 +109,42 @@ std::string Utils::findWord(const std::string &keyword, const std::string &delim
 	return foundWord;
 }
 
-std::vector<std::string> Utils::split(const std::string& str, const std::string& delimiters) {
-    std::vector<std::string> tokens;  // Vetor para armazenar os tokens resultantes
-    std::string::size_type lastPos = str.find_first_not_of(delimiters, 0); // Encontra a primeira posição não de delimitadores
+std::vector<std::string> Utils::split(const std::string &str, const std::string &delimiters)
+{
+	std::vector<std::string> tokens;									   // Vetor para armazenar os tokens resultantes
+	std::string::size_type lastPos = str.find_first_not_of(delimiters, 0); // Encontra a primeira posição não de delimitadores
 
-    while (lastPos != std::string::npos) {
-        // Encontra a próxima posição de delimitador após lastPos
-        std::string::size_type pos = str.find_first_of(delimiters, lastPos);
-        // Extrai o token entre lastPos e pos
-        if (pos == std::string::npos) {
-            tokens.push_back(str.substr(lastPos)); // Se não houver mais delimitadores, extrai o restante da string
-            break;
-        } else {
-            tokens.push_back(str.substr(lastPos, pos - lastPos)); // Extrai o token
-        }
-        // Encontra a próxima posição não de delimitadores após pos
-        lastPos = str.find_first_not_of(delimiters, pos);
-    }
+	while (lastPos != std::string::npos)
+	{
+		// Encontra a próxima posição de delimitador após lastPos
+		std::string::size_type pos = str.find_first_of(delimiters, lastPos);
+		// Extrai o token entre lastPos e pos
+		if (pos == std::string::npos)
+		{
+			tokens.push_back(str.substr(lastPos)); // Se não houver mais delimitadores, extrai o restante da string
+			break;
+		}
+		else
+		{
+			tokens.push_back(str.substr(lastPos, pos - lastPos)); // Extrai o token
+		}
+		// Encontra a próxima posição não de delimitadores após pos
+		lastPos = str.find_first_not_of(delimiters, pos);
+	}
 
-    return tokens;
+	return tokens;
 }
 
 bool Utils::isValidUser(Channel channel, std::string nickname)
 {
-	if(channel.getUsers().find(nickname) != channel.getUsers().end())
+	if (channel.getUsers().find(nickname) != channel.getUsers().end())
 		return true;
-	return false; 
+	return false;
 }
 
 bool Utils::isValidFlag(std::string flag)
 {
-	if(flag == "+k" || flag == "+l" || flag == "+i" || flag == "+t")
+	if (flag == "+k" || flag == "+l" || flag == "+i" || flag == "+t")
 		return true;
 	return false;
 }

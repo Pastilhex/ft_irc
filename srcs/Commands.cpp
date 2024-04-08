@@ -22,6 +22,7 @@ static bool isOperator(std::string nickname, std::vector<std::string> operators)
 	}
 	return false;
 }
+
 void Server::MODE(std::string message, Client client)
 {
 	(void)client;
@@ -32,7 +33,13 @@ void Server::MODE(std::string message, Client client)
 	// verificar se o comando tem argumentos suficientes
 	std::vector<std::string> operators = it->second.getOperators();
 	if (mode_cmd.size() < 3)
-		return (Utils::logMessage("Not enough arguments", 1), void());
+	{
+		// if (it->second.getOperators().size() == 1 && it->second.getOperators()[0].substr(1) == client.getNick())
+		// 	mode_cmd.push_back("+o");
+		// else
+		return (Utils::logMessage("", 1), void());
+		// return (Utils::logMessage("Not enough arguments", 1), void());
+	}
 	// verificar se o canal existe
 	if (channel_name.empty() || it == getChannels().end())
 	{
