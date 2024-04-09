@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/08 11:53:21 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/08 23:10:41 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,7 @@ public:
 	void MODE(std::string message, Client client);
 	void PONG(std::string message, Client client);
 	void KICK(std::string message, Client client);
+
 
 	void Send_WHO_toAll(Client client, std::string channelName);
 	void Send_PRIVMSG_toChannel(std::string message, Client client);

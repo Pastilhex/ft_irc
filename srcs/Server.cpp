@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/08 14:57:29 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/08 23:13:17 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
+#include "../includes/Server.hpp"
 
 Server::Server(std::string password)
 {
@@ -706,6 +707,7 @@ void Server::KICK(std::string message, Client client)
 			}
 			++us;
 		}
+	}
 }
 
 
