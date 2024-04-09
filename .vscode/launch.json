@@ -9,7 +9,7 @@
 			"type": "cppdbg",
 			"request": "launch",
 			"program": "${workspaceFolder}/ircserv",
-			"args": ["2848","password"],
+			"args": ["6667","password"],
 			"stopAtEntry": false,
 			"cwd": "${fileDirname}",
 			"environment": [],

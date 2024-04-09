@@ -56,6 +56,7 @@ public:
 	void setUserLimit(int limit);
 	void setNewUser(Client client);
 	void setNewMode(char mode);
+	void deleteMode(char mode);
 	void setPassword(std::string password);
 	void AddOperator(const std::string &);
 	void RemoveOperator(std::string);

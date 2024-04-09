@@ -265,3 +265,16 @@ std::vector<std::string> Channel::getOperators(void)
 {
 	return this->_operators;
 }
+
+void Channel::deleteMode(char mode)
+{
+	for(size_t i = 0; i < _modes.size(); i++)
+	{
+		if (_modes[i] == mode)
+        {
+            _modes.erase(_modes.begin() + i);
+            // After erasing, decrement i to account for the shift in indices
+            i--;
+        }
+	}
+}

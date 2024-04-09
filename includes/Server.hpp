@@ -95,7 +95,7 @@ public:
 	 *
 	 * @param it An iterator pointing to the channel in a map.
 	 */
-	void	handlePrivateAccessMode(std::map<std::string, Channel>::iterator it);
+	void	handlePrivateAccessMode(std::map<std::string, Channel>::iterator it, char modeOption, char modeFlag);
 
 	/**
 	 * @brief Handles the user limit mode for a channel.
@@ -105,7 +105,7 @@ public:
 	 * @param mode_cmd The mode command to handle.
 	 * @param it An iterator pointing to the channel in a map.
 	 */
-	void	handleUserLimitMode(const std::vector<std::string>& mode_cmd, std::map<std::string, Channel>::iterator it);
+	void	handleUserLimitMode(const std::vector<std::string>& mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag);
 	
 	
 	/**
@@ -117,7 +117,7 @@ public:
 	 * @param mode_cmd The command arguments for the password mode command.
 	 * @param it       An iterator pointing to the channel in which the mode command is being executed.
 	 */
-	void	handlePasswordMode(const std::vector<std::string>& mode_cmd, std::map<std::string, Channel>::iterator it);
+	void	handlePasswordMode(const std::vector<std::string>& mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag);
 
 	/**
 	 * Handles the restricted topic mode command.
@@ -126,7 +126,7 @@ public:
 	 *
 	 * @param it An iterator pointing to the channel in which the mode command is being executed.
 	 */
-	void	handleRestrictedTopicMode(std::map<std::string, Channel>::iterator it);
+	void	handleRestrictedTopicMode(std::map<std::string, Channel>::iterator it, char modeFlag);
 };
 
 #endif
