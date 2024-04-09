@@ -6,7 +6,7 @@
 /*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/08 23:13:17 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/09 22:02:02 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,7 +143,7 @@ std::string Server::getAddressIP(void)
 	// char *ip_address = inet_ntoa(*((struct in_addr *)host_info->h_addr_list[0]));
 
 	char hostname[256];
-	char *ipAddress;
+	char *ipAddress = NULL;
 
 	// Obtém o nome do host local
 	if (gethostname(hostname, sizeof(hostname)) != 0)
@@ -758,16 +758,16 @@ std::string Server::getClientNick(std::string &channelName, std::string &clientN
 void Server::sendWelcome(int clientSocket, Client &client)
 {
 	std::string welcome = ":" + getHostname() + " 001 " + client.getNick() + " :Welcome to the Internet Relay Network, " + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + "!" + getAddressIP() + "\r\n";
-	welcome += ":localhost 002 pastilhex :Your host is " + getHostname() + ", running version FT_IRC_42Porto_v1.0\r\n";
-	welcome += ":localhost 003 pastilhex :This server was created " + getCurrentDateTime() + "\r\n";
-	welcome += ":localhost 372 pastilhex :███████╗████████╗    ██╗██████╗  ██████╗\r\n";
-	welcome += ":localhost 372 pastilhex :██╔════╝╚══██╔══╝    ██║██╔══██╗██╔════╝\r\n";
-	welcome += ":localhost 372 pastilhex :█████╗     ██║       ██║██████╔╝██║     \r\n";
-	welcome += ":localhost 372 pastilhex :██╔══╝     ██║       ██║██╔══██╗██║     \r\n";
-	welcome += ":localhost 372 pastilhex :██║        ██║ ████╗ ██║██║  ██║╚██████╗\r\n";
-	welcome += ":localhost 372 pastilhex :╚═╝        ╚═╝  ╚══╝ ╚═╝╚═╝  ╚═╝ ╚═════╝\r\n";
-	welcome += ":localhost 372 pastilhex :Project by:  ialves-m  lpicoli  jhogonca\r\n";
-	welcome += ":localhost 376 pastilhex :End of /MOTD command.\r\n";
+	welcome += ":localhost 002 " + client.getNick() + " :Your host is " + getHostname() + ", running version FT_IRC_42Porto_v1.0\r\n";
+	welcome += ":localhost 003 " + client.getNick() + " :This server was created " + getCurrentDateTime() + "\r\n";
+	welcome += ":localhost 372 " + client.getNick() + " :███████╗████████╗    ██╗██████╗  ██████╗\r\n";
+	welcome += ":localhost 372 " + client.getNick() + " :██╔════╝╚══██╔══╝    ██║██╔══██╗██╔════╝\r\n";
+	welcome += ":localhost 372 " + client.getNick() + " :█████╗     ██║       ██║██████╔╝██║     \r\n";
+	welcome += ":localhost 372 " + client.getNick() + " :██╔══╝     ██║       ██║██╔══██╗██║     \r\n";
+	welcome += ":localhost 372 " + client.getNick() + " :██║        ██║ ████╗ ██║██║  ██║╚██████╗\r\n";
+	welcome += ":localhost 372 " + client.getNick() + " :╚═╝        ╚═╝  ╚══╝ ╚═╝╚═╝  ╚═╝ ╚═════╝\r\n";
+	welcome += ":localhost 372 " + client.getNick() + " :Project by:  ialves-m  lpicoli  jhogonca\r\n";
+	welcome += ":localhost 376 " + client.getNick() + " :End of /MOTD command.\r\n";
 	if (send(clientSocket, welcome.c_str(), welcome.length(), 0) == -1)
 	{
 		std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ircserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 06:36:04 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/07 20:00:39 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/09 21:29:29 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "Utils.hpp"
+#include "Macros.hpp"
 
 std::string getCurrentDateTime();
 bool isCMD(std::string message, std::string cmd);
