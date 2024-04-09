@@ -79,7 +79,6 @@ public:
 	void WHO(int clientSocket, const Client client, std::string channelName);
 	void PART(std::string message, Client &client);
 	void MODE(std::string message, Client client);
-	void PONG(std::string message, Client client);
 	void KICK(std::string message, Client client);
 
 	void Send_WHO_toAll(Client client, std::string channelName);
