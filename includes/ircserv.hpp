@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 06:36:04 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/07 20:00:39 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/10 13:23:09 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,11 @@
 #define _IRC_
 
 // Colors
-#define RESET   "\033[0m"
-#define RED     "\033[1;31m"
-#define GREEN   "\033[1;32m"
-#define YELLOW  "\033[1;33m"
-#define BLUE    "\033[1;34m"
+#define RESET "\033[0m"
+#define RED "\033[1;31m"
+#define GREEN "\033[1;32m"
+#define YELLOW "\033[1;33m"
+#define BLUE "\033[1;34m"
 
 #include <arpa/inet.h>
 #include <cctype>
@@ -43,11 +43,14 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "Utils.hpp"
+#include <sstream>
 
 std::string getCurrentDateTime();
 bool isCMD(std::string message, std::string cmd);
 std::string getInputCmd(std::string message, std::string cmd);
 std::string getInputChannel(std::string message);
 std::string getMsgToSend(std::string message);
+void SEND(int socket, std::string msg, std::string error);
+std::vector<std::string> trimInput(std::string input);
 
 #endif

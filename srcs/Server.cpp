@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/10 09:49:28 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/10 15:03:21 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -348,45 +348,40 @@ void Server::isNewClient(std::vector<pollfd> &fds, const int &serverSocket, stru
 void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, int bytesRead, int i)
 {
 	std::string message(buffer, bytesRead);
-	std::cout << message << std::endl;
+	if (!isCMD(message, "PING"))
+		std::cout << ":<< " + message << std::endl;
 
 	if (isCMD(message, "PRIVMSG"))
 	{
-		Send_PRIVMSG_toChannel(message, client);
+		PRIVMSG(message, client);
 		fds[i].revents = 0;
 	}
-
 	if (isCMD(message, "NICK") || isCMD(message, "USER ") || isCMD(message, "PASS"))
 	{
 		client.getClientLoginData(buffer, bytesRead);
 		fds[i].revents = 0;
 	}
-
 	if (isCMD(message, "MODE"))
 	{
 		MODE(message, client);
 		fds[i].revents = 0;
 	}
-
 	if (isCMD(message, "WHO"))
 	{
 		std::string channelName = getInputCmd(message, "WHO ");
 		WHO(fds[i].fd, client, channelName);
 		fds[i].revents = 0;
 	}
-
 	if (isCMD(message, "LIST"))
 	{
 		LIST(fds[i].fd, client, message);
 		fds[i].revents = 0;
 	}
-
 	if (isCMD(message, "JOIN"))
 	{
 		JOIN(fds[i].fd, client, message);
 		fds[i].revents = 0;
 	}
-
 	if (isCMD(message, "PART"))
 	{
 		// Usage: PART [<channel>] [<reason>], leaves the channel, by default the current one
@@ -401,16 +396,54 @@ void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, 
 		// Remova o cliente de todos os canais
 		fds.erase(fds.begin() + i); // Remova o cliente do vector<pollfd>
 	}
-
 	if (isCMD(message, "KICK"))
 	{
 		KICK(message, client);
 		fds[i].revents = 0;
 	}
-
+	if (isCMD(message, "TOPIC"))
+	{
+		TOPIC(fds[i].fd, client, message);
+		fds[i].revents = 0;
+	}
 }
 
-void Server::Send_PRIVMSG_toChannel(std::string message, Client client)
+void Server::TOPIC(int clientSocket, Client &client, std::string message)
+{
+	(void)clientSocket;
+
+	std::string channelName = getInputCmd(message, "TOPIC ");
+
+	int topicBegin = message.find_first_of(":") + 1;
+	int topicEnd = message.find_first_of("\r\n", topicBegin);
+	std::string topic = message.substr(topicBegin, topicEnd - topicBegin);
+
+	std::map<std::string, Channel> &channels = getChannels();
+	std::map<std::string, Channel>::iterator it = channels.find(channelName);
+
+	bool isUserOp = false;
+	bool isOpenTopic = it->second.getModeTopic();
+
+	std::vector<std::string> &operators = it->second.getOperators();
+	std::vector<std::string>::iterator op = operators.begin();
+	while (op != operators.end())
+	{
+		if ("@" + client.getNick() == *op) // quem esta a aceder ao TOPIC é Operador ?
+			isUserOp = true;
+		++op;
+	}
+
+	if (it != channels.end())
+	{
+		if (isOpenTopic || isUserOp)
+		{
+			std::string updateTopic = ":" + getHostname() + " TOPIC " + getInputCmd(message, "KICK") + " :" + topic + "\r\n";
+			SEND(client.getSocket(), updateTopic, "Erro ao enviar mensagem de alteração de TOPIC.");
+		}
+	}
+}
+
+void Server::PRIVMSG(std::string message, Client client)
 {
 	std::string channelName = getInputChannel(message);
 	std::string msgToSend = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " PRIVMSG #" + channelName + " :";
@@ -433,24 +466,6 @@ void Server::Send_PRIVMSG_toChannel(std::string message, Client client)
 	}
 }
 
-void Server::Send_WHO_toAll(Client client, std::string channelName)
-{
-	(void)client;
-	std::map<std::string, Channel> channels = getChannels();
-	std::map<std::string, Channel>::iterator it = channels.find(channelName);
-	if (it != channels.end())
-	{
-		std::map<std::string, Client> &users = it->second.getUsers();
-		std::map<std::string, Client>::iterator user_it = users.begin();
-		while (user_it != users.end())
-		{
-			WHO(user_it->second.getSocket(), user_it->second, channelName);
-			++user_it;
-		}
-		return;
-	}
-}
-
 void Server::LIST(int clientSocket, Client &client, std::string message)
 {
 	(void)message;
@@ -466,7 +481,7 @@ void Server::LIST(int clientSocket, Client &client, std::string message)
 		int nbrUser = it->second.getNbrUsers();
 		char nbrUserStr[20];				// Tamanho suficiente para armazenar um inteiro
 		sprintf(nbrUserStr, "%d", nbrUser); // Formatar o inteiro como uma string
-		std::string channel = ":" + this->getHostname() + " 322 " + client.getNick() + " #" + channel_name + " " + std::string(nbrUserStr) + " :" + it->second.getTopic() + "\r\n";
+		std::string channel = ":" + this->getHostname() + " 322 " + client.getNick() + " " + getInputCmd(message, "LIST") + " " + std::string(nbrUserStr) + " :" + it->second.getTopic() + "\r\n";
 		channel += ":" + this->getHostname() + " 323 " + client.getNick() + " :End of /LIST\r\n";
 		send(clientSocket, channel.c_str(), channel.size(), 0);
 	}
@@ -493,7 +508,7 @@ void Server::JOIN(int clientSocket, Client &client, std::string message)
 				if (it->first == channelName)
 				{
 					it->second.setNewUser(client);
-					Send_WHO_toAll(client, channelName);
+					updateChannel(client, channelName);
 					break;
 				}
 			}
@@ -584,7 +599,7 @@ void Server::PART(std::string message, Client &client)
 					std::cerr << "Erro ao enviar mensagem de saída de canal." << std::endl;
 				}
 				else
-				{	
+				{
 					users.erase(us);
 					std::cout << leaveChannel << std::endl;
 				}
@@ -602,7 +617,7 @@ void Server::PART(std::string message, Client &client)
 					}
 				}
 				else
-					Send_WHO_toAll(client, channelName);
+					updateChannel(client, channelName);
 				break;
 			}
 			++us;
@@ -617,103 +632,89 @@ void Server::PART(std::string message, Client &client)
 void Server::KICK(std::string message, Client client)
 {
 	// KICK #42 ivo :bye
-	int channelBegin = message.find_first_of("#&");
-	int channelMiddle = message.find_first_of(" \r\n", channelBegin) + 1;
-	int channelEnd = message.find_first_of(" \r\n", channelMiddle);
-	std::string kickNick = message.substr(channelMiddle, channelEnd-channelMiddle);
+	// :irc.server.com 482 nickname #canal :You're not channel operator
+	// std::string reason = ":" + getHostname() + " 461 " + client.getNick() + " " + getInputCmd(message, "KICK") + " :Not enough parameters\r\n";
+
+	std::vector<std::string> input = trimInput(message);
+	if (input.size() <= 3) // ERR_NEEDMOREPARAMS (461)
+	{
+		bool isChannelOk = ((!input[1].empty()) ? (input[1][0] == '#' || input[1][0] == '&') ? true : false : false);
+		bool isNickOk = (!input[2].empty()) ? true : false;
+		if (isChannelOk && isNickOk)
+		{
+			std::string reason = ":" + getHostname() + " 461 " + client.getNick() + " " + ((isChannelOk) ? input[1] : "") + " :Not enough parameters\r\n";
+			SEND(client.getSocket(), reason, "Erro ao enviar mensagem de KICK por falta de argumentos");
+		}
+		else
+			return;
+	}
 
 	bool isKickerOp = false;
 	bool isKickedOp = false;
 
+	int nickBegin = message.find_first_of("#&");
+	int nickMiddle = message.find_first_of(" \r\n", nickBegin) + 1;
+	int nickEnd = message.find_first_of(" \r\n", nickMiddle);
+	std::string kickNick = message.substr(nickMiddle, nickEnd - nickMiddle);
+
+	int reasonBegin = message.find_first_of(":") + 1;
+	int reasonEnd = message.find_first_of("\r\n", reasonBegin);
+	std::string reason = message.substr(reasonBegin, reasonEnd - reasonBegin);
+
 	std::string channelName = getInputCmd(message, "KICK ");
 	std::map<std::string, Channel> &channels = getChannels();
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
-
 	if (it != channels.end())
 	{
-		std::vector<std::string> &operators = it->second.getOperators();
-		std::vector<std::string>::iterator op = operators.begin();
-		while (op != operators.end())
 		{
-			if ("@" + client.getNick() == *op) // quem esta a kickar e Operador ?
-				isKickerOp = true;
-			++op;
-		}
-
-		const std::map<std::string, Client> &users = it->second.getUsers();
-		std::map<std::string, Client>::const_iterator user_it = users.begin();
-		while (user_it != users.end())
-		{
-			if (kickNick == *op) // quem esta a ser kickado é Operador ?
-				isKickedOp = true;
-		}
-
-		if (isKickerOp && isKickedOp)
-		{
-			// 	std::cout << leaveChannel << std::endl;
-			// /*	
-			// 	ERR_CHANOPRIVSNEEDED (482)
-			// 	"<client> <channel> :You're not channel operator"
-			// 	Indicates that a command failed because the client does not have the appropriate channel privileges.
-			// 	This numeric can apply for different prefixes such as halfop, operator, etc.
-			// 	The text used in the last param of this message may vary.
-			// */
-			std::string leaveChannel = ":" + getHostname() + " " + client.getNick() + " " + ":Permission Denied- You're not an IRC operator";
-			if (send(client.getSocket(), leaveChannel.c_str(), leaveChannel.length(), 0) == -1)
+			std::vector<std::string> &operators = it->second.getOperators();
+			std::vector<std::string>::iterator op = operators.begin();
+			while (op != operators.end())
 			{
-				std::cerr << "Erro ao enviar mensagem de KICK." << std::endl;
+				if ("@" + client.getNick() == *op) // quem esta a kickar e Operador ?
+					isKickerOp = true;
+				++op;
 			}
-			return ;
 		}
-		else if (!isKickerOp && isKickedOp)
 		{
-			/*	
-				ERR_NOPRIVILEGES (481)
-				:server.host 481 <seu_nick> :Permission Denied- You're not an IRC operator
-				"<client> :Permission Denied- You're not an IRC operator"
-				Indicates that the command failed because the user is not an IRC operator.
-				The text used in the last param of this message may vary.
-			*/
-			return ;
+			std::vector<std::string> &operators = it->second.getOperators();
+			std::vector<std::string>::iterator op = operators.begin();
+			while (op != operators.end())
+			{
+				if ("@" + kickNick == *op) // quem esta a ser kickado é Operador ?
+					isKickedOp = true;
+				++op;
+			}
+		}
+		if (isKickerOp && isKickedOp) // ERR_NOPRIVILEGES (481)
+		{
+			std::string leaveChannel = ":" + getHostname() + " 481 " + client.getNick() + " " + getInputCmd(message, "KICK") + " :Permission Denied- You're not an IRC operator\r\n";
+			SEND(client.getSocket(), leaveChannel, "Erro ao enviar mensagem de KICK.");
+			return;
+		}
+		else if ((!isKickerOp && isKickedOp) || (!isKickerOp && !isKickedOp)) // ERR_CHANOPRIVSNEEDED (482)
+		{
+			std::string leaveChannel = ":" + getHostname() + " 482 " + client.getNick() + " " + getInputCmd(message, "KICK") + " :You're not channel operator\r\n";
+			SEND(client.getSocket(), leaveChannel, "Erro ao enviar mensagem de KICK.");
+			return;
 		}
 		else if (isKickerOp && !isKickedOp)
-		{
-			// std::string leaveChannel = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " KICK " + getInputCmd(message, "KICK") + " " + ":You're not channel operator";
-			// if (send(client.getSocket(), leaveChannel.c_str(), leaveChannel.length(), 0) == -1)
-			// {
-			// 	std::cerr << "Erro ao enviar mensagem de KICK." << std::endl;
-			// }
-			// else
-			users.erase(us);
-			Send_WHO_toAll(client, channelName);
-			return ;
-			
-		}
-
-
 		{
 			std::map<std::string, Client> &users = it->second.getUsers();
 			std::map<std::string, Client>::iterator us = users.begin();
 			while (us != users.end())
 			{
-				if (us->second.getNick() == kickNick)
+				if (us->first == kickNick)
 				{
-					std::string leaveChannel = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " " + message;
-					if (send(client.getSocket(), leaveChannel.c_str(), leaveChannel.length(), 0) == -1)
-					{
-						std::cerr << "Erro ao enviar mensagem de KICK." << std::endl;
-					}
-					else
-					{	
-						std::cout << leaveChannel << std::endl;
-						Send_WHO_toAll(client, channelName);
-					}
-					break;
+					std::string leaveChannel = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " KICK " + getInputCmd(message, "KICK") + " " + kickNick + " :" + reason + "\r\n";
+					SEND(client.getSocket(), leaveChannel, "Erro ao enviar mensagem de KICK.");
+					users.erase(us);
+					updateChannel(client, channelName);
+					return;
 				}
 				++us;
 			}
 		}
-
 	}
 }
 
@@ -759,6 +760,24 @@ std::string Server::getClientNick(std::string &channelName, std::string &clientN
 		}
 	}
 	return "";
+}
+
+void Server::updateChannel(Client client, std::string channelName)
+{
+	(void)client;
+	std::map<std::string, Channel> channels = getChannels();
+	std::map<std::string, Channel>::iterator it = channels.find(channelName);
+	if (it != channels.end())
+	{
+		std::map<std::string, Client> &users = it->second.getUsers();
+		std::map<std::string, Client>::iterator user_it = users.begin();
+		while (user_it != users.end())
+		{
+			WHO(user_it->second.getSocket(), user_it->second, channelName);
+			++user_it;
+		}
+		return;
+	}
 }
 
 void Server::sendWelcome(int clientSocket, Client &client)
