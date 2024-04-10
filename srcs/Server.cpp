@@ -6,7 +6,7 @@
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/08 23:54:23 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/10 01:18:01 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -622,6 +622,9 @@ void Server::KICK(std::string message, Client client)
 	int channelEnd = message.find_first_of(" \r\n", channelMiddle);
 	std::string kickNick = message.substr(channelMiddle, channelEnd-channelMiddle);
 
+	bool isKickerOp = false;
+	bool isKickedOp = false;
+
 	std::string channelName = getInputCmd(message, "KICK ");
 	std::map<std::string, Channel> &channels = getChannels();
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
@@ -632,75 +635,85 @@ void Server::KICK(std::string message, Client client)
 		std::vector<std::string>::iterator op = operators.begin();
 		while (op != operators.end())
 		{
-			std::string opNick;
-			opNick = op->substr(0,1);
-			if (opNick == client.getNick()) // quem esta a kickar e Operador ?
+			if ("@" + client.getNick() == *op) // quem esta a kickar e Operador ?
+				isKickerOp = true;
+			++op;
+		}
+
+		const std::map<std::string, Client> &users = it->second.getUsers();
+		std::map<std::string, Client>::const_iterator user_it = users.begin();
+		while (user_it != users.end())
+		{
+			if (kickNick == *op) // quem esta a ser kickado é Operador ?
+				isKickedOp = true;
+		}
+
+		if (isKickerOp && isKickedOp)
+		{
+			// 	std::cout << leaveChannel << std::endl;
+			// /*	
+			// 	ERR_CHANOPRIVSNEEDED (482)
+			// 	"<client> <channel> :You're not channel operator"
+			// 	Indicates that a command failed because the client does not have the appropriate channel privileges.
+			// 	This numeric can apply for different prefixes such as halfop, operator, etc.
+			// 	The text used in the last param of this message may vary.
+			// */
+			std::string leaveChannel = ":" + getHostname() + " " + client.getNick() + " " + ":Permission Denied- You're not an IRC operator";
+			if (send(client.getSocket(), leaveChannel.c_str(), leaveChannel.length(), 0) == -1)
 			{
-				if (*op == kickNick) // quem esta a ser kickado e Operador ?
+				std::cerr << "Erro ao enviar mensagem de KICK." << std::endl;
+			}
+			return ;
+		}
+		else if (!isKickerOp && isKickedOp)
+		{
+			/*	
+				ERR_NOPRIVILEGES (481)
+				:server.host 481 <seu_nick> :Permission Denied- You're not an IRC operator
+				"<client> :Permission Denied- You're not an IRC operator"
+				Indicates that the command failed because the user is not an IRC operator.
+				The text used in the last param of this message may vary.
+			*/
+			return ;
+		}
+		else if (isKickerOp && !isKickedOp)
+		{
+			// std::string leaveChannel = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " KICK " + getInputCmd(message, "KICK") + " " + ":You're not channel operator";
+			// if (send(client.getSocket(), leaveChannel.c_str(), leaveChannel.length(), 0) == -1)
+			// {
+			// 	std::cerr << "Erro ao enviar mensagem de KICK." << std::endl;
+			// }
+			// else
+			users.erase(us);
+			Send_WHO_toAll(client, channelName);
+			return ;
+			
+		}
+
+
+		{
+			std::map<std::string, Client> &users = it->second.getUsers();
+			std::map<std::string, Client>::iterator us = users.begin();
+			while (us != users.end())
+			{
+				if (us->second.getNick() == kickNick)
 				{
-					std::string leaveChannel = ":" + getHostname() + " " + client.getNick() + " " + ":Permission Denied- You're not an IRC operator";
-					return ;
+					std::string leaveChannel = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " " + message;
 					if (send(client.getSocket(), leaveChannel.c_str(), leaveChannel.length(), 0) == -1)
 					{
 						std::cerr << "Erro ao enviar mensagem de KICK." << std::endl;
 					}
-					/*	
-						ERR_NOPRIVILEGES (481)
-						:server.host 481 <seu_nick> :Permission Denied- You're not an IRC operator
-						"<client> :Permission Denied- You're not an IRC operator"
-						Indicates that the command failed because the user is not an IRC operator.
-						The text used in the last param of this message may vary.
-					*/
+					else
+					{	
+						std::cout << leaveChannel << std::endl;
+						Send_WHO_toAll(client, channelName);
+					}
+					break;
 				}
-				else
-				{
-					operators.erase(op);
-					Send_WHO_toAll(client, channelName);
-					return ;
-				}
+				++us;
 			}
-			else
-			{
-				// std::string leaveChannel = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " KICK " + getInputCmd(message, "KICK") + " " + ":You're not channel operator";
-				// if (send(client.getSocket(), leaveChannel.c_str(), leaveChannel.length(), 0) == -1)
-				// {
-				// 	std::cerr << "Erro ao enviar mensagem de KICK." << std::endl;
-				// }
-				// else
-				// 	std::cout << leaveChannel << std::endl;
-				// /*	
-				// 	ERR_CHANOPRIVSNEEDED (482)
-				// 	"<client> <channel> :You're not channel operator"
-				// 	Indicates that a command failed because the client does not have the appropriate channel privileges.
-				// 	This numeric can apply for different prefixes such as halfop, operator, etc.
-				// 	The text used in the last param of this message may vary.
-				// */
-				// return ;
-			}			
-			++op;
 		}
 
-		std::map<std::string, Client> &users = it->second.getUsers();
-		std::map<std::string, Client>::iterator us = users.begin();
-		while (us != users.end())
-		{
-			if (us->second.getNick() == kickNick)
-			{
-				std::string leaveChannel = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " " + message;
-				if (send(client.getSocket(), leaveChannel.c_str(), leaveChannel.length(), 0) == -1)
-				{
-					std::cerr << "Erro ao enviar mensagem de KICK." << std::endl;
-				}
-				else
-				{	
-					users.erase(us);
-					std::cout << leaveChannel << std::endl;
-					Send_WHO_toAll(client, channelName);
-				}
-				break;
-			}
-			++us;
-		}
 	}
 }
 
