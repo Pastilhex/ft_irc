@@ -635,6 +635,9 @@ void Server::KICK(std::string message, Client client)
 	// :irc.server.com 482 nickname #canal :You're not channel operator
 	// std::string reason = ":" + getHostname() + " 461 " + client.getNick() + " " + getInputCmd(message, "KICK") + " :Not enough parameters\r\n";
 
+	bool isKickerOp = false;
+	bool isKickedOp = false;
+
 	std::vector<std::string> input = trimInput(message);
 	if (input.size() <= 3) // ERR_NEEDMOREPARAMS (461)
 	{
@@ -649,19 +652,10 @@ void Server::KICK(std::string message, Client client)
 			return;
 	}
 
-	bool isKickerOp = false;
-	bool isKickedOp = false;
-
-	int nickBegin = message.find_first_of("#&");
-	int nickMiddle = message.find_first_of(" \r\n", nickBegin) + 1;
-	int nickEnd = message.find_first_of(" \r\n", nickMiddle);
-	std::string kickNick = message.substr(nickMiddle, nickEnd - nickMiddle);
-
-	int reasonBegin = message.find_first_of(":") + 1;
-	int reasonEnd = message.find_first_of("\r\n", reasonBegin);
-	std::string reason = message.substr(reasonBegin, reasonEnd - reasonBegin);
-
+	std::string kickNick = input[2];
+	std::string reason = (!input[3].empty()) ? input[3] : "";
 	std::string channelName = getInputCmd(message, "KICK ");
+
 	std::map<std::string, Channel> &channels = getChannels();
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
 	if (it != channels.end())
@@ -671,7 +665,7 @@ void Server::KICK(std::string message, Client client)
 			std::vector<std::string>::iterator op = operators.begin();
 			while (op != operators.end())
 			{
-				if ("@" + client.getNick() == *op) // quem esta a kickar e Operador ?
+				if ("@" + client.getNick() == *op) // quem esta a kickar é Operador ?
 					isKickerOp = true;
 				++op;
 			}
@@ -686,6 +680,7 @@ void Server::KICK(std::string message, Client client)
 				++op;
 			}
 		}
+
 		if (isKickerOp && isKickedOp) // ERR_NOPRIVILEGES (481)
 		{
 			std::string leaveChannel = ":" + getHostname() + " 481 " + client.getNick() + " " + getInputCmd(message, "KICK") + " :Permission Denied- You're not an IRC operator\r\n";
@@ -782,17 +777,18 @@ void Server::updateChannel(Client client, std::string channelName)
 
 void Server::sendWelcome(int clientSocket, Client &client)
 {
-	std::string welcome = ":" + getHostname() + " 001 " + client.getNick() + " :Welcome to the Internet Relay Network, " + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + "!" + getAddressIP() + "\r\n";
-	welcome += ":localhost 002 pastilhex :Your host is " + getHostname() + ", running version FT_IRC_42Porto_v1.0\r\n";
-	welcome += ":localhost 003 pastilhex :This server was created " + getCurrentDateTime() + "\r\n";
-	welcome += ":localhost 372 pastilhex :███████╗████████╗    ██╗██████╗  ██████╗\r\n";
-	welcome += ":localhost 372 pastilhex :██╔════╝╚══██╔══╝    ██║██╔══██╗██╔════╝\r\n";
-	welcome += ":localhost 372 pastilhex :█████╗     ██║       ██║██████╔╝██║     \r\n";
-	welcome += ":localhost 372 pastilhex :██╔══╝     ██║       ██║██╔══██╗██║     \r\n";
-	welcome += ":localhost 372 pastilhex :██║        ██║ ████╗ ██║██║  ██║╚██████╗\r\n";
-	welcome += ":localhost 372 pastilhex :╚═╝        ╚═╝  ╚══╝ ╚═╝╚═╝  ╚═╝ ╚═════╝\r\n";
-	welcome += ":localhost 372 pastilhex :Project by:  ialves-m  lpicoli  jhogonca\r\n";
-	welcome += ":localhost 376 pastilhex :End of /MOTD command.\r\n";
+	std::string welcome;
+	welcome += ":" + getHostname() + " 001 " + client.getNick() + " :Welcome to the Internet Relay Network, " + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + "!" + getAddressIP() + "\r\n";
+	welcome += ":" + getHostname() + " 002 " + client.getNick() + " :Your host is " + getHostname() + ", running version FT_IRC_42Porto_v1.0\r\n";
+	welcome += ":" + getHostname() + " 003 " + client.getNick() + " :This server was created " + getCurrentDateTime() + "\r\n";
+	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :███████╗████████╗    ██╗██████╗  ██████╗\r\n";
+	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :██╔════╝╚══██╔══╝    ██║██╔══██╗██╔════╝\r\n";
+	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :█████╗     ██║       ██║██████╔╝██║     \r\n";
+	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :██╔══╝     ██║       ██║██╔══██╗██║     \r\n";
+	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :██║        ██║ ████╗ ██║██║  ██║╚██████╗\r\n";
+	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :╚═╝        ╚═╝  ╚══╝ ╚═╝╚═╝  ╚═╝ ╚═════╝\r\n";
+	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :Project by:  ialves-m  lpicoli  jhogonca\r\n";
+	welcome += ":" + getHostname() + " 376 " + client.getNick() + " :End of /MOTD command.\r\n";
 	if (send(clientSocket, welcome.c_str(), welcome.length(), 0) == -1)
 	{
 		std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;

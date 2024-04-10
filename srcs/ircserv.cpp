@@ -73,7 +73,19 @@ std::vector<std::string> trimInput(std::string input)
 	std::string word;
 
 	while (ss >> word)
-		words.push_back(word);
+	{
+		if (word[0] == ':')
+		{
+		    words.push_back(word);
+            while (ss >> word)
+            {
+                words.back() += " ";
+                words.back() += word;
+            }
+		}
+		else
+			words.push_back(word);
+	}
 
 	return words;
 }
