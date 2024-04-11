@@ -6,7 +6,7 @@
 /*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/08 23:10:41 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/11 19:06:26 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,6 +163,7 @@ public:
 	void sendWelcome(int clientSocket, Client &client);
 	void processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, int bytesRead, int i);
 	void isNewClient(std::vector<pollfd> &fds, const int &serverSocket, struct sockaddr_in &clientAddress, Client &client);
+	std::vector<std::string> trimInput(std::string input, Client client);
 
 	bool addClientToGlobalUsers(Client client);
 	void removeClientFromGlobalUsers(Client client);

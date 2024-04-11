@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ircserv.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 13:07:13 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/11 12:21:47 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/11 19:37:45 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,30 +62,3 @@ void SEND(int socket, std::string msg, std::string error)
 	std::cout << msg << std::endl;
 }
 
-std::vector<std::string> trimInput(std::string input)
-{
-	int begin = input.find_first_not_of(" \r\n\t");
-	int end = input.find_last_not_of(" \r\n\t");
-	std::string trimmed = input.substr(begin, end-begin + 1);
-	
-	std::vector<std::string> words;
-	std::stringstream ss(trimmed);
-	std::string word;
-
-	while (ss >> word)
-	{
-		if (word[0] == ':')
-		{
-		    words.push_back(word);
-            while (ss >> word)
-            {
-                words.back() += " ";
-                words.back() += word;
-            }
-		}
-		else
-			words.push_back(word);
-	}
-
-	return words;
-}

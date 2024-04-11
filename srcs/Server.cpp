@@ -6,7 +6,7 @@
 /*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/09 22:02:02 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/11 19:38:57 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -412,7 +412,7 @@ void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, 
 void Server::TOPIC(int clientSocket, Client &client, std::string message)
 {
 	(void)clientSocket;
-	std::vector<std::string> input = trimInput(message);
+	std::vector<std::string> input = trimInput(message, client);
 	std::string channelName = getInputCmd(message, "TOPIC ");
 	if (input.size() <= 3) // ERR_NEEDMOREPARAMS (461)
 	{
@@ -646,8 +646,8 @@ void Server::KICK(std::string message, Client client)
 	bool isKickerOp = false;
 	bool isKickedOp = false;
 
-	std::vector<std::string> input = trimInput(message);
-	if (input.size() <= 3) // ERR_NEEDMOREPARAMS (461)
+	std::vector<std::string> input = trimInput(message, client);
+	/* if (input.size() <= 3) // ERR_NEEDMOREPARAMS (461)
 	{
 		bool isChannelOk = ((!input[1].empty()) ? (input[1][0] == '#' || input[1][0] == '&') ? true : false : false);
 		bool isNickOk = (!input[2].empty()) ? true : false;
@@ -657,7 +657,7 @@ void Server::KICK(std::string message, Client client)
 			SEND(client.getSocket(), reason, "Erro ao enviar mensagem de KICK por falta de argumentos");
 			return;
 		}
-	}
+	} */
 
 	std::string kickNick = input[2];
 	std::string reason = (input.size() == 4 && !input[3].empty()) ? input[3] : "";
@@ -801,4 +801,53 @@ void Server::sendWelcome(int clientSocket, Client &client)
 	{
 		std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
 	}
+}
+
+// std::vector<std::pair <std::string, std::string> > 
+
+std::vector<std::string> Server::trimInput(std::string input, Client client)
+{
+(void)client;
+int begin = input.find_first_not_of(" \r\n\t");
+int end = input.find_last_not_of(" \r\n\t,");
+std::string trimmed = input.substr(begin, end - begin + 1);
+
+// Substituir vírgulas por espaços
+for (size_t i = 0; i < trimmed.size(); ++i) {
+    if (trimmed[i] == ',') {
+        trimmed[i] = ' ';
+    }
+}
+
+std::vector<std::string> words;
+std::stringstream ss(trimmed);
+std::string word;
+while (ss >> word)
+{
+    if (word[0] == ':')
+    {
+        words.push_back(word);
+        while (ss >> word)
+        {
+            words.back() += " ";
+            words.back() += word;
+        }
+    }
+    else
+        words.push_back(word);
+}
+
+	// if (input.size() <= 3) // ERR_NEEDMOREPARAMS (461)
+	// {
+	// 	bool isChannelOk = ((!input[1].empty()) ? (input[1][0] == '#' || input[1][0] == '&') ? true : false : false);
+	// 	bool isNickOk = (!input[2].empty()) ? true : false;
+	// 	if (!isChannelOk || !isNickOk)
+	// 	{
+	// 		std::string reason = ":" + getHostname() + " 461 " + client.getNick() + " " + ((isChannelOk) ? input[1] : "") + " :Not enough parameters\r\n";
+	// 		SEND(client.getSocket(), reason, "Erro ao enviar mensagem de KICK por falta de argumentos");
+	// 		return;
+	// 	}
+	// }
+
+	return words;
 }

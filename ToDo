@@ -1,0 +1,52 @@
+1. **JOIN:**
+   - Verificar se o canal é válido.
+   - Verificar se o canal possui uma senha (se aplicável).
+   - Criar um índice para o canal e sua senha (se existir).
+   - Verificar se há vários canais (sempre separados por vírgula e sem espaços).
+   - Substituir vírgulas por espaços no input.
+   - Criar o vetor (ss).
+   
+2. **KICK:**
+   - Verificar se o canal está no vetor.
+   - Verificar se o canal é válido.
+   - Verificar se o canal possui uma senha (se aplicável).
+   - Verificar se o nick está no canal.
+   - Substituir vírgulas por espaços no input.
+   - Criar o vetor (ss).
+   
+3. **LIST:**
+   - Substituir vírgulas por espaços no input.
+   - Criar o vetor (ss).
+   
+4. **NICK:**
+   - Substituir vírgulas por espaços no input.
+   - Criar o vetor (ss).
+   
+5. **PART:**
+   - Substituir vírgulas por espaços no input.
+   - Criar o vetor (ss).
+   
+6. **PRIVMSG:**
+   - Substituir vírgulas por espaços no input.
+   - Criar o vetor (ss).
+   
+7. **QUIT:**
+   - Substituir vírgulas por espaços no input.
+   - Criar o vetor (ss).
+   
+8. **TOPIC:**
+   - Substituir vírgulas por espaços no input.
+   - Criar o vetor (ss).
+   
+9. **MODE:**
+   - Substituir vírgulas por espaços no input.
+   - Criar o vetor (ss).
+   
+10. **INVITE:**
+    - Substituir vírgulas por espaços no input.
+    - Criar o vetor (ss).
+    
+11. **WHO:**
+    - Substituir vírgulas por espaços no input.
+    - Criar o vetor (ss).
+   
