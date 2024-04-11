@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/06 14:04:50 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/08 13:33:30 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,9 +42,9 @@ public:
 	bool getRestrictedTopic(void);
 	int getNbrUsers(void);
 	std::map<std::string, Client> &getUsers(void);
-	std::vector<std::string> getOperators(void);
 	int getUserLimit(void);
 	std::vector<char> getModes(void);
+	std::vector<std::string> &getOperators(void);
 
 	/* Setters */
 	void setName(std::string name);

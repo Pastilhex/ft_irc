@@ -6,11 +6,12 @@
 /*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/06 23:52:38 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/11 19:38:57 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
+#include "../includes/Server.hpp"
 
 Server::Server(std::string password)
 {
@@ -22,13 +23,6 @@ void ft_print(std::string str)
 	std::cout << str << std::endl;
 }
 
-/**
- * @brief Obtém o descritor de arquivo do socket do servidor.
- *
- * Esta função retorna o descritor de arquivo do socket do servidor.
- *
- * @return Retorna o descritor de arquivo do socket do servidor.
- */
 int Server::getSocket(void)
 {
 	return this->_socket;
@@ -39,13 +33,6 @@ std::string Server::getHostname(void) const
 	return this->_hostname;
 }
 
-/**
- * @brief Obtém a estrutura sockaddr_in do servidor.
- *
- * Esta função retorna a estrutura sockaddr_in que representa o endereço do servidor.
- *
- * @return Retorna a estrutura sockaddr_in do servidor.
- */
 struct sockaddr_in Server::getAddress(void)
 {
 	return this->_address;
@@ -66,13 +53,6 @@ void Server::setChannel(std::string channel_name, bool state)
 	_channels.insert(std::make_pair(channel_name, Channel(channel_name, state)));
 }
 
-/**
- * @brief Define o descritor de arquivo do socket do servidor.
- *
- * Esta função define o descritor de arquivo do socket do servidor para um novo valor.
- *
- * @param newSocket O novo valor do descritor de arquivo do socket do servidor.
- */
 void Server::setSocket(int newSocket)
 {
 	this->_socket = newSocket;
@@ -83,26 +63,11 @@ void Server::setHostname(std::string hostname)
 	this->_hostname = hostname;
 }
 
-/**
- * @brief Define a estrutura sockaddr_in do servidor.
- *
- * Esta função define a estrutura sockaddr_in que representa o endereço do servidor para um novo valor.
- *
- * @param newAddress O novo valor da estrutura sockaddr_in do servidor.
- */
 void Server::setAddress(struct sockaddr_in newAddress)
 {
 	this->_address = newAddress;
 }
 
-/**
- * @brief Verifica se uma porta é válida.
- *
- * Esta função verifica se uma  std::string representa uma porta válida.
- *
- * @param str A  std::string contendo a porta a ser verificada.
- * @return Retorna true se a porta for válida, false caso contrário.
- */
 bool Server::isValidPort(char *str)
 {
 	for (size_t i = 0; i < strlen(str); i++)
@@ -111,15 +76,6 @@ bool Server::isValidPort(char *str)
 	return true;
 }
 
-/**
- * @brief Função para obter o socket do servidor.
- *
- * Esta função cria e configura um socket do servidor.
- *
- * @return Retorna o descritor de arquivo do socket do servidor se bem-sucedido,
- *         -1 se ocorrer um erro ao criar o socket,
- *         1 se ocorrer um erro ao definir o modo não-bloqueante para o socket.
- */
 int Server::createSocket(void)
 {
 	int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -159,14 +115,6 @@ void Server::createHostname(void)
 	std::cout << "Nome do servidor: " << hostname << std::endl;
 }
 
-/**
- * @brief Cria uma estrutura sockaddr_in para o servidor.
- *
- * Esta função cria e configura uma estrutura sockaddr_in para representar o endereço do servidor.
- *
- * @param port A porta do servidor.
- * @return Retorna a estrutura sockaddr_in configurada.
- */
 struct sockaddr_in Server::createAddress(int port)
 {
 	struct sockaddr_in serverAddress;
@@ -178,11 +126,6 @@ struct sockaddr_in Server::createAddress(int port)
 	return serverAddress;
 }
 
-/**
- * @brief Obtém informações de endereço do servidor.
- *
- * Esta função obtém e exibe o endereço IP local do servidor.
- */
 std::string Server::getAddressIP(void)
 {
 	// char hostname[256];
@@ -200,7 +143,7 @@ std::string Server::getAddressIP(void)
 	// char *ip_address = inet_ntoa(*((struct in_addr *)host_info->h_addr_list[0]));
 
 	char hostname[256];
-	char *ipAddress;
+	char *ipAddress = NULL;
 
 	// Obtém o nome do host local
 	if (gethostname(hostname, sizeof(hostname)) != 0)
@@ -265,15 +208,6 @@ Client &Server::getClientBySocket(int socket, Client &client)
 	return client;
 }
 
-/**
- * @brief Inicia o servidor.
- *
- * Esta função inicia o servidor, configurando o socket e o endereço para comunicação.
- *
- * @param str Uma  std::string contendo a porta do servidor.
- * @return Retorna true se o servidor foi iniciado com sucesso,
- *         false caso contrário.
- */
 bool Server::start(char *str)
 {
 	if (!isValidPort(str))
@@ -284,16 +218,6 @@ bool Server::start(char *str)
 	return true;
 }
 
-/**
- * @brief Associa o socket do servidor a um endereço específico.
- *
- * Esta função associa o socket do servidor a um endereço IP e número de porta específicos.
- *
- * @param serverSocket O descritor de arquivo do socket do servidor.
- * @param serverAddress A estrutura sockaddr_in contendo o endereço IP e número de porta do servidor.
- * @return Retorna true se o socket foi associado ao endereço com sucesso,
- *         false caso contrário.
- */
 bool Server::bindSocket(const int &serverSocket, const struct sockaddr_in &serverAddress)
 {
 	if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1)
@@ -305,16 +229,6 @@ bool Server::bindSocket(const int &serverSocket, const struct sockaddr_in &serve
 	return true;
 }
 
-/**
- * @brief Verifica as conexões do servidor.
- *
- * Esta função configura o socket do servidor para entrar no modo de escuta
- * para aceitar conexões de entrada dos clientes.
- *
- * @param serverSocket O descritor de arquivo do socket do servidor.
- * @return Retorna true se o socket foi colocado no modo de escuta com sucesso,
- *         false caso contrário.
- */
 bool Server::checkConnections(const int &serverSocket)
 {
 	if (listen(serverSocket, 5) == -1)
@@ -420,12 +334,12 @@ void Server::isNewClient(std::vector<pollfd> &fds, const int &serverSocket, stru
 
 		// Adiciona o client à lista global de usuarios
 		if (!addClientToGlobalUsers(client))
-		if (client.getSocket() == -1)
-		{
-			std::cerr << "Erro ao aceitar a conexão com o nick: " + client.getNick() + "." << std::endl;
-			close(serverSocket);
-			return;
-		}
+			if (client.getSocket() == -1)
+			{
+				std::cerr << "Erro ao aceitar a conexão com o nick: " + client.getNick() + "." << std::endl;
+				close(serverSocket);
+				return;
+			}
 
 		if (!client.getNick().empty() && !client.getUsername().empty())
 			sendWelcome(clientPoll.fd, client);
@@ -435,42 +349,45 @@ void Server::isNewClient(std::vector<pollfd> &fds, const int &serverSocket, stru
 void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, int bytesRead, int i)
 {
 	std::string message(buffer, bytesRead);
-	std::cout << "<<:\n" << std::string(buffer, bytesRead) << std::endl;
+	if (!isCMD(message, "PING"))
+		std::cout << ":<< " + message << std::endl;
 
+	if (isCMD(message, "PRIVMSG"))
+	{
+		PRIVMSG(message, client);
+		fds[i].revents = 0;
+	}
 	if (isCMD(message, "NICK") || isCMD(message, "USER ") || isCMD(message, "PASS"))
 	{
 		client.getClientLoginData(buffer, bytesRead);
 		fds[i].revents = 0;
 	}
-
 	if (isCMD(message, "MODE"))
 	{
+		MODE(message, client);
+		fds[i].revents = 0;
 	}
-
 	if (isCMD(message, "WHO"))
 	{
-		std::string channelName = getInput(message, "WHO ");
+		std::string channelName = getInputCmd(message, "WHO ");
 		WHO(fds[i].fd, client, channelName);
 		fds[i].revents = 0;
 	}
-
 	if (isCMD(message, "LIST"))
 	{
 		LIST(fds[i].fd, client, message);
 		fds[i].revents = 0;
 	}
-
 	if (isCMD(message, "JOIN"))
 	{
 		JOIN(fds[i].fd, client, message);
 		fds[i].revents = 0;
 	}
-
 	if (isCMD(message, "PART"))
 	{
+		// Usage: PART [<channel>] [<reason>], leaves the channel, by default the current one
 		// PART #canalX :Até logo, pessoal!
-		std::string channelName = getInput(message, "PART");
-		PART(client, channelName);
+		PART(message, client);
 		fds[i].revents = 0;
 	}
 	if (message.find("QUIT") != std::string::npos)
@@ -480,34 +397,66 @@ void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, 
 		// Remova o cliente de todos os canais
 		fds.erase(fds.begin() + i); // Remova o cliente do vector<pollfd>
 	}
-	if (message.find("MODE") != std::string::npos)
+	if (isCMD(message, "KICK"))
 	{
-		MODE(message, client);
+		KICK(message, client);
+		fds[i].revents = 0;
+	}
+	if (isCMD(message, "TOPIC"))
+	{
+		TOPIC(fds[i].fd, client, message);
 		fds[i].revents = 0;
 	}
 }
 
-
-void Server::Send_PRIVMSG_toChannel(Client client, std::string channelName)
+void Server::TOPIC(int clientSocket, Client &client, std::string message)
 {
-	(void)client;
-	std::map<std::string, Channel> channels = getChannels();
+	(void)clientSocket;
+	std::vector<std::string> input = trimInput(message, client);
+	std::string channelName = getInputCmd(message, "TOPIC ");
+	if (input.size() <= 3) // ERR_NEEDMOREPARAMS (461)
+	{
+		bool isChannelOk = ((!input[1].empty()) ? (input[1][0] == '#' || input[1][0] == '&') ? true : false : false);
+		bool isNickOk = (!input[2].empty()) ? true : false;
+		if (!isChannelOk || !isNickOk)
+		{
+			std::string reason = ":" + getHostname() + " 461 " + client.getNick() + " " + ((isChannelOk) ? input[1] : "") + " :Not enough parameters\r\n";
+			SEND(client.getSocket(), reason, "Erro ao enviar mensagem de KICK por falta de argumentos");
+			return;
+		}
+	}
+
+	std::map<std::string, Channel> &channels = getChannels();
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
+
+	bool isUserOp = false;
+	bool isOpenTopic = it->second.getModeTopic();
+
+	std::vector<std::string> &operators = it->second.getOperators();
+	std::vector<std::string>::iterator op = operators.begin();
+	while (op != operators.end())
+	{
+		if ("@" + client.getNick() == *op) // quem esta a aceder ao TOPIC é Operador ?
+			isUserOp = true;
+		++op;
+	}
+
 	if (it != channels.end())
 	{
-		std::map<std::string, Client> &users = it->second.getUsers();
-		std::map<std::string, Client>::iterator user_it = users.begin();
-		while (user_it != users.end())
+		if (isOpenTopic || isUserOp)
 		{
-			WHO(user_it->second.getSocket(), user_it->second, channelName);
-			++user_it;
+			std::string updateTopic = ":" + getHostname() + " TOPIC " + getInputCmd(message, "KICK") + " :" + /*topic*/ + "\r\n";
+			SEND(client.getSocket(), updateTopic, "Erro ao enviar mensagem de alteração de TOPIC.");
 		}
 	}
 }
 
-void Server::Send_WHO_toAll(Client client, std::string channelName)
+void Server::PRIVMSG(std::string message, Client client)
 {
-	(void)client;
+	std::string channelName = getInputChannel(message);
+	std::string msgToSend = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " PRIVMSG #" + channelName + " :";
+	msgToSend += getMsgToSend(message) + "\r\n";
+
 	std::map<std::string, Channel> channels = getChannels();
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
 	if (it != channels.end())
@@ -516,10 +465,12 @@ void Server::Send_WHO_toAll(Client client, std::string channelName)
 		std::map<std::string, Client>::iterator user_it = users.begin();
 		while (user_it != users.end())
 		{
-			WHO(user_it->second.getSocket(), user_it->second, channelName);
+			if (user_it->first != client.getNick() && (send(user_it->second.getSocket(), msgToSend.c_str(), msgToSend.length(), 0) == -1))
+			{
+				std::cerr << "Erro ao enviar mensagem para o canal." << std::endl;
+			}
 			++user_it;
 		}
-		return;
 	}
 }
 
@@ -538,10 +489,9 @@ void Server::LIST(int clientSocket, Client &client, std::string message)
 		int nbrUser = it->second.getNbrUsers();
 		char nbrUserStr[20];				// Tamanho suficiente para armazenar um inteiro
 		sprintf(nbrUserStr, "%d", nbrUser); // Formatar o inteiro como uma string
-		std::string channel = ":" + this->getHostname() + " 322 " + client.getNick() + " #" + channel_name + " " + std::string(nbrUserStr) + " :" + it->second.getTopic() + "\r\n";
+		std::string channel = ":" + this->getHostname() + " 322 " + client.getNick() + " " + getInputCmd(message, "LIST") + " " + std::string(nbrUserStr) + " :" + it->second.getTopic() + "\r\n";
 		channel += ":" + this->getHostname() + " 323 " + client.getNick() + " :End of /LIST\r\n";
 		send(clientSocket, channel.c_str(), channel.size(), 0);
-		std::cout << ">> " + channel << std::endl;
 	}
 }
 
@@ -566,7 +516,7 @@ void Server::JOIN(int clientSocket, Client &client, std::string message)
 				if (it->first == channelName)
 				{
 					it->second.setNewUser(client);
-					Send_WHO_toAll(client, channelName);
+					updateChannel(client, channelName);
 					break;
 				}
 			}
@@ -578,12 +528,6 @@ void Server::JOIN(int clientSocket, Client &client, std::string message)
 				channel.setNewUser(client);
 				channel.AddOperator(client.getNick());
 				_channels.insert(std::make_pair(channelName, channel)); // Fazer um setter para esta função
-				// removeClientFromGlobalUsers(client);
-			}
-			else
-			{
-				// std::map<std::string, Channel>::iterator in = channels.begin();
-				// removeClientFromGlobalUsers(client);
 			}
 		}
 
@@ -610,10 +554,8 @@ void Server::WHO(int clientSocket, const Client client, std::string channelName)
 {
 	std::map<std::string, Channel> &channels = getChannels();
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
-
 	bool channelPrivacy = it->second.getModePrivateAccess();
 	std::string privacy = (channelPrivacy) ? "@" : "#";
-
 	if (it != channels.end())
 	{
 		std::string whoMsg = ":" + getHostname() + " 353 " + client.getNick() + " = " + privacy + channelName + " :";
@@ -626,8 +568,7 @@ void Server::WHO(int clientSocket, const Client client, std::string channelName)
 			std::vector<std::string>::iterator op_it = opList.begin();
 			while (op_it != opList.end())
 			{
-
-				if ((*op_it).find(nickname, 1) != std::string::npos) // esta condição não está a funcionar bem
+				if ((*op_it).find(nickname, 1) != std::string::npos)
 				{
 					nickname = *op_it;
 					break; // Interrompe o loop assim que encontrar uma correspondência
@@ -647,64 +588,139 @@ void Server::WHO(int clientSocket, const Client client, std::string channelName)
 	}
 }
 
-void Server::PART(Client &client, std::string channelName)
+void Server::PART(std::string message, Client &client)
 {
-	int isInChannels = 0;
+	std::string channelName = getInputCmd(message, "PART ");
 	std::map<std::string, Channel> &channels = getChannels();
-	std::map<std::string, Channel>::iterator channels_begin = channels.begin();
-	std::map<std::string, Channel>::iterator channels_end = channels.end();
-
-	for (std::map<std::string, Channel>::iterator &it = channels_begin; it != channels_end; ++it)
+	std::map<std::string, Channel>::iterator it = channels.find(channelName);
+	if (it != channels.end())
 	{
 		std::map<std::string, Client> &users = it->second.getUsers();
-		const std::map<std::string, Client>::iterator &users_it = users.begin();
-		while (users_it != users.end())
+		std::map<std::string, Client>::iterator us = users.begin();
+		while (us != users.end())
 		{
-			if (users_it->second.getNick() == client.getNick())
+			if (us->second.getNick() == client.getNick())
 			{
-				isInChannels++;
+				std::string leaveChannel = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + "!" + getAddressIP() + " PART " + getInputCmd(message, "PART") + "\r\n";
+				if (send(client.getSocket(), leaveChannel.c_str(), leaveChannel.length(), 0) == -1)
+				{
+					std::cerr << "Erro ao enviar mensagem de saída de canal." << std::endl;
+				}
+				else
+				{
+					users.erase(us);
+					std::cout << leaveChannel << std::endl;
+				}
+				if (it->second.getNbrUsers() == 0)
+				{
+					std::string closeChannel = ":" + getHostname() + " PART " + getInputCmd(message, "PART");
+					if (send(client.getSocket(), closeChannel.c_str(), closeChannel.length(), 0) == -1)
+					{
+						std::cerr << "Erro ao enviar mensagem de fecho de canal." << std::endl;
+					}
+					else
+					{
+						channels.erase(it);
+						std::cout << closeChannel << std::endl;
+					}
+				}
+				else
+					updateChannel(client, channelName);
 				break;
 			}
+			++us;
 		}
 	}
-	if (isInChannels == 1)
+	else
 	{
-		std::map<std::string, Channel> &channels = getChannels();
-		std::map<std::string, Channel>::iterator channels_begin = channels.begin();
-		std::map<std::string, Channel>::iterator channels_end = channels.end();
+		std::cout << "Canal não encontrado." << std::endl;
+	}
+}
 
-		for (std::map<std::string, Channel>::iterator &it = channels_begin; it != channels_end; ++it)
+void Server::KICK(std::string message, Client client)
+{
+	// KICK #42 ivo :bye
+	// :irc.server.com 482 nickname #canal :You're not channel operator
+	// std::string reason = ":" + getHostname() + " 461 " + client.getNick() + " " + getInputCmd(message, "KICK") + " :Not enough parameters\r\n";
+
+	bool isKickerOp = false;
+	bool isKickedOp = false;
+
+	std::vector<std::string> input = trimInput(message, client);
+	/* if (input.size() <= 3) // ERR_NEEDMOREPARAMS (461)
+	{
+		bool isChannelOk = ((!input[1].empty()) ? (input[1][0] == '#' || input[1][0] == '&') ? true : false : false);
+		bool isNickOk = (!input[2].empty()) ? true : false;
+		if (!isChannelOk || !isNickOk)
+		{
+			std::string reason = ":" + getHostname() + " 461 " + client.getNick() + " " + ((isChannelOk) ? input[1] : "") + " :Not enough parameters\r\n";
+			SEND(client.getSocket(), reason, "Erro ao enviar mensagem de KICK por falta de argumentos");
+			return;
+		}
+	} */
+
+	std::string kickNick = input[2];
+	std::string reason = (input.size() == 4 && !input[3].empty()) ? input[3] : "";
+	std::string channelName = getInputCmd(message, "KICK ");
+
+	std::map<std::string, Channel> &channels = getChannels();
+	std::map<std::string, Channel>::iterator it = channels.find(channelName);
+	if (it != channels.end())
+	{
+		{
+			std::vector<std::string> &operators = it->second.getOperators();
+			std::vector<std::string>::iterator op = operators.begin();
+			while (op != operators.end())
+			{
+				if ("@" + client.getNick() == *op) // quem esta a kickar é Operador ?
+					isKickerOp = true;
+				++op;
+			}
+		}
+		{
+			std::vector<std::string> &operators = it->second.getOperators();
+			std::vector<std::string>::iterator op = operators.begin();
+			while (op != operators.end())
+			{
+				if ("@" + kickNick == *op) // quem esta a ser kickado é Operador ?
+					isKickedOp = true;
+				++op;
+			}
+		}
+
+		if (isKickerOp && isKickedOp) // ERR_NOPRIVILEGES (481)
+		{
+			std::string leaveChannel = ":" + getHostname() + " 481 " + client.getNick() + " " + getInputCmd(message, "KICK") + " :Permission Denied- You're not an IRC operator\r\n";
+			SEND(client.getSocket(), leaveChannel, "Erro ao enviar mensagem de KICK.");
+			return;
+		}
+		else if ((!isKickerOp && isKickedOp) || (!isKickerOp && !isKickedOp)) // ERR_CHANOPRIVSNEEDED (482)
+		{
+			std::string leaveChannel = ":" + getHostname() + " 482 " + client.getNick() + " " + getInputCmd(message, "KICK") + " :You're not channel operator\r\n";
+			SEND(client.getSocket(), leaveChannel, "Erro ao enviar mensagem de KICK.");
+			return;
+		}
+		else if (isKickerOp && !isKickedOp)
 		{
 			std::map<std::string, Client> &users = it->second.getUsers();
-			const std::map<std::string, Client>::iterator &users_it = users.begin();
-			while (users_it != users.end())
+			std::map<std::string, Client>::iterator us = users.begin();
+			while (us != users.end())
 			{
-				if (users_it->second.getNick() == client.getNick())
+				if (us->first == kickNick)
 				{
-					// Adiciona o client à lista global de usuarios
-					
-					users.erase(users_it);
-					std::string leaveChannel = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + "!" + getAddressIP() + " PART #" + channelName + "\r\n";
-					std::cout << leaveChannel << std::endl;
-					if (send(client.getSocket(), leaveChannel.c_str(), leaveChannel.length(), 0) == -1)
-					{
-						std::cerr << "Erro ao enviar mensagem de saida de canal." << std::endl;
-					}
-					break;
+					std::string leaveChannel = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " KICK " + getInputCmd(message, "KICK") + " " + kickNick + " " + reason + "\r\n";
+					SEND(client.getSocket(), leaveChannel, "Erro ao enviar mensagem de KICK.");
+					users.erase(us);
+					WHO(us->second.getSocket(), us->second, channelName);
+					updateChannel(client, channelName);
+					return;
 				}
+				++us;
 			}
 		}
 	}
 }
 
-/**
- * @brief Executa o servidor.
- *
- * Esta função inicia o servidor e executa as etapas necessárias para aceitar conexões dos clientes.
- *
- * @return Retorna true se o servidor foi iniciado e as conexões foram verificadas com sucesso,
- *         false caso contrário.
- */
 bool Server::run(void)
 {
 	if (getSocket() && bindSocket(getSocket(), getAddress()) && checkConnections(getSocket()))
@@ -749,54 +765,89 @@ std::string Server::getClientNick(std::string &channelName, std::string &clientN
 	return "";
 }
 
-/**
- * @brief Envia uma mensagem de boas-vindas para o cliente.
- *
- * Esta função envia uma mensagem de boas-vindas para o cliente conectado ao servidor.
- * A mensagem contém informações sobre o servidor e uma saudação ao cliente.
- *
- * @param clientSocket O descritor de arquivo do socket do cliente.
- */
+void Server::updateChannel(Client client, std::string channelName)
+{
+	(void)client;
+	std::map<std::string, Channel> channels = getChannels();
+	std::map<std::string, Channel>::iterator it = channels.find(channelName);
+	if (it != channels.end())
+	{
+		std::map<std::string, Client> &users = it->second.getUsers();
+		std::map<std::string, Client>::iterator user_it = users.begin();
+		while (user_it != users.end())
+		{
+			WHO(user_it->second.getSocket(), user_it->second, channelName);
+			++user_it;
+		}
+		return;
+	}
+}
+
 void Server::sendWelcome(int clientSocket, Client &client)
 {
-	std::string welcome = ":localhost 001 pastilhex :Welcome to the Internet Relay Network, " + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + "!" + getAddressIP() + "\r\n";
-	welcome += ":localhost 002 pastilhex :Your host is " + getHostname() + ", running version FT_IRC_42Porto_v1.0\r\n";
-	welcome += ":localhost 003 pastilhex :This server was created " + getCurrentDateTime() + "\r\n";
-	welcome += ":localhost 372 pastilhex :███████╗████████╗    ██╗██████╗  ██████╗\r\n";
-	welcome += ":localhost 372 pastilhex :██╔════╝╚══██╔══╝    ██║██╔══██╗██╔════╝\r\n";
-	welcome += ":localhost 372 pastilhex :█████╗     ██║       ██║██████╔╝██║     \r\n";
-	welcome += ":localhost 372 pastilhex :██╔══╝     ██║       ██║██╔══██╗██║     \r\n";
-	welcome += ":localhost 372 pastilhex :██║        ██║ ████╗ ██║██║  ██║╚██████╗\r\n";
-	welcome += ":localhost 372 pastilhex :╚═╝        ╚═╝  ╚══╝ ╚═╝╚═╝  ╚═╝ ╚═════╝\r\n";
-	welcome += ":localhost 372 pastilhex :Project by:  ialves-m  lpicoli  jhogonca\r\n";
-	welcome += ":localhost 376 pastilhex :End of /MOTD command.\r\n";
-
-	// 001: Welcome to the Internet Relay Network, [seu_nick]!user@host
-	// 002: Your host is irc.server.com, running version UnrealIRCd-5.2.1
-	// 003: This server was created [data]
-	// 004: irc.server.com UnrealIRCd-5.2.1 [modos de servidor suportados]
-	// 005: [lista de recursos suportados pelo servidor]
-	// 375: - irc.server.com Message of the Day -
-	// 375: Welcome to irc.server.com, the best IRC network out there!
-	// 375: Rules: No spamming, no flooding, be respectful to others.
-	// 376: End of /MOTD command.
-
-	// * Connected. Now logging in.
-	// * *** Looking up your ident...
-	// * *** Looking up your hostname...
-	// * *** Could not resolve your hostname: Domain not found; using your IP address (188.250.216.53) instead.
-	// * Capabilities supported: inspircd.org/poison inspircd.org/standard-replies multi-prefix setname userhost-in-names
-	// * Capabilities requested: multi-prefix setname userhost-in-names
-	// * *** If you are having problems connecting due to registration timeouts type /quote PONG xaAJQBRIW~ or /raw PONG xaAJQBRIW~ now.
-	// * Capabilities acknowledged: multi-prefix setname userhost-in-names
-	// * *** Ident lookup timed out, using ~ivo instead.
-
-	// * Welcome to the ChatJunkies IRC Network pastilhex!~ivo@188.250.216.53
-	// * Your host is chatjunkies.org, running version InspIRCd-3
-	// * This server was created 19:20:48 Jun 16 2023
-
+	std::string welcome;
+	welcome += ":" + getHostname() + " 001 " + client.getNick() + " :Welcome to the Internet Relay Network, " + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + "!" + getAddressIP() + "\r\n";
+	welcome += ":" + getHostname() + " 002 " + client.getNick() + " :Your host is " + getHostname() + ", running version FT_IRC_42Porto_v1.0\r\n";
+	welcome += ":" + getHostname() + " 003 " + client.getNick() + " :This server was created " + getCurrentDateTime() + "\r\n";
+	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :███████╗████████╗    ██╗██████╗  ██████╗\r\n";
+	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :██╔════╝╚══██╔══╝    ██║██╔══██╗██╔════╝\r\n";
+	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :█████╗     ██║       ██║██████╔╝██║     \r\n";
+	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :██╔══╝     ██║       ██║██╔══██╗██║     \r\n";
+	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :██║        ██║ ████╗ ██║██║  ██║╚██████╗\r\n";
+	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :╚═╝        ╚═╝  ╚══╝ ╚═╝╚═╝  ╚═╝ ╚═════╝\r\n";
+	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :Project by:  ialves-m  lpicoli  jhogonca\r\n";
+	welcome += ":" + getHostname() + " 376 " + client.getNick() + " :End of /MOTD command.\r\n";
 	if (send(clientSocket, welcome.c_str(), welcome.length(), 0) == -1)
 	{
 		std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
 	}
+}
+
+// std::vector<std::pair <std::string, std::string> > 
+
+std::vector<std::string> Server::trimInput(std::string input, Client client)
+{
+(void)client;
+int begin = input.find_first_not_of(" \r\n\t");
+int end = input.find_last_not_of(" \r\n\t,");
+std::string trimmed = input.substr(begin, end - begin + 1);
+
+// Substituir vírgulas por espaços
+for (size_t i = 0; i < trimmed.size(); ++i) {
+    if (trimmed[i] == ',') {
+        trimmed[i] = ' ';
+    }
+}
+
+std::vector<std::string> words;
+std::stringstream ss(trimmed);
+std::string word;
+while (ss >> word)
+{
+    if (word[0] == ':')
+    {
+        words.push_back(word);
+        while (ss >> word)
+        {
+            words.back() += " ";
+            words.back() += word;
+        }
+    }
+    else
+        words.push_back(word);
+}
+
+	// if (input.size() <= 3) // ERR_NEEDMOREPARAMS (461)
+	// {
+	// 	bool isChannelOk = ((!input[1].empty()) ? (input[1][0] == '#' || input[1][0] == '&') ? true : false : false);
+	// 	bool isNickOk = (!input[2].empty()) ? true : false;
+	// 	if (!isChannelOk || !isNickOk)
+	// 	{
+	// 		std::string reason = ":" + getHostname() + " 461 " + client.getNick() + " " + ((isChannelOk) ? input[1] : "") + " :Not enough parameters\r\n";
+	// 		SEND(client.getSocket(), reason, "Erro ao enviar mensagem de KICK por falta de argumentos");
+	// 		return;
+	// 	}
+	// }
+
+	return words;
 }

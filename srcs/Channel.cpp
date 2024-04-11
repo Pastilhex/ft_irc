@@ -6,17 +6,16 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:41:57 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/03 16:21:56 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/08 13:42:19 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
 
-
 Channel::Channel(std::string name, bool isPrivate)
 {
-    this->_name = name;
-    this->_isPrivate = isPrivate;
+	this->_name = name;
+	this->_isPrivate = isPrivate;
 }
 
 int Channel::getNbrUsers(void)
@@ -39,6 +38,10 @@ std::map<std::string, Client>& Channel::getUsers(void)
 	return this->_clients;
 }
 
+std::vector<std::string> &Channel::getOperators(void)
+{
+	return this->_operators;
+}
 
 /**
  * @brief Get the name of the channel.
@@ -47,7 +50,7 @@ std::map<std::string, Client>& Channel::getUsers(void)
  */
 std::string Channel::getName(void)
 {
-    return this->_name;
+	return this->_name;
 }
 
 /**
@@ -57,7 +60,7 @@ std::string Channel::getName(void)
  */
 std::string Channel::getTopic(void)
 {
-    return this->_topic;
+	return this->_topic;
 }
 
 /**
@@ -67,7 +70,7 @@ std::string Channel::getTopic(void)
  */
 std::string Channel::getPassword(void)
 {
-    return this->_password;
+	return this->_password;
 }
 
 /**
@@ -97,7 +100,7 @@ bool Channel::getRestrictedTopic(void)
  */
 bool Channel::getModePrivateAccess(void)
 {
-    return this->_isPrivate;
+	return this->_isPrivate;
 }
 
 
@@ -123,7 +126,7 @@ std::vector<char> Channel::getModes(void)
  */
 void Channel::setName(std::string name)
 {
-    this->_name = name;
+	this->_name = name;
 }
 
 /**
@@ -133,9 +136,8 @@ void Channel::setName(std::string name)
  */
 void Channel::setTopic(std::string topic)
 {
-    this->_topic = topic;
+	this->_topic = topic;
 }
-
 
 /**
  * @brief Set the mode status of the channel's topic.
@@ -144,18 +146,18 @@ void Channel::setTopic(std::string topic)
  */
 void Channel::setModeTopic(bool mode)
 {
-    this->_modeTopic = mode;
+	this->_modeTopic = mode;
 }
 
 /**
  * @brief Set the mode status of private access to the channel.
  *
- * @param mode The mode status to set for private access. 
+ * @param mode The mode status to set for private access.
  * Set True to active private access only, false to active public access.
  */
 void Channel::setModePrivateAccess(bool mode)
 {
-    this->_isPrivate = mode;	
+	this->_isPrivate = mode;
 }
 
 /**
@@ -222,7 +224,7 @@ void Channel::setRestrictedTopic(bool mode)
 void	Channel::AddOperator(const std::string& nickname)
 {
 	std::vector<std::string>::iterator it;
-	bool	Op_flag = false;
+	bool Op_flag = false;
 
 	for (it = this->_operators.begin(); it != this->_operators.end(); ++it)
 	{

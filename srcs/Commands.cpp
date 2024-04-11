@@ -98,6 +98,26 @@ std::string Server::handleOperatorMode(const std::vector<std::string> &mode_cmd,
 			return (mode_cmd[3] + " " + it->first + " :User removed as an operator\r\n");
 		}
 		return (mode_cmd[3] + " " + it->first + " :User can't be removed of the operator's list because it's not an operator\r\n");
+
+ /**
+ * @brief Handles the MODE command for a server.
+ *
+ * This function is responsible for processing the MODE command received from a client.
+ * It checks the validity of the command arguments, verifies if the channel exists,
+ * and checks if the client is an operator of the channel. It also handles setting
+ * different flags for the channel, such as making it private or setting a user limit.
+ *
+ * @param message The MODE command message received from the client.
+ * @param client The client who sent the MODE command.
+ * @return Returns 0 if the command is successfully processed, otherwise returns an error code.
+ */
+
+static bool isOperator(std::string nickname, std::vector<std::string> operators)
+{
+	for (size_t i = 0; i < operators.size(); i++)
+	{
+		if (operators[i] == nickname)
+			return true;
 	}
 	return NULL;
 }
@@ -147,7 +167,6 @@ void Server::handleRestrictedTopicMode(std::map<std::string, Channel>::iterator 
 			it->second.deleteMode('t');
 			return (Utils::logMessage("Channel topic is now unrestricted", 0), void());
 		}
-		return (Utils::logMessage("Channel topic is already unrestricted", 0), void());
 	}
 }
 

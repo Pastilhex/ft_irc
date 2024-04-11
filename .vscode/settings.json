@@ -47,7 +47,12 @@
 		"typeinfo": "cpp",
 		"cerrno": "cpp",
 		"map": "cpp",
-		"ctime": "cpp"
+		"ctime": "cpp",
+		"csignal": "cpp",
+		"optional": "cpp",
+		"fstream": "cpp",
+		"sstream": "cpp",
+		"cinttypes": "cpp"
 	},
 	"editor.fontVariations": false
 }
