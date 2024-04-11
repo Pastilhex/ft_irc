@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   ircserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 06:36:04 by ialves-m          #+#    #+#             */
 /*   Updated: 2024/04/10 13:23:09 by ialves-m         ###   ########.fr       */
@@ -43,6 +43,7 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "Utils.hpp"
+#include "Macros.hpp"
 #include <sstream>
 
 std::string getCurrentDateTime();

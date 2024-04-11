@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/11 12:27:35 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/09 22:02:02 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
+#include "../includes/Server.hpp"
 
 Server::Server(std::string password)
 {
@@ -142,7 +143,7 @@ std::string Server::getAddressIP(void)
 	// char *ip_address = inet_ntoa(*((struct in_addr *)host_info->h_addr_list[0]));
 
 	char hostname[256];
-	char *ipAddress;
+	char *ipAddress = NULL;
 
 	// Obtém o nome do host local
 	if (gethostname(hostname, sizeof(hostname)) != 0)
