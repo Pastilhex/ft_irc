@@ -142,9 +142,20 @@ bool Utils::isValidUser(Channel channel, std::string nickname)
 	return false;
 }
 
-bool Utils::isValidFlag(std::string flag)
+bool Utils::isOperator(Channel channel, std::string nickname)
 {
-	if (flag == "+k" || flag == "+l" || flag == "+i" || flag == "+t")
+	std::vector<std::string> operators = channel.getOperators();
+	for (size_t i = 0; i < operators.size(); i++)
+	{
+		if (operators[i] == nickname)
+			return true;
+	}
+	return false;
+}
+
+bool Utils::isValidFlag(char flag)
+{
+	if(flag == 'k' || flag == 'l' || flag == 'i' || flag == 't' || flag == 'o')
 		return true;
 	return false;
 }

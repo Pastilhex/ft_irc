@@ -16,6 +16,7 @@
 #define DATE std::string(__TIME__) +" "+ std::string(__DATE__)
 #define USER_ID(nickname, username) (":" + nickname + "!" + username + "@localhost")
 #define LOCAL ":localhost "
+#define UNLIMITED_USERS -1
 
 // Server messages
 #define RPL_WELCOME(user_id, nickname) \
