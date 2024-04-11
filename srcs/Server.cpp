@@ -411,12 +411,19 @@ void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, 
 void Server::TOPIC(int clientSocket, Client &client, std::string message)
 {
 	(void)clientSocket;
-
+	std::vector<std::string> input = trimInput(message);
 	std::string channelName = getInputCmd(message, "TOPIC ");
-
-	int topicBegin = message.find_first_of(":") + 1;
-	int topicEnd = message.find_first_of("\r\n", topicBegin);
-	std::string topic = message.substr(topicBegin, topicEnd - topicBegin);
+	if (input.size() <= 3) // ERR_NEEDMOREPARAMS (461)
+	{
+		bool isChannelOk = ((!input[1].empty()) ? (input[1][0] == '#' || input[1][0] == '&') ? true : false : false);
+		bool isNickOk = (!input[2].empty()) ? true : false;
+		if (!isChannelOk || !isNickOk)
+		{
+			std::string reason = ":" + getHostname() + " 461 " + client.getNick() + " " + ((isChannelOk) ? input[1] : "") + " :Not enough parameters\r\n";
+			SEND(client.getSocket(), reason, "Erro ao enviar mensagem de KICK por falta de argumentos");
+			return;
+		}
+	}
 
 	std::map<std::string, Channel> &channels = getChannels();
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
@@ -437,7 +444,7 @@ void Server::TOPIC(int clientSocket, Client &client, std::string message)
 	{
 		if (isOpenTopic || isUserOp)
 		{
-			std::string updateTopic = ":" + getHostname() + " TOPIC " + getInputCmd(message, "KICK") + " :" + topic + "\r\n";
+			std::string updateTopic = ":" + getHostname() + " TOPIC " + getInputCmd(message, "KICK") + " :" + /*topic*/ + "\r\n";
 			SEND(client.getSocket(), updateTopic, "Erro ao enviar mensagem de alteração de TOPIC.");
 		}
 	}
@@ -700,9 +707,10 @@ void Server::KICK(std::string message, Client client)
 			{
 				if (us->first == kickNick)
 				{
-					std::string leaveChannel = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " KICK " + getInputCmd(message, "KICK") + " " + kickNick + " :" + reason + "\r\n";
+					std::string leaveChannel = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " KICK " + getInputCmd(message, "KICK") + " " + kickNick + " " + reason + "\r\n";
 					SEND(client.getSocket(), leaveChannel, "Erro ao enviar mensagem de KICK.");
 					users.erase(us);
+					WHO(us->second.getSocket(), us->second, channelName);
 					updateChannel(client, channelName);
 					return;
 				}
