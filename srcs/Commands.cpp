@@ -201,3 +201,8 @@ void Server::handleUserLimitMode(const std::vector<std::string> &mode_cmd, std::
 		return (Utils::logMessage("User limit is now removed", 0), void());
 	}
 }
+
+// void Server::INVITE(Client client)
+// {
+// 	if()
+// }

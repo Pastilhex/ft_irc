@@ -43,6 +43,12 @@ std::string Server::getPassword(void)
 	return this->_password;
 }
 
+
+std::vector<std::string> Server::getInput(void)
+{
+	return this->_input;
+}
+
 std::map<std::string, Channel> &Server::getChannels(void)
 {
 	return this->_channels;
@@ -66,6 +72,11 @@ void Server::setHostname(std::string hostname)
 void Server::setAddress(struct sockaddr_in newAddress)
 {
 	this->_address = newAddress;
+}
+
+void Server::setInput(std::string input)
+{
+	this->_input.push_back(input);
 }
 
 bool Server::isValidPort(char *str)
@@ -208,6 +219,8 @@ Client &Server::getClientBySocket(int socket, Client &client)
 	return client;
 }
 
+
+
 bool Server::start(char *str)
 {
 	if (!isValidPort(str))
@@ -349,6 +362,7 @@ void Server::isNewClient(std::vector<pollfd> &fds, const int &serverSocket, stru
 void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, int bytesRead, int i)
 {
 	std::string message(buffer, bytesRead);
+	setInput(message);
 	if (!isCMD(message, "PING"))
 		std::cout << ":<< " + message << std::endl;
 
@@ -412,15 +426,15 @@ void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, 
 void Server::TOPIC(int clientSocket, Client &client, std::string message)
 {
 	(void)clientSocket;
-	std::vector<std::string> input = trimInput(message, client);
+
 	std::string channelName = getInputCmd(message, "TOPIC ");
-	if (input.size() <= 3) // ERR_NEEDMOREPARAMS (461)
+	if (getInput().size() <= 3) // ERR_NEEDMOREPARAMS (461)
 	{
-		bool isChannelOk = ((!input[1].empty()) ? (input[1][0] == '#' || input[1][0] == '&') ? true : false : false);
-		bool isNickOk = (!input[2].empty()) ? true : false;
+		bool isChannelOk = ((!getInput()[1].empty()) ? (getInput()[1][0] == '#' || getInput()[1][0] == '&') ? true : false : false);
+		bool isNickOk = (!getInput()[2].empty()) ? true : false;
 		if (!isChannelOk || !isNickOk)
 		{
-			std::string reason = ":" + getHostname() + " 461 " + client.getNick() + " " + ((isChannelOk) ? input[1] : "") + " :Not enough parameters\r\n";
+			std::string reason = ":" + getHostname() + " 461 " + client.getNick() + " " + ((isChannelOk) ? getInput()[1] : "") + " :Not enough parameters\r\n";
 			SEND(client.getSocket(), reason, "Erro ao enviar mensagem de KICK por falta de argumentos");
 			return;
 		}
@@ -497,7 +511,6 @@ void Server::LIST(int clientSocket, Client &client, std::string message)
 
 void Server::JOIN(int clientSocket, Client &client, std::string message)
 {
-	std::vector<std::string> input = trimInput(message, client);
 	size_t posCmd = message.find("JOIN");
 	size_t posCmdLower = message.find("join");
 	if (posCmd != std::string::npos || posCmdLower != std::string::npos)
@@ -647,7 +660,6 @@ void Server::KICK(std::string message, Client client)
 	bool isKickerOp = false;
 	bool isKickedOp = false;
 
-	std::vector<std::string> input = trimInput(message, client);
 	/* if (input.size() <= 3) // ERR_NEEDMOREPARAMS (461)
 	{
 		bool isChannelOk = ((!input[1].empty()) ? (input[1][0] == '#' || input[1][0] == '&') ? true : false : false);
@@ -660,8 +672,8 @@ void Server::KICK(std::string message, Client client)
 		}
 	} */
 
-	std::string kickNick = input[2];
-	std::string reason = (input.size() == 4 && !input[3].empty()) ? input[3] : "";
+	std::string kickNick = getInput()[2];
+	std::string reason = (getInput().size() == 4 && !getInput()[3].empty()) ? getInput()[3] : "";
 	std::string channelName = getInputCmd(message, "KICK ");
 
 	std::map<std::string, Channel> &channels = getChannels();
@@ -808,35 +820,35 @@ void Server::sendWelcome(int clientSocket, Client &client)
 
 std::vector<std::string> Server::trimInput(std::string input, Client client)
 {
-(void)client;
-int begin = input.find_first_not_of(" \r\n\t");
-int end = input.find_last_not_of(" \r\n\t,");
-std::string trimmed = input.substr(begin, end - begin + 1);
+	(void)client;
+	int begin = input.find_first_not_of(" \r\n\t");
+	int end = input.find_last_not_of(" \r\n\t,");
+	std::string trimmed = input.substr(begin, end - begin + 1);
 
-// Substituir vírgulas por espaços
-for (size_t i = 0; i < trimmed.size(); ++i) {
-    if (trimmed[i] == ',') {
-        trimmed[i] = ' ';
-    }
-}
+	// Substituir vírgulas por espaços
+	for (size_t i = 0; i < trimmed.size(); ++i) {
+		if (trimmed[i] == ',') {
+			trimmed[i] = ' ';
+		}
+	}
 
-std::vector<std::string> words;
-std::stringstream ss(trimmed);
-std::string word;
-while (ss >> word)
-{
-    if (word[0] == ':')
-    {
-        words.push_back(word);
-        while (ss >> word)
-        {
-            words.back() += " ";
-            words.back() += word;
-        }
-    }
-    else
-        words.push_back(word);
-}
+	std::vector<std::string> words;
+	std::stringstream ss(trimmed);
+	std::string word;
+	while (ss >> word)
+	{
+		if (word[0] == ':')
+		{
+			words.push_back(word);
+			while (ss >> word)
+			{
+				words.back() += " ";
+				words.back() += word;
+			}
+		}
+		else
+			words.push_back(word);
+	}
 
 	// if (input.size() <= 3) // ERR_NEEDMOREPARAMS (461)
 	// {

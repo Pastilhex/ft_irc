@@ -32,6 +32,7 @@ private:
 	std::string _password; /**< The password required to connect to the server. */
 	std::map<std::string, Channel> _channels; /**< The map of channels on the server. */
 	std::map<std::string, Client> _globalUsers; /**< The map of global users on the server. */
+	std::vector<std::string> _input; /**< The vector of input strings. */
 
 public:
 	/* Constructors*/
@@ -62,6 +63,7 @@ public:
 	std::string getAddressIP(void);
 	std::string getClientNick(std::string &channelName, std::string &clientName);
 	std::string getOpNick(std::string &channelName, std::string clientName);
+	std::vector<std::string> getInput(void);
 	Client &getClientBySocket(int socket, Client &client);
 
 	/* Setters */
@@ -85,6 +87,7 @@ public:
 	void setAddress(struct sockaddr_in newAddress);
 	void setHostname(std::string hostname);
 	void setChannel(std::string, bool);
+	void setInput(std::string input);
 
 	/* Commands */
 	void LIST(int clientSocket, Client &client, std::string message);
@@ -97,6 +100,7 @@ public:
 	void PART(std::string message, Client &client);
 	void MODE(std::string message, Client client);
 	void KICK(std::string message, Client client);
+	void INVITE(Client client);
   
 	void updateChannel(Client client, std::string channelName);
 	void PRIVMSG(std::string message, Client client);
