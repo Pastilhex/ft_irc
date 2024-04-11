@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/10 15:03:21 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/11 12:27:35 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -643,17 +643,16 @@ void Server::KICK(std::string message, Client client)
 	{
 		bool isChannelOk = ((!input[1].empty()) ? (input[1][0] == '#' || input[1][0] == '&') ? true : false : false);
 		bool isNickOk = (!input[2].empty()) ? true : false;
-		if (isChannelOk && isNickOk)
+		if (!isChannelOk || !isNickOk)
 		{
 			std::string reason = ":" + getHostname() + " 461 " + client.getNick() + " " + ((isChannelOk) ? input[1] : "") + " :Not enough parameters\r\n";
 			SEND(client.getSocket(), reason, "Erro ao enviar mensagem de KICK por falta de argumentos");
-		}
-		else
 			return;
+		}
 	}
 
 	std::string kickNick = input[2];
-	std::string reason = (!input[3].empty()) ? input[3] : "";
+	std::string reason = (input.size() == 4 && !input[3].empty()) ? input[3] : "";
 	std::string channelName = getInputCmd(message, "KICK ");
 
 	std::map<std::string, Channel> &channels = getChannels();
