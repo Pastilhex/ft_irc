@@ -98,7 +98,7 @@ class Utils
          * @param flag The flag to check.
          * @return true if the flag is valid, false otherwise.
          */
-        static bool isValidFlag(std::string flag);
+        static bool isValidFlag(char flag);
 
 
         /**

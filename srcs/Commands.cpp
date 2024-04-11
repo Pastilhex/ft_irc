@@ -44,15 +44,15 @@ void Server::MODE(std::string message, Client client)
 	std::string msg;
 	int clientSocket = client.getSocket();
 
-	if (modeOption == 'o')
+	if (modeOption == 'o' && mode_cmd.size() == 3)
 	{
 		msg = handleOperatorMode(mode_cmd, it, modeFlag);
 	}
-	else if (modeOption == 'i')
+	else if (modeOption == 'i' && mode_cmd.size() == 3)
 	{
 		handlePrivateAccessMode(it, modeOption, modeFlag);
 	}
-	else if (modeOption == 't')
+	else if (modeOption == 't' && mode_cmd.size() == 3)
 	{
 		handleRestrictedTopicMode(it, modeFlag);
 	}
@@ -64,6 +64,8 @@ void Server::MODE(std::string message, Client client)
 	{
 		handleUserLimitMode(mode_cmd, it, modeFlag);
 	}
+	else if(Utils::isValidFlag(modeOption)) //for the cas the flag is valid but with the wrong number of arguments
+		return;
 	else
 		msg = client.getNick() + "  :Unknown MODE flag\r\n";
 	std::cout << msg << std::endl;
@@ -72,12 +74,7 @@ void Server::MODE(std::string message, Client client)
 
 std::string Server::handleOperatorMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag)
 {
-
-	if (mode_cmd.size() != 4)
-	{
-		return (NULL);
-	}
-	else if (!Utils::isValidUser(it->second, mode_cmd[3]))
+	if (!Utils::isValidUser(it->second, mode_cmd[3]))
 	{
 		return (mode_cmd[3] + " " + it->first + " :User is not in the channel\r\n");
 	}
@@ -97,7 +94,7 @@ std::string Server::handleOperatorMode(const std::vector<std::string> &mode_cmd,
 		if (Utils::isOperator(it->second, mode_cmd[3]))
 		{
 			it->second.RemoveOperator(mode_cmd[3]);
-			// Zilio removes channel operator status from Zilio
+			// Zilio removes channel operator status from pastilhex (sintaxe assim ?)
 			return (mode_cmd[3] + " " + it->first + " :User removed as an operator\r\n");
 		}
 		return (mode_cmd[3] + " " + it->first + " :User can't be removed of the operator's list because it's not an operator\r\n");
@@ -107,8 +104,6 @@ std::string Server::handleOperatorMode(const std::vector<std::string> &mode_cmd,
 
 void Server::handlePrivateAccessMode(std::map<std::string, Channel>::iterator it, char modeOption, char modeFlag)
 {
-	(void)modeFlag;
-
 	if(modeFlag == '+')
 	{
 		if (it->second.getModePrivateAccess())
@@ -154,12 +149,10 @@ void Server::handleRestrictedTopicMode(std::map<std::string, Channel>::iterator 
 		}
 		return (Utils::logMessage("Channel topic is already unrestricted", 0), void());
 	}
-	
 }
 
 void Server::handlePasswordMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag)
 {
-	(void)modeFlag;
 	if (mode_cmd.size() >= 4 && modeFlag == '+')
 	{
 		if(it->second.getPassword() == mode_cmd[3])
@@ -170,7 +163,7 @@ void Server::handlePasswordMode(const std::vector<std::string> &mode_cmd, std::m
 		it->second.setNewMode('k');
 		return (Utils::logMessage("New channel key is now set", 0), void());
 	}
-	else if (mode_cmd.size() < 4 && modeFlag == '-')
+	else if (mode_cmd.size() <= 3 && modeFlag == '-')
 	{
 		if(it->second.getPassword() == "")
 			return (Utils::logMessage("Channel key is already null", 0), void());
@@ -182,7 +175,6 @@ void Server::handlePasswordMode(const std::vector<std::string> &mode_cmd, std::m
 
 void Server::handleUserLimitMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag)
 {
-	(void)modeFlag;
 	if (mode_cmd.size() >= 4 && modeFlag == '+')
 	{
 		try
@@ -200,7 +192,7 @@ void Server::handleUserLimitMode(const std::vector<std::string> &mode_cmd, std::
 			return (Utils::logMessage("Invalid user limit to be set", 1), void());
 		}
 	}
-	else if(mode_cmd.size() >= 3 && modeFlag == '-')
+	else if(mode_cmd.size() <= 3 && modeFlag == '-')
 	{
 		if(it->second.getUserLimit() == UNLIMITED_USERS)
 			return (Utils::logMessage("User limit is already unset", 0), void());

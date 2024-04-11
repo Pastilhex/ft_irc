@@ -146,9 +146,9 @@ bool Utils::isOperator(Channel channel, std::string nickname)
 	return false;
 }
 
-bool Utils::isValidFlag(std::string flag)
+bool Utils::isValidFlag(char flag)
 {
-	if(flag == "+k" || flag == "+l" || flag == "+i" || flag == "+t")
+	if(flag == 'k' || flag == 'l' || flag == 'i' || flag == 't' || flag == 'o')
 		return true;
 	return false;
 }
