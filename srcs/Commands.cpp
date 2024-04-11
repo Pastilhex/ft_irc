@@ -1,4 +1,5 @@
 #include "../includes/ircserv.hpp"
+#include <iostream> // Add missing include statement
 
 void Server::MODE(std::string message, Client client)
 {
@@ -9,25 +10,22 @@ void Server::MODE(std::string message, Client client)
 		return;
 	}
 	std::string channel_name = mode_cmd[1].substr(1);
-#include <iostream> // Add missing include statement
 
 	std::map<std::string, Channel>::iterator it = getChannels().find(channel_name);
 	if (it == getChannels().end())
 	{
 		std::string msg = client.getNick() + " " + channel_name + " :No such channel\r\n";
 		send(client.getSocket(), msg.c_str(), msg.size(), 0);
-		return;
+		return (Utils::logMessage("Channel not found", 0), void());
 	}
 
 	if (mode_cmd.size() == 2)
 	{
 		std::vector<char> channelModes = it->second.getModes();
 		std::string channelModesStr(channelModes.begin(), channelModes.end());
-		std::cout << "channels mode::" + channelModesStr << std::endl;
-		// std::string msg = "MODE " + channel_name + " " + channelModesStr + "\r\n";
-		// send(client.getSocket(), msg.c_str(), msg.size(), 0);
-		// msg += "MODE " + channel_name + " " + channelModes + "\r\n";
-		// send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		std::cout << "channel's mode:" + channelModesStr;
+		if(channelModesStr == "")
+			std::cout << " no modes set" << std::endl;
 		return;
 	}
 
@@ -118,8 +116,8 @@ void Server::handlePrivateAccessMode(std::map<std::string, Channel>::iterator it
 			return (Utils::logMessage("Channel is already private", 0), void());
 		}
 		it->second.setModePrivateAccess(true);
-		it->second.setNewMode('i');
-		//return (Utils::logMessage("Channel is now private", 0), void());
+		it->second.setNewMode(modeOption);
+		return (Utils::logMessage("Channel is now private", 0), void());
 	}
 	else if (modeFlag == '-')
 	{
@@ -127,6 +125,7 @@ void Server::handlePrivateAccessMode(std::map<std::string, Channel>::iterator it
 		{
 			it->second.setModePrivateAccess(false);
 			it->second.deleteMode(modeOption);
+			return (Utils::logMessage("Channel is now public", 0), void());
 		}
 		return (Utils::logMessage("Channel is already public", 0), void());
 	}
@@ -134,45 +133,79 @@ void Server::handlePrivateAccessMode(std::map<std::string, Channel>::iterator it
 
 void Server::handleRestrictedTopicMode(std::map<std::string, Channel>::iterator it, char modeFlag)
 {
-	(void)modeFlag;
-	if (it->second.getRestrictedTopic())
+	if(modeFlag == '+')
 	{
-		return (Utils::logMessage("Channel topic is already restricted", 0), void());
+		// quando o canal e criado de forma privada o topico ja e restrito? 
+		if (it->second.getRestrictedTopic())
+		{
+			return (Utils::logMessage("Channel topic is already restricted", 0), void());
+		}
+		it->second.setRestrictedTopic(true);
+		it->second.setNewMode('t');
+		return (Utils::logMessage("Channel topic is now restricted", 0), void());
 	}
-	it->second.setRestrictedTopic(true);
-	it->second.setNewMode('t');
-	return (Utils::logMessage("Channel topic is now restricted", 0), void());
+	else if (modeFlag == '-')
+	{
+		if(it->second.getRestrictedTopic())
+		{
+			it->second.setRestrictedTopic(false);
+			it->second.deleteMode('t');
+			return (Utils::logMessage("Channel topic is now unrestricted", 0), void());
+		}
+		return (Utils::logMessage("Channel topic is already unrestricted", 0), void());
+	}
+	
 }
 
 void Server::handlePasswordMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag)
 {
 	(void)modeFlag;
-	if (mode_cmd.size() >= 4)
+	if (mode_cmd.size() >= 4 && modeFlag == '+')
 	{
+		if(it->second.getPassword() == mode_cmd[3])
+			return (Utils::logMessage("You can't set the same password", 0), void());
+
 		std::string password = mode_cmd[3];
 		it->second.setPassword(password);
 		it->second.setNewMode('k');
-		return (Utils::logMessage("Channel key is now set", 0), void());
+		return (Utils::logMessage("New channel key is now set", 0), void());
+	}
+	else if (mode_cmd.size() < 4 && modeFlag == '-')
+	{
+		if(it->second.getPassword() == "")
+			return (Utils::logMessage("Channel key is already null", 0), void());
+		it->second.setPassword("");
+		it->second.deleteMode('k');
+		return (Utils::logMessage("Channel key is now removed", 0), void());
 	}
 }
 
 void Server::handleUserLimitMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag)
 {
 	(void)modeFlag;
-	if (mode_cmd.size() >= 4)
+	if (mode_cmd.size() >= 4 && modeFlag == '+')
 	{
 		try
 		{
 			double userLimit = atof(mode_cmd[3].c_str());
 			int roundedLimit = static_cast<int>(userLimit);
+			if(it->second.getUserLimit() == roundedLimit)
+				return (Utils::logMessage("You can't set the same user limit", 0), void());
 			it->second.setUserLimit(roundedLimit);
 			it->second.setNewMode('l');
-			return (Utils::logMessage("User limit is now set", 0), void());
+			return (Utils::logMessage("New user limit is now set", 0), void());
 		}
 		catch (const std::exception &e)
 		{
-			return (Utils::logMessage("Removing user limit", 1), void());
-			it->second.setUserLimit(UNLIMITED_USERS);
+			return (Utils::logMessage("Invalid user limit to be set", 1), void());
 		}
+	}
+	else if(mode_cmd.size() >= 3 && modeFlag == '-')
+	{
+		if(it->second.getUserLimit() == UNLIMITED_USERS)
+			return (Utils::logMessage("User limit is already unset", 0), void());
+		it->second.setUserLimit(UNLIMITED_USERS);
+		it->second.deleteMode('l');
+		return (Utils::logMessage("User limit is now removed", 0), void());
 	}
 }
