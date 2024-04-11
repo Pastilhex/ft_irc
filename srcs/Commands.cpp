@@ -202,7 +202,13 @@ void Server::handleUserLimitMode(const std::vector<std::string> &mode_cmd, std::
 	}
 }
 
-// void Server::INVITE(Client client)
-// {
-// 	if()
-// }
+/* void Server::INVITE(Client client)
+{
+	if(getInput().size() != 3)
+		return ;
+
+	std::string invitedUser = getInput()[1];
+	std::string channel = getInput()[2];
+
+
+} */

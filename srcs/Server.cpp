@@ -651,6 +651,8 @@ void Server::PART(std::string message, Client &client)
 	}
 }
 
+
+
 void Server::KICK(std::string message, Client client)
 {
 	// KICK #42 ivo :bye
