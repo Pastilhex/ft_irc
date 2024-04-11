@@ -6,7 +6,7 @@
 /*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/11 19:38:57 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/11 20:41:39 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -497,6 +497,7 @@ void Server::LIST(int clientSocket, Client &client, std::string message)
 
 void Server::JOIN(int clientSocket, Client &client, std::string message)
 {
+	std::vector<std::string> input = trimInput(message, client);
 	size_t posCmd = message.find("JOIN");
 	size_t posCmdLower = message.find("join");
 	if (posCmd != std::string::npos || posCmdLower != std::string::npos)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:41:57 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/08 13:42:19 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/11 19:57:45 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -258,15 +258,6 @@ void	Channel::RemoveOperator(std::string nickname)
 	}
 }
 
-/**
- * @brief Get the list of operators in the channel.
- * 
- * @return std::vector<std::string> The list of operators.
- */
-std::vector<std::string> Channel::getOperators(void)
-{
-	return this->_operators;
-}
 
 void Channel::deleteMode(char mode)
 {

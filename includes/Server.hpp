@@ -6,7 +6,7 @@
 /*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/11 19:06:26 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/11 19:56:17 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -228,10 +228,6 @@ public:
 	 *
 	 * Esta função obtém e exibe o endereço IP local do servidor.
 	 */
-	std::string getAddressIP(void);
-	std::string getClientNick(std::string &channelName, std::string &clientName);
-	std::string getOpNick(std::string &channelName, std::string clientName);
-	Client &getClientBySocket(int socket, Client &client);
 };
 
 #endif
