@@ -33,6 +33,7 @@ public:
 	Server(std::string password);
 
 	/* Getters */
+
 	/**
 	 * @brief Obtém o descritor de arquivo do socket do servidor.
 	 *
@@ -41,6 +42,7 @@ public:
 	 * @return Retorna o descritor de arquivo do socket do servidor.
 	 */
 	int getSocket(void);
+	
 	/**
 	 * @brief Obtém a estrutura sockaddr_in do servidor.
 	 *
@@ -54,6 +56,7 @@ public:
 	std::map<std::string, Channel> &getChannels(void);
 
 	/* Setters */
+	
 	/**
 	 * @brief Define o descritor de arquivo do socket do servidor.
 	 *
@@ -62,6 +65,7 @@ public:
 	 * @param newSocket O novo valor do descritor de arquivo do socket do servidor.
 	 */
 	void setSocket(int newSocket);
+	
 	/**
 	 * @brief Define a estrutura sockaddr_in do servidor.
 	 *
@@ -75,18 +79,18 @@ public:
 
 	/* Commands */
 	void LIST(int clientSocket, Client &client, std::string message);
+	void TOPIC(int clientSocket, Client &client, std::string message);
 	void JOIN(int clientSocket, Client &client, std::string message);
 	void WHO(int clientSocket, const Client client, std::string channelName);
 	void PART(std::string message, Client &client);
 	void MODE(std::string message, Client client);
-	void PONG(std::string message, Client client);
 	void KICK(std::string message, Client client);
-
-
-	void Send_WHO_toAll(Client client, std::string channelName);
-	void Send_PRIVMSG_toChannel(std::string message, Client client);
+  
+	void updateChannel(Client client, std::string channelName);
+	void PRIVMSG(std::string message, Client client);
 
 	/* Methods */
+	
 	/**
 	 * @brief Função para obter o socket do servidor.
 	 *
@@ -117,6 +121,7 @@ public:
 	 * @return Retorna true se a porta for válida, false caso contrário.
 	 */
 	static bool isValidPort(char *str);
+	
 	/**
 	 * @brief Inicia o servidor.
 	 *
@@ -127,6 +132,7 @@ public:
 	 *         false caso contrário.
 	 */
 	bool start(char *str);
+	
 	/**
 	 * @brief Associa o socket do servidor a um endereço específico.
 	 *
