@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/11 22:57:26 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/12 19:57:11 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,9 +73,9 @@ void Server::setAddress(struct sockaddr_in newAddress)
 	this->_address = newAddress;
 }
 
-void Server::setInput(std::string input)
+void Server::setInput(std::string message)
 {
-	this->_input.push_back(input);
+	this->_input = trimInput(message);
 }
 
 bool Server::isValidPort(char *str)
@@ -339,6 +339,9 @@ void Server::isNewClient(std::vector<pollfd> &fds, const int &serverSocket, stru
 		{
 			int bytesRead = recv(clientPoll.fd, buffer, sizeof(buffer), 0);
 			std::string message(buffer, bytesRead);
+			if (message.find("CAP LS") != std::string::npos)
+				SEND(clientPoll.fd, ":* CAP * LS :42Porto Ft_IRCv1.0\r\n", "Error sending CAP LS message to client");
+			std::cout << message << std::endl;
 			client.getClientLoginData(buffer, bytesRead);
 		}
 
@@ -360,6 +363,11 @@ void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, 
 {
 	std::string message(buffer, bytesRead);
 	setInput(message);
+
+
+	if (message.find("CAP END") != std::string::npos)
+		SEND(fds[i].fd, ":* CAP * END\r\n", "Error sending CAP LS message to client");
+
 	if (!isCMD(message, "PING"))
 		std::cout << ":<< " + message << std::endl;
 
@@ -380,8 +388,7 @@ void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, 
 	}
 	if (isCMD(message, "WHO"))
 	{
-		std::string channelName = getInputCmd(message, "WHO ");
-		WHO(fds[i].fd, client, channelName);
+		WHO(fds[i].fd, client);
 		fds[i].revents = 0;
 	}
 	if (isCMD(message, "LIST"))
@@ -418,6 +425,11 @@ void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, 
 		TOPIC(fds[i].fd, client, message);
 		fds[i].revents = 0;
 	}
+	if (isCMD(message, "INVITE"))
+	{
+		INVITE(client);
+		fds[i].revents = 0;
+	}
 }
 
 void Server::TOPIC(int clientSocket, Client &client, std::string message)
@@ -441,7 +453,7 @@ void Server::TOPIC(int clientSocket, Client &client, std::string message)
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
 
 	bool isUserOp = false;
-	bool isOpenTopic = it->second.getModeTopic();
+	bool isOpenTopic = it->second.getInvisibility();
 
 	std::vector<std::string> &operators = it->second.getOperators();
 	std::vector<std::string>::iterator op = operators.begin();
@@ -464,8 +476,21 @@ void Server::TOPIC(int clientSocket, Client &client, std::string message)
 
 void Server::PRIVMSG(std::string message, Client client)
 {
-	std::string channelName = getInputChannel(message);
-	std::string msgToSend = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " PRIVMSG #" + channelName + " :";
+	std::vector<std::string> input = getInput();
+	std::vector<std::string>::iterator inputIterator = input.begin();
+	std::string channelName;
+	
+	while (inputIterator != input.end())
+	{
+		if ((*inputIterator)[0] == '#' || (*inputIterator)[0] == '&')
+		{
+			channelName =  *inputIterator;
+			break;
+		}
+		++inputIterator;
+	}
+
+	std::string msgToSend = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " PRIVMSG " + channelName + " :";
 	msgToSend += getMsgToSend(message) + "\r\n";
 
 	std::map<std::string, Channel> channels = getChannels();
@@ -508,68 +533,86 @@ void Server::LIST(int clientSocket, Client &client, std::string message)
 
 void Server::JOIN(int clientSocket, Client &client, std::string message)
 {
-	size_t posCmd = message.find("JOIN");
-	size_t posCmdLower = message.find("join");
-	if (posCmd != std::string::npos || posCmdLower != std::string::npos)
+	(void) message;
+
+	std::vector<std::string> input = getInput();
+	std::vector<std::string>::iterator inputIterator = input.begin();
+	std::string channelName;
+
+	while (inputIterator != input.end())
 	{
-		size_t posChannel = message.find_first_not_of(" \n\r\t", posCmd + 4);
-		std::string channelName = message.substr(posChannel + 1, message.find_first_of(" \n\r\t", posChannel + 1) - (posChannel + 1));
-
-		if (!(message[posChannel] == '#' || (message[posChannel] == '&')))
-			std::cout << ("Not a valid channel name, try with '#' or '&'") << std::endl;
-
-		std::map<std::string, Channel> &channels = getChannels(); // Criar uma ligação com a lista de canais
-		std::map<std::string, Channel>::iterator it = channels.find(channelName);
-		if (message[posChannel] == '#' || message[posChannel] == '&')
+		if ((*inputIterator)[0] == '#' || (*inputIterator)[0] == '&')
 		{
-			for (it = channels.begin(); it != channels.end(); ++it)
+			channelName =  *inputIterator;
+
+			std::map<std::string, Channel> &channels = getChannels();
+			std::map<std::string, Channel>::iterator it = channels.find(channelName);
+
+			if ((*inputIterator)[0] == '#' || (*inputIterator)[0] == '&')
 			{
-				if (it->first == channelName)
+				// Adiciona o user a uma sala existente
+				for (it = channels.begin(); it != channels.end(); ++it)
 				{
-					it->second.setNewUser(client);
-					updateChannel(client, channelName);
-					break;
+					if (it->first == channelName)
+					{
+						it->second.setNewUser(client);
+						updateChannel(client, channelName);
+						break;
+					}
+				}
+
+				// Adiciona o user a uma nova sala
+				if (it == channels.end())
+				{
+					bool state = (input[1][0] == '#') ? false : true;
+					Channel channel = Channel(channelName, state);
+					channel.setNewUser(client);
+					channel.AddOperator(client.getNick());
+					_channels.insert(std::make_pair(channelName, channel)); // Fazer um setter para esta função
 				}
 			}
 
-			if (it == channels.end())
+			// Prepara e envia a msg de JOIN
+			std::map<std::string, Channel>::iterator newIt = channels.find(channelName);
+			if (newIt != channels.end())
 			{
-				bool state = (message[posChannel] == '#') ? false : true;
-				Channel channel = Channel(channelName, state);
-				channel.setNewUser(client);
-				channel.AddOperator(client.getNick());
-				_channels.insert(std::make_pair(channelName, channel)); // Fazer um setter para esta função
+				Channel &channel = newIt->second;
+				std::string topic = channel.getTopic();
+				std::string joinMsg = ":" + client.getNick() + " JOIN " + channelName + " :" + topic + "\r\n";
+				SEND(clientSocket, joinMsg, "Erro ao entrar no canal.");
+				WHO(client.getSocket(), client);
 			}
-		}
-
-		std::map<std::string, Channel>::iterator newIt = channels.find(channelName);
-		if (newIt != channels.end())
-		{
-			Channel &channel = newIt->second;
-			std::string topic = channel.getTopic();
-			std::string joinMsg = ":" + client.getNick() + " JOIN " + message[posChannel] + channelName + " :" + topic + "\r\n";
-			std::cout << joinMsg << std::endl;
-			if (send(clientSocket, joinMsg.c_str(), joinMsg.length(), 0) == -1)
+			else
 			{
-				std::cerr << "Erro ao entrar no canal." << std::endl;
+				std::cout << "Canal não encontrado" << std::endl;
 			}
+			++inputIterator;
 		}
 		else
-		{
-			std::cout << "Canal não encontrado" << std::endl;
-		}
+			++inputIterator;
 	}
+
 }
 
-void Server::WHO(int clientSocket, const Client client, std::string channelName)
+void Server::WHO(int clientSocket, const Client client)
 {
+	std::vector<std::string> input = getInput();
+	std::string channelName;
+	for (size_t i = 0; i < getInput().size(); ++i)
+	{
+		if (input[i][0] == '#' || input[i][0] == '&')
+		{
+			channelName = input[i];
+			break;
+		}
+	}
 	std::map<std::string, Channel> &channels = getChannels();
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
 	bool channelPrivacy = it->second.getModePrivateAccess();
 	std::string privacy = (channelPrivacy) ? "@" : "#";
 	if (it != channels.end())
 	{
-		std::string whoMsg = ":" + getHostname() + " 353 " + client.getNick() + " = " + privacy + channelName + " :";
+		std::string whoMsg = ":" + getHostname() + " 353 " + client.getNick() + " = " + channelName + " :";
 		const std::map<std::string, Client> &users = it->second.getUsers();
 		std::map<std::string, Client>::const_iterator user_it = users.begin();
 		while (user_it != users.end())
@@ -590,7 +633,7 @@ void Server::WHO(int clientSocket, const Client client, std::string channelName)
 			if (++user_it != users.end())
 				whoMsg += " ";
 		}
-		whoMsg += "\r\n:" + getHostname() + " 366 " + client.getNick() + " " + privacy + channelName + " :End of Names list.\r\n";
+		whoMsg += "\r\n:" + getHostname() + " 366 " + client.getNick() + " " + channelName + " :End of Names list.\r\n";
 		std::cout << whoMsg << std::endl;
 		if (send(clientSocket, whoMsg.c_str(), whoMsg.length(), 0) == -1)
 		{
@@ -657,23 +700,9 @@ void Server::KICK(std::string message, Client client)
 	bool isKickerOp = false;
 	bool isKickedOp = false;
 
-	/* if (input.size() <= 3) // ERR_NEEDMOREPARAMS (461)
-	{
-		bool isChannelOk = ((!input[1].empty()) ? (input[1][0] == '#' || input[1][0] == '&') ? true : false : false);
-		bool isNickOk = (!input[2].empty()) ? true : false;
-		if (!isChannelOk || !isNickOk)
-		{
-			std::string reason = ":" + getHostname() + " 461 " + client.getNick() + " " + ((isChannelOk) ? input[1] : "") + " :Not enough parameters\r\n";
-			SEND(client.getSocket(), reason, "Erro ao enviar mensagem de KICK por falta de argumentos");
-			return;
-		}
-	} */
-
-	
-
 	std::string kickNick = getInput()[2];
 	std::string reason = (getInput().size() == 4 && !getInput()[3].empty()) ? getInput()[3] : "";
-	std::string channelName = getInputCmd(message, "KICK ");
+	std::string channelName = getInputCmd(message, "KICK");
 
 	std::map<std::string, Channel> &channels = getChannels();
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
@@ -702,7 +731,7 @@ void Server::KICK(std::string message, Client client)
 
 		if (isKickerOp && isKickedOp) // ERR_NOPRIVILEGES (481)
 		{
-			std::string leaveChannel = ":" + getHostname() + " 481 " + client.getNick() + " " + getInputCmd(message, "KICK") + " :Permission Denied- You're not an IRC operator\r\n";
+			std::string leaveChannel = ":" + getHostname() + " 481 " + client.getNick() + " " + getInputCmd(message, "KICK") + " :Permission Denied - You're not an IRC operator\r\n";
 			SEND(client.getSocket(), leaveChannel, "Erro ao enviar mensagem de KICK.");
 			return;
 		}
@@ -723,7 +752,7 @@ void Server::KICK(std::string message, Client client)
 					std::string leaveChannel = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " KICK " + getInputCmd(message, "KICK") + " " + kickNick + " " + reason + "\r\n";
 					SEND(client.getSocket(), leaveChannel, "Erro ao enviar mensagem de KICK.");
 					users.erase(us);
-					WHO(us->second.getSocket(), us->second, channelName);
+					WHO(us->second.getSocket(), us->second);
 					updateChannel(client, channelName);
 					return;
 				}
@@ -788,7 +817,7 @@ void Server::updateChannel(Client client, std::string channelName)
 		std::map<std::string, Client>::iterator user_it = users.begin();
 		while (user_it != users.end())
 		{
-			WHO(user_it->second.getSocket(), user_it->second, channelName);
+			WHO(user_it->second.getSocket(), user_it->second);
 			++user_it;
 		}
 		return;
@@ -815,13 +844,11 @@ void Server::sendWelcome(int clientSocket, Client &client)
 	}
 }
 
-
-std::vector<std::string> Server::trimInput(std::string input, Client client)
+std::vector<std::string> Server::trimInput(std::string msg)
 {
-	(void)client;
-	int begin = input.find_first_not_of(" \r\n\t");
-	int end = input.find_last_not_of(" \r\n\t,");
-	std::string trimmed = input.substr(begin, end - begin + 1);
+	int begin = msg.find_first_not_of(" \r\n\t");
+	int end = msg.find_last_not_of(" \r\n\t,");
+	std::string trimmed = msg.substr(begin, end - begin + 1);
 
 	// Substituir vírgulas por espaços
 	for (size_t i = 0; i < trimmed.size(); ++i)

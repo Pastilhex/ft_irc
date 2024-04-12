@@ -147,7 +147,7 @@ bool Utils::isOperator(Channel channel, std::string nickname)
 	std::vector<std::string> operators = channel.getOperators();
 	for (size_t i = 0; i < operators.size(); i++)
 	{
-		if (operators[i] == nickname)
+		if (operators[i] == "@" + nickname)
 			return true;
 	}
 	return false;

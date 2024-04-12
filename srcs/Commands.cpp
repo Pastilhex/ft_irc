@@ -3,30 +3,25 @@
 
 void Server::MODE(std::string message, Client client)
 {
-	(void)client;
+	(void)message;
 	std::vector<std::string> mode_cmd = Utils::split(message, " \n\t\r");
-	
+
 	if (mode_cmd.size() < 2)
 		return;
 
-	std::string channel_name = mode_cmd[1].substr(1);
+	std::string channel_name = mode_cmd[1];
 
-	std::map<std::string, Channel>::iterator it = getChannels().find(channel_name);
-	if (it == getChannels().end())
-	{
-		std::string msg = client.getNick() + " " + channel_name + " :No such channel\r\n";
-		send(client.getSocket(), msg.c_str(), msg.size(), 0);
-		return (Utils::logMessage("Channel not found", 0), void());
-	}
+	const std::map<std::string, Channel>::iterator &it = getChannels().find(channel_name);
 
 	if (mode_cmd.size() == 2)
 	{
+		// :harpy.de.SpotChat.org 324 ivo #test :+nt
+		// :harpy.de.SpotChat.org 329 ivo #test :1712114531
 		std::vector<char> channelModes = it->second.getModes();
 		std::string channelModesStr(channelModes.begin(), channelModes.end());
-		std::cout << "channel's mode:" + channelModesStr;
-		if(channelModesStr == "")
-			std::cout << " no modes set";
-		std::cout << std::endl;
+		std::string tmp = ":" + getHostname() + " 324 " + client.getNick() + " " + channel_name + " :+" + channelModesStr + "\r\n";
+		SEND(client.getSocket(), tmp, "Error sending MODE message");
+		SEND(client.getSocket(), ":" + getHostname() + " 329 " + client.getNick() + " " + channel_name + " :" + it->second.getCreationTime() + "\r\n", "Error sending MODE message");
 		return;
 	}
 
@@ -43,19 +38,19 @@ void Server::MODE(std::string message, Client client)
 	char modeFlag = mode[0];
 	char modeOption = mode[1];
 	std::string msg;
-	int clientSocket = client.getSocket();
+	//int clientSocket = client.getSocket();
 
-	if (modeOption == 'o' && mode_cmd.size() == 3)
+	if (modeOption == 'o' && mode_cmd.size() == 4)
 	{
-		msg = handleOperatorMode(mode_cmd, it, modeFlag);
+		msg = handleOperatorMode(mode_cmd, it, modeFlag, client);
 	}
 	else if (modeOption == 'i' && mode_cmd.size() == 3)
 	{
-		handlePrivateAccessMode(it, modeOption, modeFlag);
+		handlePrivateAccessMode(it, modeOption, modeFlag, client);
 	}
 	else if (modeOption == 't' && mode_cmd.size() == 3)
 	{
-		handleRestrictedTopicMode(it, modeFlag);
+		handleRestrictedTopicMode(it, modeFlag, client, modeOption);
 	}
 	else if (modeOption == 'k')
 	{
@@ -69,25 +64,24 @@ void Server::MODE(std::string message, Client client)
 		return;
 	else
 		msg = client.getNick() + "  :Unknown MODE flag\r\n";
-	std::cout << msg << std::endl;
-	send(clientSocket, msg.c_str(), msg.size(), 0);
+	// std::cout << msg << std::endl;
+	//send(clientSocket, msg.c_str(), msg.size(), 0);
 }
 
-std::string Server::handleOperatorMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag)
+std::string Server::handleOperatorMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag, Client client)
 {
 	if (!Utils::isValidUser(it->second, mode_cmd[3]))
 	{
 		return (mode_cmd[3] + " " + it->first + " :User is not in the channel\r\n");
 	}
-
 	if (modeFlag == '+')
 	{
 		if (Utils::isOperator(it->second, mode_cmd[3]))
 		{
-			// TO DO: operators esta guardando o user com @ junto, assim temos problemas na verificacao 
 			return (mode_cmd[3] + " " + it->first + " :User is already an operator\r\n");
 		}
 		it->second.AddOperator(it->second.getUsers().find(mode_cmd[3])->first);
+		updateChannel(client, mode_cmd[1]);
 		return (mode_cmd[3] + " " + it->first + " :User added as an operator\r\n");
 	}
 	else if (modeFlag == '-')
@@ -95,7 +89,7 @@ std::string Server::handleOperatorMode(const std::vector<std::string> &mode_cmd,
 		if (Utils::isOperator(it->second, mode_cmd[3]))
 		{
 			it->second.RemoveOperator(mode_cmd[3]);
-			// Zilio removes channel operator status from pastilhex (sintaxe assim ?)
+			updateChannel(client, mode_cmd[1]);
 			return (mode_cmd[3] + " " + it->first + " :User removed as an operator\r\n");
 		}
 		return (mode_cmd[3] + " " + it->first + " :User can't be removed of the operator's list because it's not an operator\r\n");
@@ -103,23 +97,24 @@ std::string Server::handleOperatorMode(const std::vector<std::string> &mode_cmd,
 	return NULL;
 }
 
-void Server::handlePrivateAccessMode(std::map<std::string, Channel>::iterator it, char modeOption, char modeFlag)
+void Server::handlePrivateAccessMode(std::map<std::string, Channel>::iterator it, char modeOption, char modeFlag, Client client)
 {
 	if(modeFlag == '+')
 	{
-		if (it->second.getModePrivateAccess())
+		if (it->second.getInvisibility())
 		{
 			return (Utils::logMessage("Channel is already private", 0), void());
 		}
-		it->second.setModePrivateAccess(true);
+		it->second.setInvisibility(true);
 		it->second.setNewMode(modeOption);
+		SEND(client.getSocket(),":" + client.getNick() + " MODE " + it->first + " +" + modeOption, "Error sending MODE message");
 		return (Utils::logMessage("Channel is now private", 0), void());
 	}
 	else if (modeFlag == '-')
 	{
-		if (it->second.getModePrivateAccess())
+		if (it->second.getInvisibility())
 		{
-			it->second.setModePrivateAccess(false);
+			it->second.setInvisibility(false);
 			it->second.deleteMode(modeOption);
 			return (Utils::logMessage("Channel is now public", 0), void());
 		}
@@ -127,8 +122,11 @@ void Server::handlePrivateAccessMode(std::map<std::string, Channel>::iterator it
 	}
 }
 
-void Server::handleRestrictedTopicMode(std::map<std::string, Channel>::iterator it, char modeFlag)
+void Server::handleRestrictedTopicMode(std::map<std::string, Channel>::iterator it, char modeFlag, Client client, char modeOption)
 {
+	(void)client;
+	(void)modeOption;
+	std::string channelName = it->second.getName();
 	if(modeFlag == '+')
 	{
 		// quando o canal e criado de forma privada o topico ja e restrito? 
@@ -138,6 +136,7 @@ void Server::handleRestrictedTopicMode(std::map<std::string, Channel>::iterator 
 		}
 		it->second.setRestrictedTopic(true);
 		it->second.setNewMode('t');
+		//SEND(client.getSocket(),":" + getHostname() + " MODE " + channelName + " +" + modeOption, "Error sending MODE message");
 		return (Utils::logMessage("Channel topic is now restricted", 0), void());
 	}
 	else if (modeFlag == '-')
@@ -146,6 +145,7 @@ void Server::handleRestrictedTopicMode(std::map<std::string, Channel>::iterator 
 		{
 			it->second.setRestrictedTopic(false);
 			it->second.deleteMode('t');
+			//SEND(client.getSocket(),":" + getHostname() + " MODE " + channelName + " -" + modeOption, "Error sending MODE message");
 			return (Utils::logMessage("Channel topic is now unrestricted", 0), void());
 		}
 	}
@@ -202,7 +202,7 @@ void Server::handleUserLimitMode(const std::vector<std::string> &mode_cmd, std::
 	}
 }
 
-/* void Server::INVITE(Client client)
+void Server::INVITE(Client client)
 {
 	if(getInput().size() != 3)
 		return ;
@@ -210,5 +210,7 @@ void Server::handleUserLimitMode(const std::vector<std::string> &mode_cmd, std::
 	std::string invitedUser = getInput()[1];
 	std::string channel = getInput()[2];
 
-
-} */
+	// :dan-!d@localhost INVITE Wiz #test
+	std::string msg = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " INVITE " + invitedUser + " " + channel + "\r\n";
+	SEND(client.getSocket(), msg, "Error sending INVITE message");
+}

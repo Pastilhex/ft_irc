@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/11 22:48:26 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/12 19:56:41 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,10 +93,8 @@ public:
 	void LIST(int clientSocket, Client &client, std::string message);
 	void TOPIC(int clientSocket, Client &client, std::string message);
 	void JOIN(int clientSocket, Client &client, std::string message);
-	void WHO(int clientSocket, const Client client, std::string channelName);
+	void WHO(int clientSocket, const Client client);
 
-	void Send_WHO_toAll(Client client, std::string channelName);
-	void Send_PRIVMSG_toChannel(Client client, std::string channelName);
 	void PART(std::string message, Client &client);
 	void MODE(std::string message, Client client);
 	void KICK(std::string message, Client client);
@@ -179,14 +177,14 @@ public:
 	void sendWelcome(int clientSocket, Client &client);
 	void processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, int bytesRead, int i);
 	void isNewClient(std::vector<pollfd> &fds, const int &serverSocket, struct sockaddr_in &clientAddress, Client &client);
-	std::vector<std::string> trimInput(std::string input, Client client);
+	std::vector<std::string> trimInput(std::string input);
 
 	bool addClientToGlobalUsers(Client client);
 	void removeClientFromGlobalUsers(Client client);
 
 	// Handles
 
-	std::string handleOperatorMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag);
+	std::string handleOperatorMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag, Client client);
 
 	/**
 	 * @brief Handles the private access mode for a channel.
@@ -195,7 +193,7 @@ public:
 	 *
 	 * @param it An iterator pointing to the channel in a map.
 	 */
-	void handlePrivateAccessMode(std::map<std::string, Channel>::iterator it, char modeOption, char modeFlag);
+	void handlePrivateAccessMode(std::map<std::string, Channel>::iterator it, char modeOption, char modeFlag, Client client);
 
 	/**
 	 * @brief Handles the user limit mode for a channel.
@@ -225,7 +223,7 @@ public:
 	 *
 	 * @param it An iterator pointing to the channel in which the mode command is being executed.
 	 */
-	void handleRestrictedTopicMode(std::map<std::string, Channel>::iterator it, char modeFlag);
+	void handleRestrictedTopicMode(std::map<std::string, Channel>::iterator it, char modeFlag, Client client, char modeOption);
 	/**
 	 * @brief Obtém informações de endereço do servidor.
 	 *

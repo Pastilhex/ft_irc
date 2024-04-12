@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:41:57 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/11 19:57:45 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/12 19:50:56 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,20 @@ Channel::Channel(std::string name, bool isPrivate)
 {
 	this->_name = name;
 	this->_isPrivate = isPrivate;
+	this->_isInvisible = false;
+	this->_modes.push_back('n');
+	this->_modes.push_back('t');
+	this->_creationTime = time(0);
+}
+
+std::string Channel::getCreationTime(void)
+{
+	time(&this->_creationTime);
+
+	std::ostringstream oss;
+	oss << this->_creationTime;
+	std::string strTime = oss.str();
+	return strTime;
 }
 
 int Channel::getNbrUsers(void)
@@ -78,9 +92,9 @@ std::string Channel::getPassword(void)
  *
  * @return True if the topic can be edited, false if topic is locked.
  */
-bool Channel::getModeTopic(void)
+bool Channel::getInvisibility(void)
 {
-    return this->_modeTopic;
+    return this->_isInvisible;
 }
 
 /**
@@ -144,9 +158,9 @@ void Channel::setTopic(std::string topic)
  *
  * @param mode Set True to allow topic editing, False to block topic editing.
  */
-void Channel::setModeTopic(bool mode)
+void Channel::setInvisibility(bool mode)
 {
-	this->_modeTopic = mode;
+	this->_isInvisible = mode;
 }
 
 /**
@@ -238,6 +252,21 @@ void	Channel::AddOperator(const std::string& nickname)
 		this->_operators.push_back("@" + nickname);
 }
 
+void	Channel::AddInvited(const std::string& nickname)
+{
+	std::vector<std::string>::iterator it;
+
+	for (it = this->_invited.begin(); it != this->_invited.end(); ++it)
+	{
+		if (*it == nickname)
+		{
+			std::cout << "Operator already in this channel list" << std::endl;
+			return ;
+		}
+	}
+	this->_invited.push_back(nickname);
+}
+
 /**
  * @brief Removes an operator from the channel.
  * 
@@ -247,17 +276,23 @@ void	Channel::AddOperator(const std::string& nickname)
  */
 void	Channel::RemoveOperator(std::string nickname)
 {
-	std::vector<std::string>::iterator it;
-
-	for (it = this->_operators.begin(); it != this->_operators.end(); ++it)
-	{
-		if (*it == nickname)
-		{
-			this->_operators.erase(it);
-		}
-	}
+	std::vector<std::string>::iterator it = this->_operators.begin();
+	while (it != this->_operators.end())
+		if (*it == "@" + nickname)
+			it = this->_operators.erase(it);
+		else
+			++it;
 }
 
+void	Channel::RemoveInvited(std::string nickname)
+{
+	std::vector<std::string>::iterator it = this->_invited.begin();
+	while (it != this->_operators.end())
+		if (*it == nickname)
+			it = this->_operators.erase(it);
+		else
+			++it;
+}
 
 void Channel::deleteMode(char mode)
 {
@@ -266,7 +301,6 @@ void Channel::deleteMode(char mode)
 		if (_modes[i] == mode)
         {
             _modes.erase(_modes.begin() + i);
-            // After erasing, decrement i to account for the shift in indices
             i--;
         }
 	}
