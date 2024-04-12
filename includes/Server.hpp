@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/11 19:56:17 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/11 22:48:26 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,14 @@ class Server
 {
 
 private:
-	int _socket; /**< The socket file descriptor for the server. */
-	int _port; /**< The port number on which the server is running. */
-	struct sockaddr_in _address; /**< The server's address information. */
-	std::string _hostname; /**< The hostname of the server. */
-	std::string _password; /**< The password required to connect to the server. */
-	std::map<std::string, Channel> _channels; /**< The map of channels on the server. */
+	int _socket;								/**< The socket file descriptor for the server. */
+	int _port;									/**< The port number on which the server is running. */
+	struct sockaddr_in _address;				/**< The server's address information. */
+	std::string _hostname;						/**< The hostname of the server. */
+	std::string _password;						/**< The password required to connect to the server. */
+	std::map<std::string, Channel> _channels;	/**< The map of channels on the server. */
 	std::map<std::string, Client> _globalUsers; /**< The map of global users on the server. */
-	std::vector<std::string> _input; /**< The vector of input strings. */
+	std::vector<std::string> _input;			/**< The vector of input strings. */
 
 public:
 	/* Constructors*/
@@ -48,7 +48,7 @@ public:
 	 * @return Retorna o descritor de arquivo do socket do servidor.
 	 */
 	int getSocket(void);
-	
+
 	/**
 	 * @brief Obtém a estrutura sockaddr_in do servidor.
 	 *
@@ -67,7 +67,7 @@ public:
 	Client &getClientBySocket(int socket, Client &client);
 
 	/* Setters */
-	
+
 	/**
 	 * @brief Define o descritor de arquivo do socket do servidor.
 	 *
@@ -76,7 +76,7 @@ public:
 	 * @param newSocket O novo valor do descritor de arquivo do socket do servidor.
 	 */
 	void setSocket(int newSocket);
-	
+
 	/**
 	 * @brief Define a estrutura sockaddr_in do servidor.
 	 *
@@ -101,12 +101,12 @@ public:
 	void MODE(std::string message, Client client);
 	void KICK(std::string message, Client client);
 	void INVITE(Client client);
-  
+
 	void updateChannel(Client client, std::string channelName);
 	void PRIVMSG(std::string message, Client client);
 
 	/* Methods */
-	
+
 	/**
 	 * @brief Função para obter o socket do servidor.
 	 *
@@ -117,7 +117,7 @@ public:
 	 *         1 se ocorrer um erro ao definir o modo não-bloqueante para o socket.
 	 */
 	int createSocket(void);
-  
+
 	/**
 	 * @brief Cria uma estrutura sockaddr_in para o servidor.
 	 *
@@ -137,7 +137,7 @@ public:
 	 * @return Retorna true se a porta for válida, false caso contrário.
 	 */
 	static bool isValidPort(char *str);
-	
+
 	/**
 	 * @brief Inicia o servidor.
 	 *
@@ -148,7 +148,7 @@ public:
 	 *         false caso contrário.
 	 */
 	bool start(char *str);
-	
+
 	/**
 	 * @brief Associa o socket do servidor a um endereço específico.
 	 *
@@ -186,8 +186,8 @@ public:
 
 	// Handles
 
-	std::string handleOperatorMode(const std::vector<std::string>& mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag);
-	
+	std::string handleOperatorMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag);
+
 	/**
 	 * @brief Handles the private access mode for a channel.
 	 *
@@ -195,7 +195,7 @@ public:
 	 *
 	 * @param it An iterator pointing to the channel in a map.
 	 */
-	void	handlePrivateAccessMode(std::map<std::string, Channel>::iterator it, char modeOption, char modeFlag);
+	void handlePrivateAccessMode(std::map<std::string, Channel>::iterator it, char modeOption, char modeFlag);
 
 	/**
 	 * @brief Handles the user limit mode for a channel.
@@ -205,9 +205,8 @@ public:
 	 * @param mode_cmd The mode command to handle.
 	 * @param it An iterator pointing to the channel in a map.
 	 */
-	void	handleUserLimitMode(const std::vector<std::string>& mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag);
-	
-	
+	void handleUserLimitMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag);
+
 	/**
 	 * Handles the password mode command.
 	 *
@@ -217,7 +216,7 @@ public:
 	 * @param mode_cmd The command arguments for the password mode command.
 	 * @param it       An iterator pointing to the channel in which the mode command is being executed.
 	 */
-	void	handlePasswordMode(const std::vector<std::string>& mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag);
+	void handlePasswordMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag);
 
 	/**
 	 * Handles the restricted topic mode command.
@@ -226,7 +225,7 @@ public:
 	 *
 	 * @param it An iterator pointing to the channel in which the mode command is being executed.
 	 */
-	void	handleRestrictedTopicMode(std::map<std::string, Channel>::iterator it, char modeFlag);
+	void handleRestrictedTopicMode(std::map<std::string, Channel>::iterator it, char modeFlag);
 	/**
 	 * @brief Obtém informações de endereço do servidor.
 	 *
