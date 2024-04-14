@@ -6,7 +6,7 @@
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 06:36:04 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/14 09:56:44 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/14 14:45:06 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,12 +39,12 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/poll.h>
+#include <sstream>
 #include "Server.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "Utils.hpp"
 #include "Macros.hpp"
-#include <sstream>
 
 std::string getCurrentDateTime();
 bool isCMD(std::string message, std::string cmd);

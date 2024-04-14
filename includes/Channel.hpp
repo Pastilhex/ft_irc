@@ -6,7 +6,7 @@
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/14 12:53:03 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/14 14:24:14 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,19 +50,22 @@ public:
 	std::vector<std::string> &getInvitedUsers(void);
 
 	/* Setters */
+	// void setUserMode(std::string usermode);
 	void setName(std::string name);
 	void setTopic(std::string topic);
-	// void setUserMode(std::string usermode);
 	void setInvisibility(bool mode);
 	void setModePrivateAccess(bool mode);
 	void setRestrictedTopic(bool mode);
 	void setUserLimit(int limit);
 	void setNewUser(Client client);
+	void setPassword(std::string password);
+	
 	void setNewMode(char mode);
 	void deleteMode(char mode);
-	void setPassword(std::string password);
+
 	void AddOperator(const std::string &);
 	void RemoveOperator(std::string);
+	
 	void AddInvited(const std::string &);
 	void RemoveInvited(std::string);};
 

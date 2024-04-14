@@ -6,7 +6,7 @@
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:41:57 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/14 12:53:06 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/14 17:27:34 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -284,20 +284,30 @@ void	Channel::RemoveOperator(std::string nickname)
 {
 	std::vector<std::string>::iterator it = this->_operators.begin();
 	while (it != this->_operators.end())
+	{
 		if (*it == "@" + nickname)
+		{
 			it = this->_operators.erase(it);
+			return;
+		}
 		else
 			++it;
+	}
 }
 
 void	Channel::RemoveInvited(std::string nickname)
 {
 	std::vector<std::string>::iterator it = this->_invited.begin();
-	while (it != this->_operators.end())
+	while (it != this->_invited.end())
+	{
 		if (*it == nickname)
-			it = this->_operators.erase(it);
+		{
+			it = this->_invited.erase(it);
+			return;
+		}
 		else
 			++it;
+	}
 }
 
 void Channel::deleteMode(char mode)

@@ -197,16 +197,3 @@ void Server::handleUserLimitMode(const std::vector<std::string> &mode_cmd, std::
 		return (Utils::logMessage("User limit is now removed", 0), void());
 	}
 }
-
-void Server::INVITE(Client client)
-{
-	if(getInput().size() != 3)
-		return ;
-
-	std::string invitedUser = getInput()[1];
-	std::string channel = getInput()[2];
-
-	// :dan-!d@localhost INVITE Wiz #test
-	std::string msg = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " INVITE " + invitedUser + " " + channel + "\r\n";
-	SEND(client.getSocket(), msg, "Error sending INVITE message");
-}

@@ -6,12 +6,11 @@
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/14 12:56:59 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/14 18:06:21 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
-#include "../includes/Server.hpp"
 
 Server::Server(std::string password)
 {
@@ -208,6 +207,24 @@ Client &Server::getClientBySocket(int socket, Client &client)
 	}
 	return client;
 }
+
+bool Server::isUserInvited(std::string user, std::string channelName)
+{
+	std::map<std::string, Channel> &channels = this->getChannels();
+	std::map<std::string, Channel>::iterator ch = channels.find(channelName);
+	if (ch != channels.end())
+	{
+		std::vector<std::string> &invitedList = ch->second.getInvitedUsers();
+		std::vector<std::string>::iterator iv = invitedList.begin();
+		while (iv != invitedList.end())
+		{
+			if (*iv == user)
+				return true;
+		}
+	}
+	return false;
+}
+
 
 bool Server::start(char *str)
 {
@@ -565,23 +582,23 @@ void Server::JOIN(int clientSocket, Client &client)
 			channelName = *inputIterator;
 			std::map<std::string, Channel> &channels = getChannels();
 			std::map<std::string, Channel>::iterator it = channels.find(channelName);
+			
 			std::vector<char> mode = it->second.getModes();
 			std::vector<char>::iterator mode_it = mode.begin();
 			for (; mode_it != mode.end(); ++mode_it)
 			{
 				if (*mode_it == 'i')
 				{
-					std::vector<std::string> invitedUser = it->second.getInvitedUsers();
-					std::vector<std::string>::iterator iv = invitedUser.begin();
-					for (; iv != invitedUser.end(); ++iv)
+					if (isUserInvited(client.getNick(), channelName))
 					{
-						if (*iv == client.getNick())
-						{
-							break;
-						}
+						it->second.RemoveInvited(client.getNick());
+						break;
 					}
-					SEND(client.getSocket(), ERR_INVITEONLYCHAN(client, channelName), "Error sending JOIN message with mode +i advise to user");
-					return;
+					else
+					{
+						SEND(client.getSocket(), ERR_INVITEONLYCHAN(client, channelName), "Error sending JOIN message with mode +i advise to user");
+						return;
+					}
 				}
 			}
 			if ((*inputIterator)[0] == '#' || (*inputIterator)[0] == '&')
@@ -770,10 +787,11 @@ void Server::KICK(std::string message, Client client)
 			{
 				if (us->first == kickNick)
 				{
-					std::string leaveChannel = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " KICK " + getInputCmd(message, "KICK") + " " + kickNick + " " + reason + "\r\n";
+					std::string leaveChannel = RPL_KICK(client, channelName, kickNick, reason);
 					SEND(client.getSocket(), leaveChannel, "Erro ao enviar mensagem de KICK.");
 					users.erase(us);
 					WHO(us->second.getSocket(), us->second);
+					informAll(client, kickNick, channelName, RPL_KICK(client, channelName, kickNick, reason));
 					updateChannel(client, channelName);
 					return;
 				}
@@ -839,6 +857,24 @@ void Server::updateChannel(Client client, std::string channelName)
 		while (user_it != users.end())
 		{
 			WHO(user_it->second.getSocket(), user_it->second);
+			++user_it;
+		}
+		return;
+	}
+}
+
+void Server::informAll(Client client, std::string kicked, std::string channelName, std::string reason)
+{
+	std::map<std::string, Channel> channels = getChannels();
+	std::map<std::string, Channel>::iterator it = channels.find(channelName);
+	if (it != channels.end())
+	{
+		std::map<std::string, Client> &users = it->second.getUsers();
+		std::map<std::string, Client>::iterator user_it = users.begin();
+		while (user_it != users.end())
+		{
+			//if (user_it->first != client.getNick())
+			SEND(user_it->second.getSocket(), RPL_KICK(client, channelName, kicked, reason), "Error informing all users");
 			++user_it;
 		}
 		return;
@@ -926,4 +962,63 @@ bool Server::checkInput(std::vector<std::string> input)
 		errorDetected = false;
 
 	return errorDetected;
+}
+
+void Server::INVITE(Client client)
+{
+	bool userAvaiable = false;
+	bool channelAvaiable = false;
+	int invitedFd;
+
+	if (getInput().size() != 3)
+		return;
+	
+	std::string invitedUser = getInput()[1];
+	std::string channel = getInput()[2];
+	if (!(channel[0] != '#' || channel[0] != '&'))
+	{
+		SEND(client.getSocket(), ERR_NOSUCHCHANNEL(client, channel), "Error sending ERR_NOSUCHCHANNEL (403)");
+		return;
+	}
+
+	std::map<std::string, Channel> &channels = this->getChannels();
+	std::map<std::string, Channel>::iterator ch = channels.begin();
+	while (ch != channels.end())
+	{
+		if (ch->first == channel)
+		{
+			channelAvaiable = true;
+			std::map<std::string, Client> &users = this->getGlobalUsers();
+			std::map<std::string, Client>::iterator us = users.begin();
+			while (us != users.end())
+			{
+				if (us->first == invitedUser)
+				{
+					userAvaiable = true;
+					invitedFd = us->second.getSocket();
+					break;
+				}
+				++us;
+			}
+			break;
+		}
+		++ch;
+	}
+
+	if (!channelAvaiable)
+	{
+		SEND(client.getSocket(), ERR_NOSUCHCHANNEL(client, channel), "Error sending msg ERR_NOSUCHCHANNEL");
+		return;
+	}
+
+	if (userAvaiable)
+		ch->second.AddInvited(invitedUser);
+	else
+	{
+		SEND(client.getSocket(), ERR_NOSUCHNICK(client, invitedUser), "Error sendinf msg ERR_NOSUCHNICK");
+		return;
+	}
+
+	std::string msg = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " INVITE " + invitedUser + " " + channel + "\r\n";
+	SEND(invitedFd, msg, "Error sending INVITE message");
 }

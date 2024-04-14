@@ -6,7 +6,7 @@
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 22:22:32 by jhogonca          #+#    #+#             */
-/*   Updated: 2024/04/14 10:36:58 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/14 17:47:34 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@
 #define RPL_INVITING(nickname, target) \
 	(std::string(LOCAL) + "341 " + nickname + " " + target + " :Inviting user to channel\r\n")
 #define ERR_NOSUCHCHANNEL(client, channel) \
-	(std::string(LOCAL) + "403 " + client + " #" + channel + " :No such channel\r\n")
+	(":" + getHostname() + " 403 " + client.getNick() + " " + channel + " :No such channel\r\n")
 #define ERR_UNKNOWNCOMMAND(client, command) \
 	(std::string(LOCAL) + "421 " + client + " " + command + " :Unknown command\r\n")
 #define ERR_NOTONCHANNEL(client, channel) \
@@ -57,8 +57,8 @@
 // KICK
 #define ERR_USERNOTINCHANNEL(client, nickname, channel) \
 	("441 " + client + " " + nickname + " #" + channel + " :They aren't on that channel\r\n")
-#define RPL_KICK(user_id, channel, kicked, reason) \
-	(user_id + " KICK #" + channel + " " + kicked + " " + reason + "\r\n")
+#define RPL_KICK(client, channel, kicked, reason) \
+	(":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " KICK " + channel + " " + kicked + " " + reason + "\r\n")
 
 // KILL
 #define ERR_NOPRIVILEGES(client) \
@@ -117,6 +117,7 @@
 	(":" + this->getHostname() + " 322 " + client.getNick() + " " + channelName + " " + std::string(nbrUserStr) + " :" + it->second.getTopic() + "\r\n")
 #define RPL_LISTEND(client) \
 	(":" + this->getHostname() + " 323 " + client.getNick() + " :End of /LIST\r\n")
+	
 // NICK
 #define ERR_NONICKNAMEGIVEN(client) \
 	(std::string(LOCAL) + "431 " + client + " :There is no nickname.\r\n")
@@ -157,7 +158,7 @@
 
 // PRIVMSG
 #define ERR_NOSUCHNICK(client, target) \
-	("401 " + client + " " + target + " :No such nick/channel\r\n")
+	(":" + getHostname() + " 401 " + client.getNick() + " INVITE " + target + " :No such nick/channel\r\n")
 #define ERR_NORECIPIENT(client) \
 	("411 " + client + " :No recipient given PRIVMSG\r\n")
 #define ERR_NOTEXTTOSEND(client) \

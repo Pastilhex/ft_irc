@@ -6,7 +6,7 @@
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/14 11:16:16 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/14 18:01:38 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ public:
 	std::string getOpNick(std::string &channelName, std::string clientName);
 	std::vector<std::string> getInput(void);
 	Client &getClientBySocket(int socket, Client &client);
+	bool isUserInvited(std::string user, std::string channel);
 
 	// Setters
 	void setSocket(int newSocket);
@@ -87,6 +88,7 @@ public:
 	bool start(char *str);
 	void sendWelcome(int clientSocket, Client &client);
 	void updateChannel(Client client, std::string channelName);
+	void informAll(Client client, std::string kicked, std::string channelName, std::string msg);
 	static bool isValidPort(char *str);
 };
 
