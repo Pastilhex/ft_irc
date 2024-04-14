@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/14 18:01:38 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/14 20:19:15 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ public:
 	bool addClientToGlobalUsers(Client client);
 	bool bindSocket(const int &serverSocket, const struct sockaddr_in &serverAddress);
 	bool checkConnections(const int &serverSocket);
-	bool checkInput(std::vector<std::string>);
+	bool checkInput(std::vector<std::string> input, Client client);
 	void connectClient(const int &serverSocket);
 	void createHostname(void);
 	int createSocket(void);

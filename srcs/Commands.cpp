@@ -5,28 +5,28 @@ void Server::MODE(std::string message, Client client)
 {
 	(void)message;
 	std::vector<std::string> mode_cmd = trimInput(message);
-	if (checkInput(mode_cmd) || (mode_cmd.size() < 2))
+	
+	if (checkInput(mode_cmd, client) || (mode_cmd.size() < 2))
 		return;
-	std::string channel_name = mode_cmd[1];
-	const std::map<std::string, Channel>::iterator &it = getChannels().find(channel_name);
+	
+	std::string channelName = mode_cmd[1];
+	const std::map<std::string, Channel>::iterator &it = getChannels().find(channelName);
 	if (mode_cmd.size() == 2)
 	{
 		// :harpy.de.SpotChat.org 324 ivo #test :+nt
 		// :harpy.de.SpotChat.org 329 ivo #test :1712114531
 		std::vector<char> channelModes = it->second.getModes();
 		std::string channelModesStr(channelModes.begin(), channelModes.end());
-		std::string tmp = ":" + getHostname() + " 324 " + client.getNick() + " " + channel_name + " :+" + channelModesStr + "\r\n";
+		std::string tmp = ":" + getHostname() + " 324 " + client.getNick() + " " + channelName + " :+" + channelModesStr + "\r\n";
 		SEND(client.getSocket(), tmp, "Error sending MODE message");
-		SEND(client.getSocket(), ":" + getHostname() + " 329 " + client.getNick() + " " + channel_name + " :" + it->second.getCreationTime() + "\r\n", "Error sending MODE message");
+		SEND(client.getSocket(), ":" + getHostname() + " 329 " + client.getNick() + " " + channelName + " :" + it->second.getCreationTime() + "\r\n", "Error sending MODE message");
 		return;
 	}
 
 	std::vector<std::string> operators = it->second.getOperators();
-
-	if (!Utils::isValidUser(it->second, client.getNick()) && Utils::isOperator(it->second, client.getNick()))
+	if (!Utils::isOperator(it->second, client.getNick())) // !Utils::isValidUser(it->second, client.getNick()) && 
 	{
-		std::string msg = client.getNick() + " " + channel_name + " :You're not channel operator\r\n";
-		send(client.getSocket(), msg.c_str(), msg.size(), 0);
+		SEND(client.getSocket(), ERR_CHANOPRIVSNEEDED(client, channelName), "Error sending message");
 		return;
 	}
 
@@ -58,8 +58,8 @@ void Server::MODE(std::string message, Client client)
 	}
 	else if(Utils::isValidFlag(modeOption)) //for the cas the flag is valid but with the wrong number of arguments
 		return;
-	else
-		msg = client.getNick() + "  :Unknown MODE flag\r\n";
+	// else
+	// 	msg = client.getNick() + "  :Unknown MODE flag\r\n";
 	// std::cout << msg << std::endl;
 	//send(clientSocket, msg.c_str(), msg.size(), 0);
 }

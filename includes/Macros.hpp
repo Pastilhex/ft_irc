@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Macros.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 22:22:32 by jhogonca          #+#    #+#             */
-/*   Updated: 2024/04/14 17:47:34 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/14 19:32:00 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 #define DATE std::string(__TIME__) +" "+ std::string(__DATE__)
 #define USER_ID(nickname, username) (":" + nickname + "!" + username + "@localhost")
-#define LOCAL ":localhost "
+#define LOCAL ":" + getHostname()
 #define UNLIMITED_USERS -1
 
 // Server messages
@@ -88,7 +88,7 @@
 #define ERR_CHANNELISFULL(client, channel) \
 	("471 " + client + " #" + channel + " :Cannot join channel (+l)\r\n")
 #define ERR_CHANOPRIVSNEEDED(client, channel) \
-	(std::string(LOCAL) + "482 " + client + " #" + channel + " :You're not channel operator\r\n")
+	(std::string(LOCAL) + " 482 " + client.getNick() + " " + channel + " :You're not channel operator\r\n")
 #define ERR_INVALIDMODEPARAM(client, channel, mode, password) \
 	("696 " + client + " #" + channel + " " + mode + " " + password + " : password must only contained alphabetic character\r\n")
 #define RPL_ADDVOICE(nickname, username, channel, mode, param) \
@@ -158,7 +158,7 @@
 
 // PRIVMSG
 #define ERR_NOSUCHNICK(client, target) \
-	(":" + getHostname() + " 401 " + client.getNick() + " INVITE " + target + " :No such nick/channel\r\n")
+	(":" + getHostname() + " 401 " + client.getNick() + " " + target + " :No such nick/channel\r\n")
 #define ERR_NORECIPIENT(client) \
 	("411 " + client + " :No recipient given PRIVMSG\r\n")
 #define ERR_NOTEXTTOSEND(client) \

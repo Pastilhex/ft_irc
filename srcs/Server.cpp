@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/14 18:06:21 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/14 20:35:57 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -789,9 +789,9 @@ void Server::KICK(std::string message, Client client)
 				{
 					std::string leaveChannel = RPL_KICK(client, channelName, kickNick, reason);
 					SEND(client.getSocket(), leaveChannel, "Erro ao enviar mensagem de KICK.");
+					informAll(client, kickNick, channelName, reason);
 					users.erase(us);
-					WHO(us->second.getSocket(), us->second);
-					informAll(client, kickNick, channelName, RPL_KICK(client, channelName, kickNick, reason));
+					//WHO(us->second.getSocket(), us->second);
 					updateChannel(client, channelName);
 					return;
 				}
@@ -873,8 +873,8 @@ void Server::informAll(Client client, std::string kicked, std::string channelNam
 		std::map<std::string, Client>::iterator user_it = users.begin();
 		while (user_it != users.end())
 		{
-			//if (user_it->first != client.getNick())
-			SEND(user_it->second.getSocket(), RPL_KICK(client, channelName, kicked, reason), "Error informing all users");
+			if (user_it->first != client.getNick())
+				SEND(user_it->second.getSocket(), RPL_KICK(client, channelName, kicked, reason), "Error informing all users");
 			++user_it;
 		}
 		return;
@@ -937,7 +937,7 @@ std::vector<std::string> Server::trimInput(std::string msg)
 	return words;
 }
 
-bool Server::checkInput(std::vector<std::string> input)
+bool Server::checkInput(std::vector<std::string> input, Client client)
 {
 	bool errorDetected = true;
 	std::vector<std::string> cmd;
@@ -958,8 +958,11 @@ bool Server::checkInput(std::vector<std::string> input)
 			errorDetected = false;
 	}
 
-	if (input[1][0] == '#' || input[1][0] == '&')
-		errorDetected = false;
+	if (input[1][0] != '#' && input[1][0] != '&')
+	{
+		SEND(client.getSocket(), ERR_NOSUCHCHANNEL(client, input[1]),"Error while sending wrong channel");
+		return true;
+	}
 
 	return errorDetected;
 }
@@ -1015,10 +1018,11 @@ void Server::INVITE(Client client)
 		ch->second.AddInvited(invitedUser);
 	else
 	{
-		SEND(client.getSocket(), ERR_NOSUCHNICK(client, invitedUser), "Error sendinf msg ERR_NOSUCHNICK");
+		SEND(client.getSocket(), ERR_NOSUCHNICK(client, invitedUser), "Error sending msg ERR_NOSUCHNICK");
 		return;
 	}
 
 	std::string msg = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " INVITE " + invitedUser + " " + channel + "\r\n";
+	SEND(invitedFd, msg, "Error sending INVITE message");
 	SEND(invitedFd, msg, "Error sending INVITE message");
 }
