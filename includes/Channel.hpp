@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/12 19:47:01 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/14 12:53:03 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,20 +39,20 @@ public:
 	std::string getName(void);
 	std::string getTopic(void);
 	std::string getPassword(void);
-	std::string getUserMode(void);
 	bool getInvisibility(void);
 	bool getModePrivateAccess(void);
 	bool getRestrictedTopic(void);
 	int getNbrUsers(void);
-	std::map<std::string, Client> &getUsers(void);
 	int getUserLimit(void);
 	std::vector<char> getModes(void);
+	std::map<std::string, Client> &getUsers(void);
 	std::vector<std::string> &getOperators(void);
+	std::vector<std::string> &getInvitedUsers(void);
 
 	/* Setters */
 	void setName(std::string name);
 	void setTopic(std::string topic);
-	void setUserMode(std::string usermode);
+	// void setUserMode(std::string usermode);
 	void setInvisibility(bool mode);
 	void setModePrivateAccess(bool mode);
 	void setRestrictedTopic(bool mode);

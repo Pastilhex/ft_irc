@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Macro.hpp                                          :+:      :+:    :+:   */
+/*   Macros.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 22:22:32 by jhogonca          #+#    #+#             */
-/*   Updated: 2024/04/08 22:22:32 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/14 10:36:58 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,10 @@
 	(std::string(LOCAL) + "461 " + client + " " + command + " :Not enough parameters.\r\n")
 
 // JOIN
-#define RPL_JOIN(user_id, channel) \
-	(user_id + " JOIN :#" + channel + "\r\n")
+#define RPL_JOIN(client, channelName) \
+	(":" + client.getNick() + " JOIN " + channelName + "\r\n")
+#define ERR_INVITEONLYCHAN(client, channel) \
+	(":" + getHostname() + " 473 " + client.getNick() + " " + channelName + " :Cannot join channel (+i)\r\n")
 #define ERR_BANNEDFROMCHAN(client, channel) \
 	("474 " + client + " #" + channel + " :Cannot join channel (+b)\r\n")
 #define ERR_BADCHANNELKEY(client, channel) \
@@ -110,6 +112,11 @@
 #define RPL_ENDOFNAMES(client, channel) \
 	(std::string(LOCAL) + "366 " + client + " #" + channel + " :End of /NAMES list.\r\n")
 
+//LIST
+#define RPL_LIST(client, nbrUserStr, it) \
+	(":" + this->getHostname() + " 322 " + client.getNick() + " " + channelName + " " + std::string(nbrUserStr) + " :" + it->second.getTopic() + "\r\n")
+#define RPL_LISTEND(client) \
+	(":" + this->getHostname() + " 323 " + client.getNick() + " :End of /LIST\r\n")
 // NICK
 #define ERR_NONICKNAMEGIVEN(client) \
 	(std::string(LOCAL) + "431 " + client + " :There is no nickname.\r\n")

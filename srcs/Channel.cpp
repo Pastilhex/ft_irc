@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:41:57 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/12 19:50:56 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/14 12:53:06 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,6 +132,12 @@ std::vector<char> Channel::getModes(void)
 {
 	return this->_modes;	
 }
+
+std::vector<std::string> &Channel::getInvitedUsers(void)
+{
+	return this->_invited;
+}
+
 
 /**
  * @brief Set the name of the channel.

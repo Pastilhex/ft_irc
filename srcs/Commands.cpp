@@ -4,15 +4,11 @@
 void Server::MODE(std::string message, Client client)
 {
 	(void)message;
-	std::vector<std::string> mode_cmd = Utils::split(message, " \n\t\r");
-
-	if (mode_cmd.size() < 2)
+	std::vector<std::string> mode_cmd = trimInput(message);
+	if (checkInput(mode_cmd) || (mode_cmd.size() < 2))
 		return;
-
 	std::string channel_name = mode_cmd[1];
-
 	const std::map<std::string, Channel>::iterator &it = getChannels().find(channel_name);
-
 	if (mode_cmd.size() == 2)
 	{
 		// :harpy.de.SpotChat.org 324 ivo #test :+nt
@@ -107,7 +103,7 @@ void Server::handlePrivateAccessMode(std::map<std::string, Channel>::iterator it
 		}
 		it->second.setInvisibility(true);
 		it->second.setNewMode(modeOption);
-		SEND(client.getSocket(),":" + client.getNick() + " MODE " + it->first + " +" + modeOption, "Error sending MODE message");
+		SEND(client.getSocket(),":" + client.getNick() + " MODE " + it->first + " +" + modeOption + "\r\n", "Error sending MODE message");
 		return (Utils::logMessage("Channel is now private", 0), void());
 	}
 	else if (modeFlag == '-')
@@ -136,7 +132,7 @@ void Server::handleRestrictedTopicMode(std::map<std::string, Channel>::iterator 
 		}
 		it->second.setRestrictedTopic(true);
 		it->second.setNewMode('t');
-		//SEND(client.getSocket(),":" + getHostname() + " MODE " + channelName + " +" + modeOption, "Error sending MODE message");
+		SEND(client.getSocket(),":" + getHostname() + " MODE " + channelName + " +" + modeOption + "\r\n", "Error sending MODE message");
 		return (Utils::logMessage("Channel topic is now restricted", 0), void());
 	}
 	else if (modeFlag == '-')
@@ -145,7 +141,7 @@ void Server::handleRestrictedTopicMode(std::map<std::string, Channel>::iterator 
 		{
 			it->second.setRestrictedTopic(false);
 			it->second.deleteMode('t');
-			//SEND(client.getSocket(),":" + getHostname() + " MODE " + channelName + " -" + modeOption, "Error sending MODE message");
+			SEND(client.getSocket(),":" + getHostname() + " MODE " + channelName + " -" + modeOption + "\r\n", "Error sending MODE message");
 			return (Utils::logMessage("Channel topic is now unrestricted", 0), void());
 		}
 	}
