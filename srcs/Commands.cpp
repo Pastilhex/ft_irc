@@ -50,7 +50,7 @@ void Server::MODE(std::string message, Client client)
 	}
 	else if (modeOption == 'k')
 	{
-		handlePasswordMode(mode_cmd, it, modeFlag);
+		handlePasswordMode(mode_cmd, it, modeFlag, client, modeOption);
 	}
 	else if (modeOption == 'l')
 	{
@@ -112,6 +112,7 @@ void Server::handlePrivateAccessMode(std::map<std::string, Channel>::iterator it
 		{
 			it->second.setInvisibility(false);
 			it->second.deleteMode(modeOption);
+			SEND(client.getSocket(),":" + client.getNick() + " MODE " + it->first + " +" + modeOption + "\r\n", "Error sending MODE message");
 			return (Utils::logMessage("Channel is now public", 0), void());
 		}
 		return (Utils::logMessage("Channel is already public", 0), void());
@@ -120,12 +121,9 @@ void Server::handlePrivateAccessMode(std::map<std::string, Channel>::iterator it
 
 void Server::handleRestrictedTopicMode(std::map<std::string, Channel>::iterator it, char modeFlag, Client client, char modeOption)
 {
-	(void)client;
-	(void)modeOption;
 	std::string channelName = it->second.getName();
 	if(modeFlag == '+')
 	{
-		// quando o canal e criado de forma privada o topico ja e restrito? 
 		if (it->second.getRestrictedTopic())
 		{
 			return (Utils::logMessage("Channel topic is already restricted", 0), void());
@@ -147,7 +145,7 @@ void Server::handleRestrictedTopicMode(std::map<std::string, Channel>::iterator 
 	}
 }
 
-void Server::handlePasswordMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag)
+void Server::handlePasswordMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag, Client client, char modeOption)
 {
 	if (mode_cmd.size() >= 4 && modeFlag == '+')
 	{
@@ -157,16 +155,22 @@ void Server::handlePasswordMode(const std::vector<std::string> &mode_cmd, std::m
 		std::string password = mode_cmd[3];
 		it->second.setPassword(password);
 		it->second.setNewMode('k');
+		it->second.setModeRestrictedAccess(true);
+		SEND(client.getSocket(),":" + client.getNick() + " MODE " + it->first + " +" + modeOption + " :" + it->second.getPassword() + "\r\n", "Error sending MODE message");
 		return (Utils::logMessage("New channel key is now set", 0), void());
 	}
-	else if (mode_cmd.size() <= 3 && modeFlag == '-')
+	else if (mode_cmd.size() == 3 && modeFlag == '-')
 	{
 		if(it->second.getPassword() == "")
 			return (Utils::logMessage("Channel key is already null", 0), void());
 		it->second.setPassword("");
 		it->second.deleteMode('k');
+		it->second.setModeRestrictedAccess(false);
+		SEND(client.getSocket(),":" + client.getNick() + " MODE " + it->first + " -" + modeOption + "\r\n", "Error sending MODE message");
 		return (Utils::logMessage("Channel key is now removed", 0), void());
 	}
+	else
+		SEND(client.getSocket(), ERR_NEEDMOREPARAMS(client, "MODE"), "Error sending MODE message");
 }
 
 void Server::handleUserLimitMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag)

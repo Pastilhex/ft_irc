@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Macros.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 22:22:32 by jhogonca          #+#    #+#             */
-/*   Updated: 2024/04/14 19:32:00 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/15 08:00:54 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@
 #define ERR_USERONCHANNEL(client, nick, channel) \
 	(std::string(LOCAL) + "443 " + client + " " + nick + " #" + channel + " :is already on channel\r\n")
 #define ERR_NEEDMOREPARAMS(client, command) \
-	(std::string(LOCAL) + "461 " + client + " " + command + " :Not enough parameters.\r\n")
+	(std::string(LOCAL) + " 461 " + client.getNick() + " " + command + " :Not enough parameters.\r\n")
 
 // JOIN
 #define RPL_JOIN(client, channelName) \
@@ -160,20 +160,20 @@
 #define ERR_NOSUCHNICK(client, target) \
 	(":" + getHostname() + " 401 " + client.getNick() + " " + target + " :No such nick/channel\r\n")
 #define ERR_NORECIPIENT(client) \
-	("411 " + client + " :No recipient given PRIVMSG\r\n")
+	(" 411 " + client + " :No recipient given PRIVMSG\r\n")
 #define ERR_NOTEXTTOSEND(client) \
-	("412 " + client + " :No text to send\r\n")
-#define RPL_PRIVMSG(nick, username, target, message) \
-	(":" + nick + "!" + username + "@localhost PRIVMSG " + target + " " + message + "\r\n")
+	(" 412 " + client + " :No text to send\r\n")
+#define RPL_PRIVMSG(client, channel, message) \
+	(":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " PRIVMSG " + channel + " :" + message + "\r\n");
 
 // TOPIC
-#define RPL_TOPIC(client, channel, topic) \
-	(LOCAL + "332 " + client + " #" + channel + " " + topic + "\r\n")
+#define RPL_TOPIC(client, channel) \
+	(LOCAL + " 332 " + client.getNick() + " " + channel.getName() + " :" + channel.getTopic() + "\r\n")
 #define RPL_NOTOPIC(client, channel) \
-	(LOCAL + "331 " + client + " #" + channel + " :No topic is set\r\n")
+	(LOCAL + " 331 " + client.getNick() + " " + channel.getName() + " :No topic is set\r\n")
 
 // USER
 #define ERR_ALREADYREGISTERED(client) \
-	(LOCAL + "462 " + client + " :You may not reregister.\r\n")
+	(LOCAL + " 462 " + client + " :You may not reregister.\r\n")
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:41:57 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/14 17:27:34 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/15 07:45:45 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,11 +112,10 @@ bool Channel::getRestrictedTopic(void)
  *
  * @return True if channel is in private access mode, false if channel is public.
  */
-bool Channel::getModePrivateAccess(void)
+bool Channel::getModeRestrictedAccess(void)
 {
 	return this->_isPrivate;
 }
-
 
 /**
  * @brief Get the user limit of the channel.
@@ -175,7 +174,7 @@ void Channel::setInvisibility(bool mode)
  * @param mode The mode status to set for private access.
  * Set True to active private access only, false to active public access.
  */
-void Channel::setModePrivateAccess(bool mode)
+void Channel::setModeRestrictedAccess(bool mode)
 {
 	this->_isPrivate = mode;
 }

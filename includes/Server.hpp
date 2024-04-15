@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/14 20:19:15 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/15 07:18:06 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ public:
 	void MODE(std::string message, Client client);						// CMD channel
 	void PART(std::string message, Client &client);						// CMD channel
 	void PRIVMSG(std::string message, Client client);					// CMD channel
-	void TOPIC(int clientSocket, Client &client, std::string message);	// CMD channel
+	void TOPIC(Client &client);					// CMD channel
 	void WHO(int clientSocket, const Client client);					// CMD channel
 
 	// Utils
@@ -75,7 +75,7 @@ public:
 	void createHostname(void);
 	int createSocket(void);
 	struct sockaddr_in createAddress(int port);
-	void handlePasswordMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag);
+	void handlePasswordMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag, Client client, char modeOption);
 	void handlePrivateAccessMode(std::map<std::string, Channel>::iterator it, char modeOption, char modeFlag, Client client);
 	void handleRestrictedTopicMode(std::map<std::string, Channel>::iterator it, char modeFlag, Client client, char modeOption);
 	std::string handleOperatorMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag, Client client);
