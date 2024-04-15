@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/15 08:01:38 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/15 20:44:41 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -545,7 +545,13 @@ void Server::TOPIC(Client &client)
 						else
 						{
 							it->second.setTopic(getInput()[2]);
-							SEND(client.getSocket(), RPL_TOPIC(client, it->second), "Error while sending TOPIC message");
+							if (isUserOp)
+								SEND(client.getSocket(), RPL_TOPIC(client, it->second), "Error while sending TOPIC message");
+							else
+							{
+								it->second.setTopic("");
+								SEND(client.getSocket(), ERR_CHANOPRIVSNEEDED(client, getInput()[1]), "Error while sending TOPIC message");
+							}
 						}
 					}
 					else
@@ -555,7 +561,7 @@ void Server::TOPIC(Client &client)
 		}
 		return;
 	}
-}
+	}
 
 void Server::PRIVMSG(std::string message, Client client)
 {

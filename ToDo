@@ -57,3 +57,5 @@
     - o Operador tem de entrar automaticamente na lista de invitedUsers e enquanto for operador nunca perde o invite para puder entrar e sair do canal quando quer
    O /mode +k password" coloca paassword no canal, mas ainda nao restringe os users e operadores sem pass
    Um canal pode ser privado e restrito, se tiver convite mas nao tiver pass, nao entra
+
+   O canal ja e criado com o topico restrito, pq? 
