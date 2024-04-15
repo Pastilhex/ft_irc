@@ -35,7 +35,7 @@ bool isPassword(char *pass, Server &server)
 
 int main(int argc, char* argv[])
 {
-	Server	server("pass");
+	Server	server(argv[2]);
 	signal(SIGINT, signalHandler);
 	if (argc == 3 && isPassword(argv[2], server))
 	{

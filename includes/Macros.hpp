@@ -14,7 +14,7 @@
 # define _MACROS_
 
 #define DATE std::string(__TIME__) +" "+ std::string(__DATE__)
-#define USER_ID(nickname, username) (":" + nickname + "!" + username + "@localhost")
+#define USER_ID(nickname, username) (":" + nickname + "!" + username + "@" + getHostname())
 #define LOCAL ":" + getHostname()
 #define UNLIMITED_USERS -1
 
@@ -123,8 +123,8 @@
 	(std::string(LOCAL) + "431 " + client + " :There is no nickname.\r\n")
 #define ERR_ERRONEUSNICKNAME(client, nickname) \
 	(std::string(LOCAL) + "432 " + client + " " + nickname + " :Erroneous nickname\r\n")
-#define ERR_NICKNAMEINUSE(client, nickname) \
-	(std::string(LOCAL) + "433 " + client + " " + nickname + " :Nickname is already in use.\r\n")
+#define ERR_NICKNAMEINUSE(hostname, nickname) \
+	(":" + hostname + " 433 " + nickname + " :Nickname is already in use.\r\n")
 #define RPL_NICK(oclient, uclient, client) \
 	(":" + oclient + "!" + uclient + "@localhost NICK " +  client + "\r\n")
 
@@ -144,11 +144,11 @@
 
 // PASS
 #define ERR_PASSWDMISMATCH(client) \
-	(LOCAL + "464 " + client + " :Password incorrect.\r\n")
+	(LOCAL + " 464 " + client.getNick() + " :Server password incorrect.\r\n")
 
 // PING
-#define RPL_PONG(user_id, token) \
-	(user_id + " PONG " + token + "\r\n")
+#define RPL_PONG(nickname, username, token) \
+	(USER_ID(nickname, username) + " PONG :" + token + "\r\n")
 
 // QUIT
 #define RPL_QUIT(user_id, reason) \

@@ -42,7 +42,7 @@ public:
 	void setSocket(int fd);
 
 	/* Methods */
-	void getClientLoginData(char *buffer, int bytesRead);
+	void getClientLoginData(char *buffer, int bytesRead, std::map<std::string, Client> globalUsers, std::string hostname);
 };
 
 #endif

@@ -50,3 +50,10 @@
     - Substituir vírgulas por espaços no input.
     - Criar o vetor (ss).
    
+
+   Mudar TOPIC so como Operador ou se canal esta com TOPIC aberto
+   - Falta mandar msg TOPIC para todos
+   Invite so pode ser dado por Operador
+    - o Operador tem de entrar automaticamente na lista de invitedUsers e enquanto for operador nunca perde o invite para puder entrar e sair do canal quando quer
+   O /mode +k password" coloca paassword no canal, mas ainda nao restringe os users e operadores sem pass
+   Um canal pode ser privado e restrito, se tiver convite mas nao tiver pass, nao entra

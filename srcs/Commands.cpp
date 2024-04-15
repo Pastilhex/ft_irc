@@ -5,10 +5,10 @@ void Server::MODE(std::string message, Client client)
 {
 	(void)message;
 	std::vector<std::string> mode_cmd = trimInput(message);
-	
+
 	if (checkInput(mode_cmd, client) || (mode_cmd.size() < 2))
 		return;
-	
+
 	std::string channelName = mode_cmd[1];
 	const std::map<std::string, Channel>::iterator &it = getChannels().find(channelName);
 	if (mode_cmd.size() == 2)

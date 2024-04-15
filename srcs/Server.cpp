@@ -293,6 +293,17 @@ void Server::connectClient(const int &serverSocket)
 					std::cout << "Conexão fechada pelo cliente." << std::endl;
 					std::map<std::string, Channel> &channels = this->getChannels();
 					std::map<std::string, Channel>::iterator ch = channels.begin();
+
+					std::map<std::string, Client> &globalUsers = this->getGlobalUsers();
+					std::map<std::string, Client>::iterator gb = globalUsers.begin();
+					while (gb != globalUsers.end())
+					{
+						if (gb->first == client.getNick())
+							globalUsers.erase(gb++);
+						else
+							++gb;
+					}
+
 					while (ch != channels.end())
 					{
 						std::map<std::string, Client> &users = ch->second.getUsers();
@@ -321,15 +332,6 @@ void Server::connectClient(const int &serverSocket)
 								invitedUsers.erase(in++);
 							else
 								++in;
-						}
-						std::map<std::string, Client> &globalUsers = this->getGlobalUsers();
-						std::map<std::string, Client>::iterator gb = globalUsers.begin();
-						while (gb != globalUsers.end())
-						{
-							if (gb->first == client.getNick())
-								globalUsers.erase(gb++);
-							else
-								++gb;
 						}
 						++ch;
 					}
@@ -375,16 +377,21 @@ void Server::isNewClient(std::vector<pollfd> &fds, const int &serverSocket, stru
 
 		// guardar msg recebida num buffer
 		char buffer[1024];
-		while (client.getNick().empty() || client.getUsername().empty())
+		while (client.getNick().empty() || client.getUsername().empty() || client.getTmpPassword().empty())
 		{
 			int bytesRead = recv(clientPoll.fd, buffer, sizeof(buffer), 0);
 			std::string message(buffer, bytesRead);
-			if (message.find("CAP LS") != std::string::npos)
-				SEND(clientPoll.fd, ":* CAP * LS :42Porto Ft_IRCv1.0\r\n", "Error sending CAP LS message to client");
+			// if (message.find("CAP LS") != std::string::npos)
+			// 	SEND(clientPoll.fd, ":* CAP * LS :42Porto Ft_IRCv1.0\r\n", "Error sending CAP LS message to client");
 			std::cout << message << std::endl;
-			client.getClientLoginData(buffer, bytesRead);
+			client.getClientLoginData(buffer, bytesRead, getGlobalUsers(), getHostname());
 		}
 
+		if (client.getTmpPassword() != this->getPassword())
+		{
+			SEND(client.getSocket(), ERR_PASSWDMISMATCH(client), "Error while login");
+			return;
+		}
 		// Adiciona o client à lista global de usuarios
 		if (!addClientToGlobalUsers(client))
 			if (client.getSocket() == -1)
@@ -403,13 +410,17 @@ void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, 
 {
 	std::string message(buffer, bytesRead);
 	setInput(message);
+	std::cout << message << std::endl;
+
 
 	if (message.find("CAP END") != std::string::npos)
 		SEND(fds[i].fd, ":* CAP * END\r\n", "Error sending CAP LS message to client");
 
-	if (!isCMD(message, "PING"))
-		std::cout << ":<< " + message << std::endl;
-
+	if (isCMD(message, "PING"))
+	{
+		SEND(client.getSocket(), RPL_PONG(client.getNick(), client.getUsername(), getInput()[1]),"Error sending PONG message");
+	}
+		
 	if (isCMD(message, "PRIVMSG"))
 	{
 		PRIVMSG(message, client);
@@ -417,7 +428,8 @@ void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, 
 	}
 	if (isCMD(message, "NICK") || isCMD(message, "USER ") || isCMD(message, "PASS"))
 	{
-		client.getClientLoginData(buffer, bytesRead);
+		client.getClientLoginData(buffer, bytesRead, getGlobalUsers(), getHostname());
+		WHO(client.getSocket(), client);
 		fds[i].revents = 0;
 	}
 	if (isCMD(message, "MODE"))

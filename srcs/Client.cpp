@@ -62,13 +62,24 @@ void Client::setTmpPassword(std::string pass)
 	this->_tmpPassword = pass;
 }
 
-void	Client::getClientLoginData(char* buffer, int bytesRead)
+void	Client::getClientLoginData(char* buffer, int bytesRead, std::map<std::string, Client> globalUsers, std::string hostname)
 {
 	std::string message(buffer, bytesRead);
 	if (isCMD(message, "NICK") || isCMD(message, "USER") || isCMD(message, "PASS"))
 	{
 		if (isCMD(message, "NICK"))
-			setNick(getInputCmd(message, "NICK"));
+		{
+			std::string nickname = getInputCmd(message, "NICK");
+			std::map<std::string, Client>::iterator gb = globalUsers.find(nickname);
+			if (gb != globalUsers.end())
+				SEND(getSocket(), ERR_NICKNAMEINUSE(hostname, nickname), "Error while getting nickname");
+			else
+			{
+				std::string oldNick = getNick(); 
+				globalUsers.erase(oldNick);
+				setNick(nickname);
+			}
+		}
 		// if (isCMD(message, "USERHOST"))
 		// 	setUsername(getInputCmd(message, "USERHOST"));
 		if (isCMD(message, "USER "))
