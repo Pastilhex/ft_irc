@@ -57,9 +57,9 @@ std::map<std::string, Channel> &Server::getChannels(void)
 	return this->_channels;
 }
 
-void Server::setChannel(std::string channel_name, bool state)
+void Server::setNewChannel(std::string channel_name, bool isPrivate)
 {
-	_channels.insert(std::make_pair(channel_name, Channel(channel_name, state)));
+	_channels.insert(std::make_pair(channel_name, Channel(channel_name, isPrivate)));
 }
 
 void Server::setSocket(int newSocket)
@@ -639,7 +639,16 @@ void Server::JOIN(int clientSocket, Client &client)
 				{
 					if (isUserInvited(client.getNick(), channelName))
 					{
-						it->second.RemoveInvited(client.getNick());
+						if (!getPassword().empty()) //requer password para acessar
+						{
+							if(input[2].empty() || input[2] != getPassword())
+							{
+								SEND(client.getSocket(), ERR_PASSWDMISMATCH(client), "Error sending JOIN message with mode +k advise to user");
+								return ;
+							}
+						}
+						if (!Utils::isOperator(it->second, client.getNick())) // operadores nunca saem da lista de convidados do canal 
+							it->second.RemoveInvited(client.getNick());
 						break;
 					}
 					else
@@ -666,7 +675,7 @@ void Server::JOIN(int clientSocket, Client &client)
 					Channel channel = Channel(channelName, state);
 					channel.setNewUser(client);
 					channel.AddOperator(client.getNick());
-					_channels.insert(std::make_pair(channelName, channel)); // Fazer um setter para esta função
+					setNewChannel(channelName, state);
 					SEND(clientSocket, RPL_JOIN(client, channelName), "Erro ao entrar no canal.");
 				}
 			}
@@ -1015,13 +1024,40 @@ bool Server::checkInput(std::vector<std::string> input, Client client)
 
 void Server::INVITE(Client client)
 {
-	bool userAvaiable = false;
-	bool channelAvaiable = false;
+	bool userAvailable = false;
+	bool channelAvailable = false;
 	int invitedFd;
+	std::string channelName;
 
+	
 	if (getInput().size() != 3)
 		return;
 	
+	if(getInput()[2].size() > 1)
+		channelName = getInput()[2].substr(1);
+	else	
+		return;
+	const std::map<std::string, Channel>::iterator it = getChannels().find(channelName);
+
+	if (getInput()[1] == client.getNick())
+	{
+		SEND(client.getSocket(), ERR_USERONCHANNEL(client.getNick(), client.getNick(), channelName), "Error sending ERR_CHANOPRIVSNEEDED (482)");
+		return;
+	}
+
+
+	try {
+		if(!Utils::isOperator(it->second, client.getNick()))
+		{
+			SEND(client.getSocket(), ERR_CHANOPRIVSNEEDED(client, getInput()[2]), "Error sending ERR_CHANOPRIVSNEEDED (482)");
+			return;
+		}
+	} catch (std::exception& ex)
+	{
+		std::cerr << ex.what() << std::endl;
+	}
+
+
 	std::string invitedUser = getInput()[1];
 	std::string channel = getInput()[2];
 	if (!(channel[0] != '#' || channel[0] != '&'))
@@ -1036,14 +1072,14 @@ void Server::INVITE(Client client)
 	{
 		if (ch->first == channel)
 		{
-			channelAvaiable = true;
+			channelAvailable = true;
 			std::map<std::string, Client> &users = this->getGlobalUsers();
 			std::map<std::string, Client>::iterator us = users.begin();
 			while (us != users.end())
 			{
 				if (us->first == invitedUser)
 				{
-					userAvaiable = true;
+					userAvailable = true;
 					invitedFd = us->second.getSocket();
 					break;
 				}
@@ -1054,13 +1090,13 @@ void Server::INVITE(Client client)
 		++ch;
 	}
 
-	if (!channelAvaiable)
+	if (!channelAvailable)
 	{
 		SEND(client.getSocket(), ERR_NOSUCHCHANNEL(client, channel), "Error sending msg ERR_NOSUCHCHANNEL");
 		return;
 	}
 
-	if (userAvaiable)
+	if (userAvailable)
 		ch->second.AddInvited(invitedUser);
 	else
 	{

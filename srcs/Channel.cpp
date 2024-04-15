@@ -255,6 +255,8 @@ void	Channel::AddOperator(const std::string& nickname)
 	}
 	if (!Op_flag)
 		this->_operators.push_back("@" + nickname);
+
+	this->AddInvited(nickname); //adiciona o operador na lista de convidados do canal
 }
 
 void	Channel::AddInvited(const std::string& nickname)

@@ -45,6 +45,7 @@
 #include "Channel.hpp"
 #include "Utils.hpp"
 #include "Macros.hpp"
+#include <exception>
 
 std::string getCurrentDateTime();
 bool isCMD(std::string message, std::string cmd);

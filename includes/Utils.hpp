@@ -119,6 +119,8 @@ class Utils
          * @param signum The signal number to handle.
          */
         void signalHandler(int signum);
+
+        static std::string getChannelByChannelName(const std::string& channel);
 };
 
 #endif

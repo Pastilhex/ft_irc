@@ -51,11 +51,41 @@
     - Criar o vetor (ss).
    
 
+   A FAZER
+
    Mudar TOPIC so como Operador ou se canal esta com TOPIC aberto
    - Falta mandar msg TOPIC para todos
-   Invite so pode ser dado por Operador
-    - o Operador tem de entrar automaticamente na lista de invitedUsers e enquanto for operador nunca perde o invite para puder entrar e sair do canal quando quer
-   O /mode +k password" coloca paassword no canal, mas ainda nao restringe os users e operadores sem pass
-   Um canal pode ser privado e restrito, se tiver convite mas nao tiver pass, nao entra
+  
+   DONE - falta testar melhor:
+   1. O /mode +k password" coloca paassword no canal, mas ainda nao restringe os users e operadores sem pass 
+   2. Um canal pode ser privado e restrito, se tiver convite mas nao tiver pass, nao entra
+   3. o Operador tem de entrar automaticamente na lista de invitedUsers e enquanto for operador nunca perde o invite para puder entrar e sair do canal quando quer
+   
+   POR RESOLVER: EM ABERTO
 
-   O canal ja e criado com o topico restrito, pq? 
+   4. Invite so pode ser dado por Operador
+      c. exception encontrada como bad_alloc no invite nessa parte possivelmente:
+         const std::map<std::string, Channel>::iterator it = getChannels().find(channelName);
+         try {
+         if(!Utils::isOperator(it->second, client.getNick()))
+         {
+            SEND(client.getSocket(), ERR_CHANOPRIVSNEEDED(client, getInput()[2]), "Error sending ERR_CHANOPRIVSNEEDED (482)");
+            return;
+         }
+         } catch (std::exception& ex)
+         {
+            std::cerr << ex.what() << std::endl;
+         }
+
+   5. Invite nao pode ser dado ao mesmo client que esta convidando POR RESOLVER
+
+      a. problemas encontrados:
+      - esta printando  GARBAGE: c1r12s4.42porto.com443 ao fazer o SEND abaixo:
+
+      if (getInput()[1] == client.getNick())
+		{
+			SEND(client.getSocket(), ERR_USERONCHANNEL(client.getNick(), client.getNick(), channelName), "Error sending ERR_CHANOPRIVSNEEDED (482)");
+			return;
+		}
+
+      b. se o user e um operador do canal mas ele saiu do canal e esta dando um invite a ele mesmo a mensagem precisa ser diferente de ":is already on channel"

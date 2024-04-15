@@ -52,7 +52,7 @@ public:
 	void setSocket(int newSocket);
 	void setAddress(struct sockaddr_in newAddress);
 	void setHostname(std::string hostname);
-	void setChannel(std::string, bool);
+	void setNewChannel(std::string channel_name, bool isPrivate);
 	void setInput(std::string input);
 
 	// Commands

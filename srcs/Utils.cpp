@@ -17,6 +17,7 @@ int Utils::logMessage(const std::string &message, int level)
 	return level;
 }
 
+
 bool Utils::hasNonDigits(const std::string &str)
 {
 	for (size_t i = 0; i < str.length(); ++i)
