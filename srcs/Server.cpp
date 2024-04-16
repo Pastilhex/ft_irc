@@ -693,43 +693,39 @@ void Server::INVITE(Client client)
 	bool userAvailable = false;
 	bool channelAvailable = false;
 	int invitedFd;
-	std::string channelName;
+	std::string invitedUser = getInput()[1];
+	std::string channel = getInput()[2];
 
 	if (getInput().size() != 3)
 		return;
 
-	if (getInput()[2].size() > 1)
-		channelName = getInput()[2].substr(1);
-	else
-		return;
-	const std::map<std::string, Channel>::iterator it = getChannels().find(channelName);
+	const std::map<std::string, Channel>::iterator it = getChannels().find(channel);
 
-	if (getInput()[1] == client.getNick())
-	{
-		SEND(client.getSocket(), ERR_USERONCHANNEL(client.getNick(), client.getNick(), channelName), "Error sending ERR_CHANOPRIVSNEEDED (482)");
-		return;
-	}
-
-	try
-	{
-		if (!Utils::isOperator(it->second, client.getNick()))
-		{
-			SEND(client.getSocket(), ERR_CHANOPRIVSNEEDED(client, getInput()[2]), "Error sending ERR_CHANOPRIVSNEEDED (482)");
-			return;
-		}
-	}
-	catch (std::exception &ex)
-	{
-		std::cerr << ex.what() << std::endl;
-	}
-
-	std::string invitedUser = getInput()[1];
-	std::string channel = getInput()[2];
-	if (!(channel[0] != '#' || channel[0] != '&'))
+	if(it == getChannels().end())
 	{
 		SEND(client.getSocket(), ERR_NOSUCHCHANNEL(client, channel), "Error sending ERR_NOSUCHCHANNEL (403)");
 		return;
 	}
+
+	if (!Utils::isValidUser(it->second, client.getNick())) //verifica se o usuario que esta convidando o outro está no canal
+	{
+		SEND(client.getSocket(), ERR_NOTONCHANNEL(client.getNick(), channel), "Error sending ERR_NOTONCHANNEL (442)");
+		return;
+	}
+
+	if(Utils::isValidUser(it->second, invitedUser))
+	{
+		SEND(client.getSocket(), ERR_USERONCHANNEL(client.getNick(), invitedUser, channel), "Error sending ERR_USERONCHANNEL (443)");
+		return;
+	}
+
+	if (!Utils::isOperator(it->second, client.getNick()))
+	{
+		SEND(client.getSocket(), ERR_CHANOPRIVSNEEDED(client, channel), "Error sending ERR_CHANOPRIVSNEEDED (482)");
+		return;
+	}
+
+
 
 	std::map<std::string, Channel> &channels = this->getChannels();
 	std::map<std::string, Channel>::iterator ch = channels.begin();

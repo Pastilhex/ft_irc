@@ -42,7 +42,7 @@
 #define ERR_NOTONCHANNEL(client, channel) \
 	(std::string(LOCAL) + "442 " + client + " #" + channel + " :You're not on that channel\r\n")
 #define ERR_USERONCHANNEL(client, nick, channel) \
-	(std::string(LOCAL) + "443 " + client + " " + nick + " #" + channel + " :is already on channel\r\n")
+	(std::string(LOCAL) + "443 " + client + " " + nick + " " + channel + " :is already on channel\r\n")
 #define ERR_NEEDMOREPARAMS(client, command) \
 	(std::string(LOCAL) + " 461 " + client.getNick() + " " + command + " :Not enough parameters.\r\n")
 

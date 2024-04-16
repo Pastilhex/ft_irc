@@ -63,29 +63,14 @@
    
    POR RESOLVER: EM ABERTO
 
-   4. Invite so pode ser dado por Operador
-      c. exception encontrada como bad_alloc no invite nessa parte possivelmente:
-         const std::map<std::string, Channel>::iterator it = getChannels().find(channelName);
-         try {
-         if(!Utils::isOperator(it->second, client.getNick()))
-         {
-            SEND(client.getSocket(), ERR_CHANOPRIVSNEEDED(client, getInput()[2]), "Error sending ERR_CHANOPRIVSNEEDED (482)");
-            return;
-         }
-         } catch (std::exception& ex)
-         {
-            std::cerr << ex.what() << std::endl;
-         }
+   - reparei que algumas mensagens dentro do chat estao vindo quebradas as vezes (nao chega a mensagem completa)
 
-   5. Invite nao pode ser dado ao mesmo client que esta convidando POR RESOLVER
+   CONTINUA COM ERRO: 
 
-      a. problemas encontrados:
-      - esta printando  GARBAGE: c1r12s4.42porto.com443 ao fazer o SEND abaixo:
+      - esta printando  GARBAGE: c1r12s4.42porto.com443 ao fazer o SEND abaixo (verificar sintaxe):
 
-      if (getInput()[1] == client.getNick())
-		{
-			SEND(client.getSocket(), ERR_USERONCHANNEL(client.getNick(), client.getNick(), channelName), "Error sending ERR_CHANOPRIVSNEEDED (482)");
-			return;
-		}
-
-      b. se o user e um operador do canal mas ele saiu do canal e esta dando um invite a ele mesmo a mensagem precisa ser diferente de ":is already on channel"
+         if(Utils::isValidUser(it->second, invitedUser))
+      {
+         SEND(client.getSocket(), ERR_USERONCHANNEL(client.getNick(), invitedUser, channel), "Error sending ERR_USERONCHANNEL (443)");
+         return;
+      }
