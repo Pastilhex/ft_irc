@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/06 14:04:54 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/16 06:57:45 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ private:
 	std::string _serverPassword;
 	std::string _tmpPassword;
 	std::string _username;
-	int _socket;
+	pollfd clientPoll;
+
 
 public:
 	/* Constructor */
@@ -32,14 +33,19 @@ public:
 	std::string getNick(void) const;
 	std::string getUsername(void);
 	std::string getTmpPassword(void);
-	int getSocket(void);
-
+	int getSocket(void) const;
+	pollfd getClientPoll(void);
+	
+	
 	/* Setters */
 	void setNick(std::string nick);
 	void setUsername(std::string username);
 	void setTmpPassword(std::string pass);
 	void setNewClient(Client &client);
 	void setSocket(int fd);
+	void setPoll_fd(int fd);
+	void setPoll_events(void);
+	void setPoll_revents(void);
 
 	/* Methods */
 	void getClientLoginData(char *buffer, int bytesRead, std::map<std::string, Client> globalUsers, std::string hostname);

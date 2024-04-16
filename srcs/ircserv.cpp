@@ -6,7 +6,7 @@
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 13:07:13 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/14 09:56:40 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/16 08:01:29 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,6 @@ void SEND(int socket, std::string msg, std::string error)
 {
 	if (send(socket, msg.c_str(), msg.length(), 0) == -1)
 		std::cerr << error << std::endl;
-	std::cout << msg << std::endl;
+	std::cout << ">> " + msg << std::endl;
 }
 

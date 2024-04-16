@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/15 20:44:41 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/16 08:07:15 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,9 +57,9 @@ std::map<std::string, Channel> &Server::getChannels(void)
 	return this->_channels;
 }
 
-void Server::setNewChannel(std::string channel_name, bool isPrivate)
+void Server::setNewChannel(std::string channel_name, Channel channel)
 {
-	_channels.insert(std::make_pair(channel_name, Channel(channel_name, isPrivate)));
+	_channels.insert(std::make_pair(channel_name, channel));
 }
 
 void Server::setSocket(int newSocket)
@@ -196,7 +196,7 @@ void Server::removeClientFromGlobalUsers(Client client)
 	}
 }
 
-Client &Server::getClientBySocket(int socket, Client &client)
+/* Client &Server::getClientBySocket(int socket)
 {
 	std::map<std::string, Client>::iterator it_begin = _globalUsers.begin();
 	std::map<std::string, Client>::iterator it_end = _globalUsers.end();
@@ -205,8 +205,8 @@ Client &Server::getClientBySocket(int socket, Client &client)
 		if (it->second.getSocket() == socket)
 			return it->second;
 	}
-	return client;
-}
+	throw std::runtime_error("Cliente não encontrado");
+} */
 
 bool Server::isUserInvited(std::string user, std::string channelName)
 {
@@ -224,7 +224,6 @@ bool Server::isUserInvited(std::string user, std::string channelName)
 	}
 	return false;
 }
-
 
 bool Server::start(char *str)
 {
@@ -260,16 +259,14 @@ bool Server::checkConnections(const int &serverSocket)
 
 void Server::connectClient(const int &serverSocket)
 {
-	Client client;
-	struct sockaddr_in clientAddress;
-
-	pollfd serverPoll;
-	serverPoll.fd = serverSocket;
-	serverPoll.events = POLLIN;
-	serverPoll.revents = 0;
-
 	std::vector<pollfd> fds;
-	fds.push_back(serverPoll);
+
+	this->serverPoll.fd = serverSocket;
+	this->serverPoll.events = POLLIN;
+	this->serverPoll.revents = 0;
+
+	fds.push_back(this->serverPoll);
+
 	while (true)
 	{
 		int activity = poll(fds.data(), fds.size(), -1);
@@ -278,12 +275,23 @@ void Server::connectClient(const int &serverSocket)
 			std::cerr << "Erro ao chamar poll()." << std::endl;
 			break;
 		}
-		isNewClient(fds, serverSocket, clientAddress, client);
+		createNewClient(fds, serverSocket);
 		for (size_t i = 1; i < fds.size(); ++i)
 		{
 			if (fds[i].revents & POLLIN)
 			{
-				client = getClientBySocket(fds[i].fd, client);
+				Client client;
+				
+				std::map<std::string, Client>::iterator it_begin = _globalUsers.begin();
+				std::map<std::string, Client>::iterator it_end = _globalUsers.end();
+				for (std::map<std::string, Client>::iterator &it = it_begin; it != it_end; ++it)
+				{
+					if (it->second.getSocket() == fds[i].fd)
+						client = it->second;
+				}
+				if (client.getSocket() == 0)
+					throw std::runtime_error("Cliente não encontrado");
+
 				char buffer[1024];
 				int bytesRead = recv(fds[i].fd, buffer, sizeof(buffer), 0);
 				if (bytesRead == -1)
@@ -347,42 +355,37 @@ void Server::connectClient(const int &serverSocket)
 	close(serverSocket);
 }
 
-void Server::isNewClient(std::vector<pollfd> &fds, const int &serverSocket, struct sockaddr_in &clientAddress, Client &client)
+void Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
 {
-	socklen_t clientAddressSize = sizeof(clientAddress);
-
 	// verifica se a ligação estabelicida através do poll() é para o server(novo client) ou para um client(client já conectado)
 	if (fds[0].revents & POLLIN)
 	{
-		// aceita a nova ligação estabelecida com o server
-		client.setSocket(accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressSize));
+		Client client;
+		struct sockaddr_in clientAddress;
+		socklen_t clientAddressSize = sizeof(clientAddress);
+
+		// declaração de um novo client_fd (struct do tipo pollfd)
+		client.setPoll_fd(accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressSize));
 		if (client.getSocket() == -1)
 		{
 			std::cerr << "Erro ao aceitar conexão do cliente." << std::endl;
 			close(serverSocket);
 			return;
 		}
-
-		// declaração de um novo client_fd (struct do tipo pollfd)
-		pollfd clientPoll;
-		clientPoll.fd = client.getSocket();
-		clientPoll.events = POLLIN;
-		clientPoll.revents = 0;
-
-		// Limpa os dados de client antes de preencher com novos dados
-		client.setNewClient(client);
+		client.setPoll_events();
+		client.setPoll_revents();
 
 		// adicionamos o novo client_fd ao vector<pollfd>
-		fds.push_back(clientPoll);
+		fds.push_back(client.getClientPoll());
 
 		// guardar msg recebida num buffer
 		char buffer[1024];
 		while (client.getNick().empty() || client.getUsername().empty() || client.getTmpPassword().empty())
 		{
-			int bytesRead = recv(clientPoll.fd, buffer, sizeof(buffer), 0);
+			int bytesRead = recv(client.getSocket(), buffer, sizeof(buffer), 0);
 			std::string message(buffer, bytesRead);
-			// if (message.find("CAP LS") != std::string::npos)
-			// 	SEND(clientPoll.fd, ":* CAP * LS :42Porto Ft_IRCv1.0\r\n", "Error sending CAP LS message to client");
+			if (message.find("CAP LS") != std::string::npos)
+				SEND(client.getSocket(), ":* CAP * LS :42Porto Ft_IRCv1.0\r\n", "Error sending CAP LS message to client");
 			std::cout << message << std::endl;
 			client.getClientLoginData(buffer, bytesRead, getGlobalUsers(), getHostname());
 		}
@@ -392,6 +395,7 @@ void Server::isNewClient(std::vector<pollfd> &fds, const int &serverSocket, stru
 			SEND(client.getSocket(), ERR_PASSWDMISMATCH(client), "Error while login");
 			return;
 		}
+		
 		// Adiciona o client à lista global de usuarios
 		if (!addClientToGlobalUsers(client))
 			if (client.getSocket() == -1)
@@ -402,7 +406,7 @@ void Server::isNewClient(std::vector<pollfd> &fds, const int &serverSocket, stru
 			}
 
 		if (!client.getNick().empty() && !client.getUsername().empty())
-			sendWelcome(clientPoll.fd, client);
+			sendWelcome(client.getSocket(), client);
 	}
 }
 
@@ -410,7 +414,7 @@ void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, 
 {
 	std::string message(buffer, bytesRead);
 	setInput(message);
-	std::cout << message << std::endl;
+	std::cout << "<< " + message << std::endl;
 
 
 	if (message.find("CAP END") != std::string::npos)
@@ -579,7 +583,7 @@ void Server::PRIVMSG(std::string message, Client client)
 		++inputIterator;
 	}
 
-	std::string msgToSend = RPL_PRIVMSG(client, channelName, getMsgToSend(message));
+	std::string msgToSend = RPL_PRIVMSG(channelName, getMsgToSend(message));
 	std::map<std::string, Channel> channels = getChannels();
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
 	if (it != channels.end())
@@ -665,6 +669,7 @@ void Server::JOIN(int clientSocket, Client &client)
 					if (it->first == channelName)
 					{
 						it->second.setNewUser(client);
+						SEND(clientSocket, RPL_JOIN(client, channelName), "Erro ao entrar no canal.");
 						updateChannel(client, channelName);
 						break;
 					}
@@ -675,12 +680,12 @@ void Server::JOIN(int clientSocket, Client &client)
 					Channel channel = Channel(channelName, state);
 					channel.setNewUser(client);
 					channel.AddOperator(client.getNick());
-					setNewChannel(channelName, state);
+					setNewChannel(channelName, channel);
 					SEND(clientSocket, RPL_JOIN(client, channelName), "Erro ao entrar no canal.");
+					MODE("MODE", client);
+					WHO(client.getSocket(), client);
 				}
 			}
-			SEND(clientSocket, RPL_JOIN(client, channelName), "Erro ao entrar no canal.");
-			WHO(client.getSocket(), client);
 			++inputIterator;
 		}
 		else
@@ -690,6 +695,7 @@ void Server::JOIN(int clientSocket, Client &client)
 
 void Server::WHO(int clientSocket, const Client client)
 {
+	(void)clientSocket;
 	std::vector<std::string> input = getInput();
 	std::string channelName;
 	for (size_t i = 0; i < getInput().size(); ++i)
@@ -704,7 +710,7 @@ void Server::WHO(int clientSocket, const Client client)
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
 	if (it != channels.end())
 	{
-		std::string whoMsg = ":" + getHostname() + " 353 " + client.getNick() + " = " + channelName + " :";
+		std::string listUsers;
 		const std::map<std::string, Client> &users = it->second.getUsers();
 		std::map<std::string, Client>::const_iterator user_it = users.begin();
 		while (user_it != users.end())
@@ -721,16 +727,12 @@ void Server::WHO(int clientSocket, const Client client)
 				}
 				++op_it;
 			}
-			whoMsg += nickname;
+			listUsers += nickname;
 			if (++user_it != users.end())
-				whoMsg += " ";
+				listUsers += " ";
 		}
-		whoMsg += "\r\n:" + getHostname() + " 366 " + client.getNick() + " " + channelName + " :End of Names list.\r\n";
-		std::cout << whoMsg << std::endl;
-		if (send(clientSocket, whoMsg.c_str(), whoMsg.length(), 0) == -1)
-		{
-			std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
-		}
+		SEND(client.getSocket(), RPL_NAMREPLY(client, channelName, listUsers), "Error sending WHO");
+		SEND(client.getSocket(), RPL_ENDOFNAMES(client, channelName), "Error sending WHO");
 	}
 }
 

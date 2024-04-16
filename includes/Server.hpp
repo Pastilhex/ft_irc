@@ -6,7 +6,7 @@
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/15 07:18:06 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/16 07:25:34 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ private:
 	std::map<std::string, Channel> _channels;
 	std::map<std::string, Client> _globalUsers;
 	std::vector<std::string> _input;
+	pollfd serverPoll;
 
 public:
 	// Constructor
@@ -52,7 +53,7 @@ public:
 	void setSocket(int newSocket);
 	void setAddress(struct sockaddr_in newAddress);
 	void setHostname(std::string hostname);
-	void setNewChannel(std::string channel_name, bool isPrivate);
+	void setNewChannel(std::string channel_name, Channel channel);
 	void setInput(std::string input);
 
 	// Commands
@@ -80,7 +81,7 @@ public:
 	void handleRestrictedTopicMode(std::map<std::string, Channel>::iterator it, char modeFlag, Client client, char modeOption);
 	std::string handleOperatorMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag, Client client);
 	void handleUserLimitMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag);
-	void isNewClient(std::vector<pollfd> &fds, const int &serverSocket, struct sockaddr_in &clientAddress, Client &client);
+	void createNewClient(std::vector<pollfd> &fds, const int &serverSocket);
 	std::vector<std::string> trimInput(std::string input);
 	void removeClientFromGlobalUsers(Client client);
 	bool run(void);

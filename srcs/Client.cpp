@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/07 16:40:05 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/16 06:57:51 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,14 +37,35 @@ std::string Client::getTmpPassword(void)
 	return this->_tmpPassword;
 }
 
-void Client::setSocket(int fd)
+pollfd Client::getClientPoll(void)
 {
-	this->_socket = fd;
+	return this->clientPoll;
 }
 
-int Client::getSocket()
+
+void Client::setSocket(int fd)
 {
-	return this->_socket;
+	this->clientPoll.fd = fd;
+}
+
+int Client::getSocket(void) const
+{
+	return this->clientPoll.fd;
+}
+
+void Client::setPoll_fd(int fd)
+{
+	this->clientPoll.fd = fd;
+}
+
+void Client::setPoll_events(void)
+{
+	this->clientPoll.events = POLL_IN;
+}
+
+void Client::setPoll_revents(void)
+{
+	this->clientPoll.revents = 0;
 }
 
 void Client::setNick(std::string nick)

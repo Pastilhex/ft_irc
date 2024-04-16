@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Macros.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 22:22:32 by jhogonca          #+#    #+#             */
-/*   Updated: 2024/04/15 20:54:43 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/16 08:10:03 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 #define USER_ID(nickname, username) (":" + nickname + "!" + username + "@" + getHostname())
 #define LOCAL ":" + getHostname()
 #define UNLIMITED_USERS -1
+#define NICKNAME client.getNick()
+#define USERNAME client.getUsername()
 
 // Server messages
 #define RPL_WELCOME(user_id, nickname) \
@@ -107,10 +109,10 @@
 	(std::string(LOCAL) + "376 " + client + " :End of /MOTD command.\r\n")
 
 // NAMES
-#define RPL_NAMREPLY(client, symbol, channel, list_of_nicks) \
-	(std::string(LOCAL) + "353 " + client + " " + symbol + " #" + channel + " :" + list_of_nicks + "\r\n")
+#define RPL_NAMREPLY(client, channel, list_of_nicks) \
+	(std::string(LOCAL) + " 353 " + client.getNick() + " = " + channel + " :" + list_of_nicks + "\r\n")
 #define RPL_ENDOFNAMES(client, channel) \
-	(std::string(LOCAL) + "366 " + client + " #" + channel + " :End of /NAMES list.\r\n")
+	(std::string(LOCAL) + " 366 " + client.getNick() + " " + channel + " :End of /NAMES list.\r\n")
 
 //LIST
 #define RPL_LIST(client, nbrUserStr, it) \
@@ -146,9 +148,8 @@
 #define ERR_PASSWDMISMATCH(client) \
 	(LOCAL + " 464 " + client.getNick() + " :Server password incorrect.\r\n")
 
-// PING
-#define RPL_PONG(nickname, username, token) \
-	(USER_ID(nickname, username) + " PONG :" + token + "\r\n")
+// PING :pastilhex!ivo@localhost PONG :LAG1713199744574
+#define RPL_PONG(nickname, username, token) (USER_ID(nickname, username) + " PONG :" + token + "\r\n")
 
 // QUIT
 #define RPL_QUIT(user_id, reason) \
@@ -163,8 +164,8 @@
 	(" 411 " + client + " :No recipient given PRIVMSG\r\n")
 #define ERR_NOTEXTTOSEND(client) \
 	(" 412 " + client + " :No text to send\r\n")
-#define RPL_PRIVMSG(client, channel, message) \
-	(":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " PRIVMSG " + channel + " :" + message + "\r\n");
+#define RPL_PRIVMSG(channel, message) \
+	(USER_ID(NICKNAME, USERNAME) + " PRIVMSG " + channel + " :" + message + "\r\n");
 
 // TOPIC
 #define RPL_TOPIC(client, channel) \
