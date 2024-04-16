@@ -58,10 +58,6 @@ void Server::MODE(std::string message, Client client)
 	}
 	else if(Utils::isValidFlag(modeOption)) //for the cas the flag is valid but with the wrong number of arguments
 		return;
-	// else
-	// 	msg = client.getNick() + "  :Unknown MODE flag\r\n";
-	// std::cout << msg << std::endl;
-	//send(clientSocket, msg.c_str(), msg.size(), 0);
 }
 
 std::string Server::handleOperatorMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag, Client client)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Macros.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 22:22:32 by jhogonca          #+#    #+#             */
-/*   Updated: 2024/04/16 08:10:03 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/16 16:58:48 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,8 +141,8 @@
 	("381 " + client + " :You are now an IRC operator\r\n")
 
 // PART
-#define RPL_PART(user_id, channel, reason) \
-	(user_id + " PART #" + channel + " " + (reason.empty() ? "." : reason ) + "\r\n")
+#define RPL_PART(channel, reason) \
+	(USER_ID(NICKNAME, USERNAME) + " PART " + channel + " " + (reason.empty() ? "." : reason ) + "\r\n")
 
 // PASS
 #define ERR_PASSWDMISMATCH(client) \
@@ -165,11 +165,11 @@
 #define ERR_NOTEXTTOSEND(client) \
 	(" 412 " + client + " :No text to send\r\n")
 #define RPL_PRIVMSG(channel, message) \
-	(USER_ID(NICKNAME, USERNAME) + " PRIVMSG " + channel + " :" + message + "\r\n");
+	(USER_ID(NICKNAME, USERNAME) + " PRIVMSG " + channel + " :" + message + "\r\n")
 
 // TOPIC
 #define RPL_TOPIC(client, channel) \
-	(LOCAL + " 332 " + client.getNick() + " " + channel.getName() + " :" + channel.getTopic() + "\r\n")
+	(LOCAL + " 332 " + client.getNick() + " " + channel.getName() + " " + channel.getTopic() + "\r\n")
 #define RPL_NOTOPIC(client, channel) \
 	(LOCAL + " 331 " + client.getNick() + " " + channel.getName() + " :No topic is set\r\n")
 

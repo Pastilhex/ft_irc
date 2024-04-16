@@ -33,3 +33,22 @@ Functions Used:
 - [ ] fstat
 - [ ] fcntl
 - [x] poll
+
+## Mandatory
+- [x] You must be able to authenticate, set a nickname, a username, join a channel, send and receive private messages using your reference client.
+- [x] All the messages sent from one client to a channel have to be forwarded to every other client that joined the channel.
+- [x] You must have operators and regular users.
+**Then, you have to implement the commands that are specific to channel operators:**
+	- [x] KICK - Eject a client from the channel
+	- [x] INVITE - Invite a client to a channel
+	- [x] TOPIC - Change or view the channel topic
+	- [x] MODE - Change the channel’s mode:
+		- [x] i: Set/remove Invite-only channel
+		- [x] t: Set/remove the restrictions of the TOPIC command to channel operators
+		- [ ] k: Set/remove the channel key (password)
+		- [x] o: Give/take channel operator privilege
+		- [ ] l: Set/remove the user limit to channel
+
+## Bonus - Internet Relay Chat
+- [ ] Handle file transfer
+- [ ] A bot

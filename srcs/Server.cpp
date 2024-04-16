@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/16 08:07:15 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/16 18:24:11 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,6 @@ Server::Server(std::string password)
 std::map<std::string, Client> &Server::getGlobalUsers(void)
 {
 	return this->_globalUsers;
-}
-
-void ft_print(std::string str)
-{
-	std::cout << str << std::endl;
 }
 
 int Server::getSocket(void)
@@ -281,7 +276,7 @@ void Server::connectClient(const int &serverSocket)
 			if (fds[i].revents & POLLIN)
 			{
 				Client client;
-				
+
 				std::map<std::string, Client>::iterator it_begin = _globalUsers.begin();
 				std::map<std::string, Client>::iterator it_end = _globalUsers.end();
 				for (std::map<std::string, Client>::iterator &it = it_begin; it != it_end; ++it)
@@ -295,7 +290,9 @@ void Server::connectClient(const int &serverSocket)
 				char buffer[1024];
 				int bytesRead = recv(fds[i].fd, buffer, sizeof(buffer), 0);
 				if (bytesRead == -1)
+				{
 					std::cerr << "Erro ao receber dados do cliente." << std::endl;
+				}
 				else if (bytesRead == 0)
 				{
 					std::cout << "Conexão fechada pelo cliente." << std::endl;
@@ -348,7 +345,9 @@ void Server::connectClient(const int &serverSocket)
 					--i;
 				}
 				else
+				{
 					processMsg(client, fds, buffer, bytesRead, i);
+				}
 			}
 		}
 	}
@@ -378,24 +377,25 @@ void Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
 		// adicionamos o novo client_fd ao vector<pollfd>
 		fds.push_back(client.getClientPoll());
 
-		// guardar msg recebida num buffer
 		char buffer[1024];
-		while (client.getNick().empty() || client.getUsername().empty() || client.getTmpPassword().empty())
+		while (client.getNick().empty() || client.getUsername().empty() || client.getTmpPassword().empty() || client.getTmpPassword() != this->getPassword())
 		{
 			int bytesRead = recv(client.getSocket(), buffer, sizeof(buffer), 0);
 			std::string message(buffer, bytesRead);
+
 			if (message.find("CAP LS") != std::string::npos)
 				SEND(client.getSocket(), ":* CAP * LS :42Porto Ft_IRCv1.0\r\n", "Error sending CAP LS message to client");
-			std::cout << message << std::endl;
+
+			std::cout << "<< " + message << std::endl;
 			client.getClientLoginData(buffer, bytesRead, getGlobalUsers(), getHostname());
+
+			if (!client.getTmpPassword().empty() && client.getTmpPassword() != this->getPassword())
+			{
+				SEND(client.getSocket(), ERR_PASSWDMISMATCH(client), "Error while login");
+				continue; // Skip to the next iteration of the outer loop
+			}
 		}
 
-		if (client.getTmpPassword() != this->getPassword())
-		{
-			SEND(client.getSocket(), ERR_PASSWDMISMATCH(client), "Error while login");
-			return;
-		}
-		
 		// Adiciona o client à lista global de usuarios
 		if (!addClientToGlobalUsers(client))
 			if (client.getSocket() == -1)
@@ -413,18 +413,20 @@ void Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
 void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, int bytesRead, int i)
 {
 	std::string message(buffer, bytesRead);
-	setInput(message);
-	std::cout << "<< " + message << std::endl;
-
+	if (message.empty() || message.compare("\n") == 0)
+		return;
+	else
+		setInput(message);
+	std::cout << RED << "<< " << RED + message;
 
 	if (message.find("CAP END") != std::string::npos)
 		SEND(fds[i].fd, ":* CAP * END\r\n", "Error sending CAP LS message to client");
 
 	if (isCMD(message, "PING"))
 	{
-		SEND(client.getSocket(), RPL_PONG(client.getNick(), client.getUsername(), getInput()[1]),"Error sending PONG message");
+		SEND(client.getSocket(), RPL_PONG(client.getNick(), client.getUsername(), getInput()[1]), "Error sending PONG message");
 	}
-		
+
 	if (isCMD(message, "PRIVMSG"))
 	{
 		PRIVMSG(message, client);
@@ -498,7 +500,7 @@ void Server::TOPIC(Client &client)
 			}
 			if (getInput().size() == 2 && (getInput()[1].empty() || !(getInput()[1][0] == '#' || getInput()[1][0] == '&')))
 			{
-				SEND(client.getSocket(),ERR_NOSUCHNICK(client, client.getNick()), "Error sending TOPIC error message");
+				SEND(client.getSocket(), ERR_NOSUCHNICK(client, client.getNick()), "Error sending TOPIC error message");
 				return;
 			}
 			else if (getInput().size() == 2)
@@ -513,7 +515,7 @@ void Server::TOPIC(Client &client)
 						if (it->second.getTopic().empty())
 							SEND(client.getSocket(), RPL_NOTOPIC(client, it->second), "Erro ao enviar mensagem de alteração de TOPIC.");
 						else
-							SEND(client.getSocket(), RPL_TOPIC(client, it->second), "Erro ao enviar mensagem de alteração de TOPIC.");
+							SEND(client.getSocket(), RPL_TOPIC(client, it->second), "Error while sending TOPIC message");
 					}
 				}
 				return;
@@ -544,18 +546,12 @@ void Server::TOPIC(Client &client)
 						if (getInput()[2] == "::")
 						{
 							it->second.setTopic("");
-							SEND(client.getSocket(), RPL_TOPIC(client, it->second), "Error while sending TOPIC message");
+							broadcastTOPIC(client, it->first);
 						}
 						else
 						{
 							it->second.setTopic(getInput()[2]);
-							if (isUserOp)
-								SEND(client.getSocket(), RPL_TOPIC(client, it->second), "Error while sending TOPIC message");
-							else
-							{
-								it->second.setTopic("");
-								SEND(client.getSocket(), ERR_CHANOPRIVSNEEDED(client, getInput()[1]), "Error while sending TOPIC message");
-							}
+							broadcastTOPIC(client, it->first);
 						}
 					}
 					else
@@ -565,7 +561,7 @@ void Server::TOPIC(Client &client)
 		}
 		return;
 	}
-	}
+}
 
 void Server::PRIVMSG(std::string message, Client client)
 {
@@ -583,7 +579,6 @@ void Server::PRIVMSG(std::string message, Client client)
 		++inputIterator;
 	}
 
-	std::string msgToSend = RPL_PRIVMSG(channelName, getMsgToSend(message));
 	std::map<std::string, Channel> channels = getChannels();
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
 	if (it != channels.end())
@@ -592,9 +587,9 @@ void Server::PRIVMSG(std::string message, Client client)
 		std::map<std::string, Client>::iterator user_it = users.begin();
 		while (user_it != users.end())
 		{
-			if (user_it->first != client.getNick() && (send(user_it->second.getSocket(), msgToSend.c_str(), msgToSend.length(), 0) == -1))
+			if (user_it->first != client.getNick())
 			{
-				std::cerr << "Erro ao enviar mensagem para o canal." << std::endl;
+				SEND(user_it->second.getSocket(), RPL_PRIVMSG(channelName, getMsgToSend(message)), "Error sending message to channel.");
 			}
 			++user_it;
 		}
@@ -634,24 +629,24 @@ void Server::JOIN(int clientSocket, Client &client)
 			channelName = *inputIterator;
 			std::map<std::string, Channel> &channels = getChannels();
 			std::map<std::string, Channel>::iterator it = channels.find(channelName);
-			
+
 			std::vector<char> mode = it->second.getModes();
 			std::vector<char>::iterator mode_it = mode.begin();
 			for (; mode_it != mode.end(); ++mode_it)
 			{
-				if (*mode_it == 'i')
+				if (*mode_it == 'i' || *mode_it == 'k')
 				{
 					if (isUserInvited(client.getNick(), channelName))
 					{
-						if (!getPassword().empty()) //requer password para acessar
+						if (!getPassword().empty()) // requer password para acessar
 						{
-							if(input[2].empty() || input[2] != getPassword())
+							if (input[2].empty() || input[2] != getPassword())
 							{
 								SEND(client.getSocket(), ERR_PASSWDMISMATCH(client), "Error sending JOIN message with mode +k advise to user");
-								return ;
+								return;
 							}
 						}
-						if (!Utils::isOperator(it->second, client.getNick())) // operadores nunca saem da lista de convidados do canal 
+						if (!Utils::isOperator(it->second, client.getNick())) // operadores nunca saem da lista de convidados do canal
 							it->second.RemoveInvited(client.getNick());
 						break;
 					}
@@ -691,6 +686,92 @@ void Server::JOIN(int clientSocket, Client &client)
 		else
 			++inputIterator;
 	}
+}
+
+void Server::INVITE(Client client)
+{
+	bool userAvailable = false;
+	bool channelAvailable = false;
+	int invitedFd;
+	std::string channelName;
+
+	if (getInput().size() != 3)
+		return;
+
+	if (getInput()[2].size() > 1)
+		channelName = getInput()[2].substr(1);
+	else
+		return;
+	const std::map<std::string, Channel>::iterator it = getChannels().find(channelName);
+
+	if (getInput()[1] == client.getNick())
+	{
+		SEND(client.getSocket(), ERR_USERONCHANNEL(client.getNick(), client.getNick(), channelName), "Error sending ERR_CHANOPRIVSNEEDED (482)");
+		return;
+	}
+
+	try
+	{
+		if (!Utils::isOperator(it->second, client.getNick()))
+		{
+			SEND(client.getSocket(), ERR_CHANOPRIVSNEEDED(client, getInput()[2]), "Error sending ERR_CHANOPRIVSNEEDED (482)");
+			return;
+		}
+	}
+	catch (std::exception &ex)
+	{
+		std::cerr << ex.what() << std::endl;
+	}
+
+	std::string invitedUser = getInput()[1];
+	std::string channel = getInput()[2];
+	if (!(channel[0] != '#' || channel[0] != '&'))
+	{
+		SEND(client.getSocket(), ERR_NOSUCHCHANNEL(client, channel), "Error sending ERR_NOSUCHCHANNEL (403)");
+		return;
+	}
+
+	std::map<std::string, Channel> &channels = this->getChannels();
+	std::map<std::string, Channel>::iterator ch = channels.begin();
+	while (ch != channels.end())
+	{
+		if (ch->first == channel)
+		{
+			channelAvailable = true;
+			std::map<std::string, Client> &users = this->getGlobalUsers();
+			std::map<std::string, Client>::iterator us = users.begin();
+			while (us != users.end())
+			{
+				if (us->first == invitedUser)
+				{
+					userAvailable = true;
+					invitedFd = us->second.getSocket();
+					break;
+				}
+				++us;
+			}
+			break;
+		}
+		++ch;
+	}
+
+	if (!channelAvailable)
+	{
+		SEND(client.getSocket(), ERR_NOSUCHCHANNEL(client, channel), "Error sending msg ERR_NOSUCHCHANNEL");
+		return;
+	}
+
+	if (userAvailable)
+		ch->second.AddInvited(invitedUser);
+	else
+	{
+		SEND(client.getSocket(), ERR_NOSUCHNICK(client, invitedUser), "Error sending msg ERR_NOSUCHNICK");
+		return;
+	}
+
+	std::string msg = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " INVITE " + invitedUser + " " + channel + "\r\n";
+	SEND(invitedFd, msg, "Error sending INVITE message");
+	SEND(invitedFd, msg, "Error sending INVITE message");
 }
 
 void Server::WHO(int clientSocket, const Client client)
@@ -749,17 +830,8 @@ void Server::PART(std::string message, Client &client)
 		{
 			if (us->second.getNick() == client.getNick())
 			{
-				std::string leaveChannel = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + "!" + getAddressIP() + " PART " + getInputCmd(message, "PART") + "\r\n";
-				if (send(client.getSocket(), leaveChannel.c_str(), leaveChannel.length(), 0) == -1)
-				{
-					std::cerr << "Erro ao enviar mensagem de saída de canal." << std::endl;
-				}
-				else
-				{
-					users.erase(us);
-					std::cout << leaveChannel << std::endl;
-				}
-
+				SEND(client.getSocket(), RPL_PART(channelName, getMsgToSend(message)), "Erro ao enviar mensagem de saída de canal.");
+				users.erase(us);
 				if (it->second.getNbrUsers() == 0)
 				{
 					std::string closeChannel = ":" + getHostname() + " PART " + getInputCmd(message, "PART");
@@ -846,9 +918,9 @@ void Server::KICK(std::string message, Client client)
 				{
 					std::string leaveChannel = RPL_KICK(client, channelName, kickNick, reason);
 					SEND(client.getSocket(), leaveChannel, "Erro ao enviar mensagem de KICK.");
-					informAll(client, kickNick, channelName, reason);
+					broadcastKICK(client, kickNick, channelName, reason);
 					users.erase(us);
-					//WHO(us->second.getSocket(), us->second);
+					// WHO(us->second.getSocket(), us->second);
 					updateChannel(client, channelName);
 					return;
 				}
@@ -920,7 +992,24 @@ void Server::updateChannel(Client client, std::string channelName)
 	}
 }
 
-void Server::informAll(Client client, std::string kicked, std::string channelName, std::string reason)
+void Server::broadcastTOPIC(Client client, std::string channelName)
+{
+	std::map<std::string, Channel> channels = getChannels();
+	std::map<std::string, Channel>::iterator it = channels.find(channelName);
+	if (it != channels.end())
+	{
+		std::map<std::string, Client> &users = it->second.getUsers();
+		std::map<std::string, Client>::iterator user_it = users.begin();
+		while (user_it != users.end())
+		{
+			SEND(user_it->second.getSocket(), RPL_TOPIC(client, it->second), "Erro ao enviar mensagem de alteração de TOPIC.");
+			++user_it;
+		}
+		return;
+	}
+}
+
+void Server::broadcastKICK(Client client, std::string kicked, std::string channelName, std::string reason)
 {
 	std::map<std::string, Channel> channels = getChannels();
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
@@ -974,8 +1063,8 @@ std::vector<std::string> Server::trimInput(std::string msg)
 	}
 
 	std::vector<std::string> words;
-	std::stringstream ss(trimmed);
 	std::string word;
+	std::stringstream ss(trimmed);
 	while (ss >> word)
 	{
 		if (word[0] == ':')
@@ -1017,96 +1106,9 @@ bool Server::checkInput(std::vector<std::string> input, Client client)
 
 	if (input.size() > 1 && input[1][0] != '#' && input[1][0] != '&')
 	{
-		SEND(client.getSocket(), ERR_NOSUCHCHANNEL(client, input[1]),"Error while sending wrong channel");
+		SEND(client.getSocket(), ERR_NOSUCHCHANNEL(client, input[1]), "Error while sending wrong channel");
 		return true;
 	}
 
 	return errorDetected;
-}
-
-void Server::INVITE(Client client)
-{
-	bool userAvailable = false;
-	bool channelAvailable = false;
-	int invitedFd;
-	std::string channelName;
-
-	
-	if (getInput().size() != 3)
-		return;
-	
-	if(getInput()[2].size() > 1)
-		channelName = getInput()[2].substr(1);
-	else	
-		return;
-	const std::map<std::string, Channel>::iterator it = getChannels().find(channelName);
-
-	if (getInput()[1] == client.getNick())
-	{
-		SEND(client.getSocket(), ERR_USERONCHANNEL(client.getNick(), client.getNick(), channelName), "Error sending ERR_CHANOPRIVSNEEDED (482)");
-		return;
-	}
-
-
-	try {
-		if(!Utils::isOperator(it->second, client.getNick()))
-		{
-			SEND(client.getSocket(), ERR_CHANOPRIVSNEEDED(client, getInput()[2]), "Error sending ERR_CHANOPRIVSNEEDED (482)");
-			return;
-		}
-	} catch (std::exception& ex)
-	{
-		std::cerr << ex.what() << std::endl;
-	}
-
-
-	std::string invitedUser = getInput()[1];
-	std::string channel = getInput()[2];
-	if (!(channel[0] != '#' || channel[0] != '&'))
-	{
-		SEND(client.getSocket(), ERR_NOSUCHCHANNEL(client, channel), "Error sending ERR_NOSUCHCHANNEL (403)");
-		return;
-	}
-
-	std::map<std::string, Channel> &channels = this->getChannels();
-	std::map<std::string, Channel>::iterator ch = channels.begin();
-	while (ch != channels.end())
-	{
-		if (ch->first == channel)
-		{
-			channelAvailable = true;
-			std::map<std::string, Client> &users = this->getGlobalUsers();
-			std::map<std::string, Client>::iterator us = users.begin();
-			while (us != users.end())
-			{
-				if (us->first == invitedUser)
-				{
-					userAvailable = true;
-					invitedFd = us->second.getSocket();
-					break;
-				}
-				++us;
-			}
-			break;
-		}
-		++ch;
-	}
-
-	if (!channelAvailable)
-	{
-		SEND(client.getSocket(), ERR_NOSUCHCHANNEL(client, channel), "Error sending msg ERR_NOSUCHCHANNEL");
-		return;
-	}
-
-	if (userAvailable)
-		ch->second.AddInvited(invitedUser);
-	else
-	{
-		SEND(client.getSocket(), ERR_NOSUCHNICK(client, invitedUser), "Error sending msg ERR_NOSUCHNICK");
-		return;
-	}
-
-	std::string msg = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " INVITE " + invitedUser + " " + channel + "\r\n";
-	SEND(invitedFd, msg, "Error sending INVITE message");
-	SEND(invitedFd, msg, "Error sending INVITE message");
 }

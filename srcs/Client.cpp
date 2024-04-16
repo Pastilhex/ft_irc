@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/16 06:57:51 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/16 16:24:48 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,8 +101,6 @@ void	Client::getClientLoginData(char* buffer, int bytesRead, std::map<std::strin
 				setNick(nickname);
 			}
 		}
-		// if (isCMD(message, "USERHOST"))
-		// 	setUsername(getInputCmd(message, "USERHOST"));
 		if (isCMD(message, "USER "))
 			setUsername(getInputCmd(message, "USER"));
 		if (isCMD(message, "PASS"))

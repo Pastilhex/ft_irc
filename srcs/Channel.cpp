@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:41:57 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/15 07:45:45 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/16 17:49:04 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ Channel::Channel(std::string name, bool isPrivate)
 	this->_name = name;
 	this->_isPrivate = isPrivate;
 	this->_isInvisible = false;
+	this->_restrictedTopic = true;
 	this->_modes.push_back('n');
 	this->_modes.push_back('t');
 	this->_creationTime = time(0);
