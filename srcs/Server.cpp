@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/16 18:24:11 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/17 07:37:13 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,6 +215,7 @@ bool Server::isUserInvited(std::string user, std::string channelName)
 		{
 			if (*iv == user)
 				return true;
+			++iv;
 		}
 	}
 	return false;
@@ -422,65 +423,65 @@ void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, 
 	if (message.find("CAP END") != std::string::npos)
 		SEND(fds[i].fd, ":* CAP * END\r\n", "Error sending CAP LS message to client");
 
-	if (isCMD(message, "PING"))
+	else if (isCMD(message, "PING"))
 	{
 		SEND(client.getSocket(), RPL_PONG(client.getNick(), client.getUsername(), getInput()[1]), "Error sending PONG message");
 	}
 
-	if (isCMD(message, "PRIVMSG"))
+	else if (isCMD(message, "PRIVMSG"))
 	{
 		PRIVMSG(message, client);
 		fds[i].revents = 0;
 	}
-	if (isCMD(message, "NICK") || isCMD(message, "USER ") || isCMD(message, "PASS"))
+	else if (isCMD(message, "NICK") || isCMD(message, "USER ") || isCMD(message, "PASS"))
 	{
 		client.getClientLoginData(buffer, bytesRead, getGlobalUsers(), getHostname());
 		WHO(client.getSocket(), client);
 		fds[i].revents = 0;
 	}
-	if (isCMD(message, "MODE"))
+	else if (isCMD(message, "MODE"))
 	{
 		MODE(message, client);
 		fds[i].revents = 0;
 	}
-	if (isCMD(message, "WHO"))
+	else if (isCMD(message, "WHO"))
 	{
 		WHO(fds[i].fd, client);
 		fds[i].revents = 0;
 	}
-	if (isCMD(message, "LIST"))
+	else if (isCMD(message, "LIST"))
 	{
 		LIST(fds[i].fd, client);
 		fds[i].revents = 0;
 	}
-	if (isCMD(message, "JOIN"))
+	else if (isCMD(message, "JOIN"))
 	{
 		JOIN(fds[i].fd, client);
 		fds[i].revents = 0;
 	}
-	if (isCMD(message, "PART"))
+	else if (isCMD(message, "PART"))
 	{
 		PART(message, client);
 		fds[i].revents = 0;
 	}
-	if (message.find("QUIT") != std::string::npos)
+	else if (message.find("QUIT") != std::string::npos)
 	{
 		close(fds[i].fd); // Fecha a conexão com o cliente
 		// Envie uma mensagem de saída para todos os usuarios dos canais que o cliente estava
 		// Remova o cliente de todos os canais
 		fds.erase(fds.begin() + i); // Remova o cliente do vector<pollfd>
 	}
-	if (isCMD(message, "KICK"))
+	else if (isCMD(message, "KICK"))
 	{
 		KICK(message, client);
 		fds[i].revents = 0;
 	}
-	if (isCMD(message, "TOPIC"))
+	else if (isCMD(message, "TOPIC"))
 	{
 		TOPIC(client);
 		fds[i].revents = 0;
 	}
-	if (isCMD(message, "INVITE"))
+	else if (isCMD(message, "INVITE"))
 	{
 		INVITE(client);
 		fds[i].revents = 0;
@@ -567,7 +568,7 @@ void Server::PRIVMSG(std::string message, Client client)
 {
 	std::vector<std::string> input = getInput();
 	std::vector<std::string>::iterator inputIterator = input.begin();
-	std::string channelName;
+	std::string channelName = "";
 
 	while (inputIterator != input.end())
 	{
@@ -579,19 +580,34 @@ void Server::PRIVMSG(std::string message, Client client)
 		++inputIterator;
 	}
 
-	std::map<std::string, Channel> channels = getChannels();
-	std::map<std::string, Channel>::iterator it = channels.find(channelName);
-	if (it != channels.end())
+	if (channelName[0] != '#' && channelName[0] != '&')
 	{
-		std::map<std::string, Client> &users = it->second.getUsers();
-		std::map<std::string, Client>::iterator user_it = users.begin();
-		while (user_it != users.end())
+		std::map<std::string, Client> &users = getGlobalUsers();
+		std::map<std::string, Client>::iterator user_it = users.find(input[1]);
+		if (user_it != users.end())
 		{
-			if (user_it->first != client.getNick())
+			SEND(user_it->second.getSocket(), RPL_PRIVMSG(channelName, getMsgToSend(message)), "Error sending message to user.");
+		}
+		else
+			SEND(client.getSocket(), ERR_NOSUCHNICK(client, input[1]), "Error sending message to user.");
+
+	}
+	else
+	{
+		std::map<std::string, Channel> channels = getChannels();
+		std::map<std::string, Channel>::iterator it = channels.find(channelName);
+		if (it != channels.end())
+		{
+			std::map<std::string, Client> &users = it->second.getUsers();
+			std::map<std::string, Client>::iterator user_it = users.begin();
+			while (user_it != users.end())
 			{
-				SEND(user_it->second.getSocket(), RPL_PRIVMSG(channelName, getMsgToSend(message)), "Error sending message to channel.");
+				if (user_it->first != client.getNick())
+				{
+					SEND(user_it->second.getSocket(), RPL_PRIVMSG(channelName, getMsgToSend(message)), "Error sending message to channel.");
+				}
+				++user_it;
 			}
-			++user_it;
 		}
 	}
 }
