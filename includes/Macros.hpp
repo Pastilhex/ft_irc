@@ -40,9 +40,12 @@
 #define ERR_UNKNOWNCOMMAND(client, command) \
 	(std::string(LOCAL) + " 421 " + client + " " + command + " :Unknown command\r\n")
 #define ERR_NOTONCHANNEL(client, channel) \
-	(std::string(LOCAL) + " 442 " + client + " #" + channel + " :You're not on that channel\r\n")
+	(std::string(LOCAL) + " 442 " + client + " " + channel + " :You're not on that channel\r\n")
+
+/* :localhost 443 lu pastilhex #ivo :is already on channel\r\n */
 #define ERR_USERONCHANNEL(client, nick, channel) \
 	(std::string(LOCAL) + " 443 " + client + " " + nick + " " + channel + " :is already on channel\r\n")
+
 #define ERR_NEEDMOREPARAMS(client, command) \
 	(std::string(LOCAL) + " 461 " + client.getNick() + " " + command + " :Not enough parameters.\r\n")
 
@@ -88,7 +91,7 @@
 #define ERR_CANNOTSENDTOCHAN(client, channel) \
 	(" 404 " + client + " #" + channel + " :Cannot send to channel\r\n")
 #define ERR_CHANNELISFULL(client, channel) \
-	(" 471 " + client + " #" + channel + " :Cannot join channel (+l)\r\n")
+	(" 471 " + client + " " + channel + " :Cannot join channel (+l)\r\n")
 #define ERR_CHANOPRIVSNEEDED(client, channel) \
 	(std::string(LOCAL) + " 482 " + client.getNick() + " " + channel + " :You're not channel operator\r\n")
 #define ERR_INVALIDMODEPARAM(client, channel, mode, password) \

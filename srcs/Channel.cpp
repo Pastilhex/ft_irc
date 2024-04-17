@@ -16,7 +16,7 @@ Channel::Channel(std::string name, bool isPrivate)
 {
 	this->_name = name;
 	this->_isPrivate = isPrivate;
-	this->_isInvisible = false;
+	this->_isInviteOnly = false;
 	this->_restrictedTopic = true;
 	this->_modes.push_back('n');
 	this->_modes.push_back('t');
@@ -95,7 +95,7 @@ std::string Channel::getPassword(void)
  */
 bool Channel::getInvisibility(void)
 {
-    return this->_isInvisible;
+    return this->_isInviteOnly;
 }
 
 /**
@@ -166,7 +166,7 @@ void Channel::setTopic(std::string topic)
  */
 void Channel::setInvisibility(bool mode)
 {
-	this->_isInvisible = mode;
+	this->_isInviteOnly = mode;
 }
 
 /**
@@ -257,7 +257,8 @@ void	Channel::AddOperator(const std::string& nickname)
 	if (!Op_flag)
 		this->_operators.push_back("@" + nickname);
 
-	this->AddInvited(nickname); //adiciona o operador na lista de convidados do canal
+	if(_isInviteOnly)
+		this->AddInvited(nickname); //adiciona o operador na lista de convidados do canal
 }
 
 void	Channel::AddInvited(const std::string& nickname)
@@ -295,6 +296,8 @@ void	Channel::RemoveOperator(std::string nickname)
 		else
 			++it;
 	}
+	if(_isInviteOnly)
+		this->RemoveInvited(nickname);
 }
 
 void	Channel::RemoveInvited(std::string nickname)

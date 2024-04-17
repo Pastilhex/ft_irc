@@ -74,4 +74,8 @@
          return;
       }
 
-   - mudar o MODE i para +/- aparece sempre +i na msg
+// userLImit - verificar se ja esta no max
+- quando o user sai e tenta entrar de novo com outro limite
+
+
+

@@ -656,29 +656,30 @@ void Server::JOIN(int clientSocket, Client &client)
 
 			if (it != channels.end())
 			{
+				if(it->second.getUsers().size() >= (size_t)it->second.getUserLimit())
+					return (SEND(client.getSocket(), ERR_CHANNELISFULL(client.getNick(), it->first), "Error sending JOIN message with mode +l advise to user"));
 				std::vector<char> mode = it->second.getModes();
 				std::vector<char>::iterator mode_it = mode.begin();
 				for (; mode_it != mode.end(); ++mode_it)
 				{
-					if (*mode_it == 'i' || *mode_it == 'k')
+					if (*mode_it == 'i')
 					{
 						if (isUserInvited(client.getNick(), channelName))
 						{
-							if (!getPassword().empty()) // requer password para acessar
-							{
-								if (input[2].empty() || input[2] != getPassword())
-								{
-									SEND(client.getSocket(), ERR_PASSWDMISMATCH(client), "Error sending JOIN message with mode +k advise to user");
-									return;
-								}
-							}
 							if (!Utils::isOperator(it->second, client.getNick())) // operadores nunca saem da lista de convidados do canal
 								it->second.RemoveInvited(client.getNick());
-							break;
+							continue;
 						}
 						else
 						{
-							SEND(client.getSocket(), ERR_INVITEONLYCHAN(client, channelName), "Error sending JOIN message with mode +i advise to user");
+							return (SEND(client.getSocket(), ERR_INVITEONLYCHAN(client, channelName), "Error sending JOIN message with mode +i advise to user"));
+						}
+					}
+					if (*mode_it == 'k')
+					{
+						if (input[2].empty() || input[2] != getPassword())
+						{
+							SEND(client.getSocket(), ERR_PASSWDMISMATCH(client), "Error sending JOIN message with mode +k advise to user");
 							return;
 						}
 					}
@@ -718,15 +719,18 @@ void Server::JOIN(int clientSocket, Client &client)
 void Server::INVITE(Client client)
 {
 	bool userAvailable = false;
-	bool channelAvailable = false;
 	int invitedFd;
 	std::string invitedUser = getInput()[1];
 	std::string channel = getInput()[2];
+
 
 	if (getInput().size() != 3)
 		return;
 
 	const std::map<std::string, Channel>::iterator it = getChannels().find(channel);
+
+	if(!it->second.getInvisibility())
+		return;
 
 	if(it == getChannels().end())
 	{
@@ -752,15 +756,12 @@ void Server::INVITE(Client client)
 		return;
 	}
 
-
-
 	std::map<std::string, Channel> &channels = this->getChannels();
 	std::map<std::string, Channel>::iterator ch = channels.begin();
 	while (ch != channels.end())
 	{
 		if (ch->first == channel)
 		{
-			channelAvailable = true;
 			std::map<std::string, Client> &users = this->getGlobalUsers();
 			std::map<std::string, Client>::iterator us = users.begin();
 			while (us != users.end())
@@ -778,12 +779,6 @@ void Server::INVITE(Client client)
 		++ch;
 	}
 
-	if (!channelAvailable)
-	{
-		SEND(client.getSocket(), ERR_NOSUCHCHANNEL(client, channel), "Error sending msg ERR_NOSUCHCHANNEL");
-		return;
-	}
-
 	if (userAvailable)
 		ch->second.AddInvited(invitedUser);
 	else
@@ -793,7 +788,6 @@ void Server::INVITE(Client client)
 	}
 
 	std::string msg = ":" + client.getNick() + "!" + client.getUsername() + "@" + getHostname() + " INVITE " + invitedUser + " " + channel + "\r\n";
-	SEND(invitedFd, msg, "Error sending INVITE message");
 	SEND(invitedFd, msg, "Error sending INVITE message");
 }
 

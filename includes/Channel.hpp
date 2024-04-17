@@ -21,7 +21,7 @@ private:
 	std::string _name;						// Channel name
 	std::string _topic;						// Descrição do Tópico do canal
 	std::string _password;					// channel password
-	bool _isInvisible;						// Só permites entrada de users por convite
+	bool _isInviteOnly;						// Só permites entrada de users por convite
 	bool _isPrivate;						// Public or Private(requires password) channel <sim/não>
 	bool _restrictedTopic;					// Topic restricted to operators
 	int _userLimit;							// Limit of users in the channel
