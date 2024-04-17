@@ -414,6 +414,7 @@ void Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
 void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, int bytesRead, int i)
 {
 	std::string message(buffer, bytesRead);
+	
 	if (message.empty() || message.compare("\n") == 0)
 		return;
 	else
@@ -646,30 +647,33 @@ void Server::JOIN(int clientSocket, Client &client)
 			std::map<std::string, Channel> &channels = getChannels();
 			std::map<std::string, Channel>::iterator it = channels.find(channelName);
 
-			std::vector<char> mode = it->second.getModes();
-			std::vector<char>::iterator mode_it = mode.begin();
-			for (; mode_it != mode.end(); ++mode_it)
+			if (it != channels.end())
 			{
-				if (*mode_it == 'i' || *mode_it == 'k')
+				std::vector<char> mode = it->second.getModes();
+				std::vector<char>::iterator mode_it = mode.begin();
+				for (; mode_it != mode.end(); ++mode_it)
 				{
-					if (isUserInvited(client.getNick(), channelName))
+					if (*mode_it == 'i' || *mode_it == 'k')
 					{
-						if (!getPassword().empty()) // requer password para acessar
+						if (isUserInvited(client.getNick(), channelName))
 						{
-							if (input[2].empty() || input[2] != getPassword())
+							if (!getPassword().empty()) // requer password para acessar
 							{
-								SEND(client.getSocket(), ERR_PASSWDMISMATCH(client), "Error sending JOIN message with mode +k advise to user");
-								return;
+								if (input[2].empty() || input[2] != getPassword())
+								{
+									SEND(client.getSocket(), ERR_PASSWDMISMATCH(client), "Error sending JOIN message with mode +k advise to user");
+									return;
+								}
 							}
+							if (!Utils::isOperator(it->second, client.getNick())) // operadores nunca saem da lista de convidados do canal
+								it->second.RemoveInvited(client.getNick());
+							break;
 						}
-						if (!Utils::isOperator(it->second, client.getNick())) // operadores nunca saem da lista de convidados do canal
-							it->second.RemoveInvited(client.getNick());
-						break;
-					}
-					else
-					{
-						SEND(client.getSocket(), ERR_INVITEONLYCHAN(client, channelName), "Error sending JOIN message with mode +i advise to user");
-						return;
+						else
+						{
+							SEND(client.getSocket(), ERR_INVITEONLYCHAN(client, channelName), "Error sending JOIN message with mode +i advise to user");
+							return;
+						}
 					}
 				}
 			}

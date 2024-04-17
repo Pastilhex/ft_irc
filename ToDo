@@ -53,13 +53,13 @@
 
    A FAZER
 
-   Mudar TOPIC so como Operador ou se canal esta com TOPIC aberto
-   - Falta mandar msg TOPIC para todos
   
    DONE - falta testar melhor:
    1. O /mode +k password" coloca paassword no canal, mas ainda nao restringe os users e operadores sem pass 
    2. Um canal pode ser privado e restrito, se tiver convite mas nao tiver pass, nao entra
    3. o Operador tem de entrar automaticamente na lista de invitedUsers e enquanto for operador nunca perde o invite para puder entrar e sair do canal quando quer
+   4. Mudar TOPIC so como Operador ou se canal esta com TOPIC aberto - Falta mandar msg TOPIC para todos
+      - esta printando  GARBAGE: c1r12s4.42porto.com443 ao fazer o SEND abaixo (verificar sintaxe):
    
    POR RESOLVER: EM ABERTO
 
@@ -67,10 +67,11 @@
 
    CONTINUA COM ERRO: 
 
-      - esta printando  GARBAGE: c1r12s4.42porto.com443 ao fazer o SEND abaixo (verificar sintaxe):
 
          if(Utils::isValidUser(it->second, invitedUser))
       {
          SEND(client.getSocket(), ERR_USERONCHANNEL(client.getNick(), invitedUser, channel), "Error sending ERR_USERONCHANNEL (443)");
          return;
       }
+
+   - mudar o MODE i para +/- aparece sempre +i na msg
