@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/17 07:37:13 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/17 18:53:33 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -415,77 +415,84 @@ void Server::processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, 
 {
 	std::string message(buffer, bytesRead);
 	
-	if (message.empty() || message.compare("\n") == 0)
-		return;
-	else
-		setInput(message);
-	std::cout << RED << "<< " << RED + message;
+	std::vector<std::string> splitMessage = Utils::splitVector(message, "\r\n");
 
-	if (message.find("CAP END") != std::string::npos)
-		SEND(fds[i].fd, ":* CAP * END\r\n", "Error sending CAP LS message to client");
+	while (splitMessage.size())
+	{
 
-	else if (isCMD(message, "PING"))
-	{
-		SEND(client.getSocket(), RPL_PONG(client.getNick(), client.getUsername(), getInput()[1]), "Error sending PONG message");
-	}
+		if (message.empty() || message.compare("\n") == 0)
+			return;
+		else
+			setInput(message);
+		std::cout << RED << "<< " << RED + message;
 
-	else if (isCMD(message, "PRIVMSG"))
-	{
-		PRIVMSG(message, client);
-		fds[i].revents = 0;
-	}
-	else if (isCMD(message, "NICK") || isCMD(message, "USER ") || isCMD(message, "PASS"))
-	{
-		client.getClientLoginData(buffer, bytesRead, getGlobalUsers(), getHostname());
-		WHO(client.getSocket(), client);
-		fds[i].revents = 0;
-	}
-	else if (isCMD(message, "MODE"))
-	{
-		MODE(message, client);
-		fds[i].revents = 0;
-	}
-	else if (isCMD(message, "WHO"))
-	{
-		WHO(fds[i].fd, client);
-		fds[i].revents = 0;
-	}
-	else if (isCMD(message, "LIST"))
-	{
-		LIST(fds[i].fd, client);
-		fds[i].revents = 0;
-	}
-	else if (isCMD(message, "JOIN"))
-	{
-		JOIN(fds[i].fd, client);
-		fds[i].revents = 0;
-	}
-	else if (isCMD(message, "PART"))
-	{
-		PART(message, client);
-		fds[i].revents = 0;
-	}
-	else if (message.find("QUIT") != std::string::npos)
-	{
-		close(fds[i].fd); // Fecha a conexão com o cliente
-		// Envie uma mensagem de saída para todos os usuarios dos canais que o cliente estava
-		// Remova o cliente de todos os canais
-		fds.erase(fds.begin() + i); // Remova o cliente do vector<pollfd>
-	}
-	else if (isCMD(message, "KICK"))
-	{
-		KICK(message, client);
-		fds[i].revents = 0;
-	}
-	else if (isCMD(message, "TOPIC"))
-	{
-		TOPIC(client);
-		fds[i].revents = 0;
-	}
-	else if (isCMD(message, "INVITE"))
-	{
-		INVITE(client);
-		fds[i].revents = 0;
+		if (message.find("CAP END") != std::string::npos)
+			SEND(fds[i].fd, ":* CAP * END\r\n", "Error sending CAP LS message to client");
+
+		else if (isCMD(message, "PING"))
+		{
+			SEND(client.getSocket(), RPL_PONG(client.getNick(), client.getUsername(), getInput()[1]), "Error sending PONG message");
+		}
+
+		else if (isCMD(message, "PRIVMSG"))
+		{
+			PRIVMSG(message, client);
+			fds[i].revents = 0;
+		}
+		else if (isCMD(message, "NICK") || isCMD(message, "USER ") || isCMD(message, "PASS"))
+		{
+			client.getClientLoginData(buffer, bytesRead, getGlobalUsers(), getHostname());
+			WHO(client.getSocket(), client);
+			fds[i].revents = 0;
+		}
+		else if (isCMD(message, "MODE"))
+		{
+			MODE(message, client);
+			fds[i].revents = 0;
+		}
+		else if (isCMD(message, "WHO"))
+		{
+			WHO(fds[i].fd, client);
+			fds[i].revents = 0;
+		}
+		else if (isCMD(message, "LIST"))
+		{
+			LIST(fds[i].fd, client);
+			fds[i].revents = 0;
+		}
+		else if (isCMD(message, "JOIN"))
+		{
+			JOIN(fds[i].fd, client);
+			fds[i].revents = 0;
+		}
+		else if (isCMD(message, "PART"))
+		{
+			PART(message, client);
+			fds[i].revents = 0;
+		}
+		else if (message.find("QUIT") != std::string::npos)
+		{
+			close(fds[i].fd); // Fecha a conexão com o cliente
+			// Envie uma mensagem de saída para todos os usuarios dos canais que o cliente estava
+			// Remova o cliente de todos os canais
+			fds.erase(fds.begin() + i); // Remova o cliente do vector<pollfd>
+		}
+		else if (isCMD(message, "KICK"))
+		{
+			KICK(message, client);
+			fds[i].revents = 0;
+		}
+		else if (isCMD(message, "TOPIC"))
+		{
+			TOPIC(client);
+			fds[i].revents = 0;
+		}
+		else if (isCMD(message, "INVITE"))
+		{
+			INVITE(client);
+			fds[i].revents = 0;
+		}
+		splitMessage.erase(splitMessage.begin());
 	}
 }
 

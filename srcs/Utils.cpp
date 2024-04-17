@@ -136,6 +136,19 @@ std::vector<std::string> Utils::split(const std::string &str, const std::string 
 	return tokens;
 }
 
+std::vector<std::string> Utils::splitVector(const std::string& str, const std::string& delimiter)
+{
+	std::vector<std::string> tokens;
+	size_t start = 0, end = 0;
+	while ((end = str.find(delimiter, start)) != std::string::npos)
+	{
+		tokens.push_back(str.substr(start, end - start));
+		start = end + delimiter.length();
+	}
+	return tokens;
+
+}
+
 bool Utils::isValidUser(Channel channel, std::string nickname)
 {
 	if (channel.getUsers().find(nickname) != channel.getUsers().end())

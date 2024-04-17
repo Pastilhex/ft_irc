@@ -78,6 +78,8 @@ class Utils
          * @return A vector of strings containing the split string.
          */
         static std::vector<std::string> split(const std::string& str, const std::string& delimiters);
+        static std::vector<std::string> splitVector(const std::string& str, const std::string& delimiter);
+
 
         /**
          * @brief Checks if a given string is a valid user.
