@@ -173,3 +173,11 @@ bool Utils::isValidFlag(char flag)
 		return true;
 	return false;
 }
+
+bool Utils::isValidPort(char *str)
+{
+	for (size_t i = 0; i < strlen(str); i++)
+		if (!isdigit(str[i]))
+			return false;
+	return true;
+}

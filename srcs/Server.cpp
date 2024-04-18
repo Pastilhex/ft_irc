@@ -77,14 +77,6 @@ void Server::setInput(std::string message)
 	this->_input = trimInput(message);
 }
 
-bool Server::isValidPort(char *str)
-{
-	for (size_t i = 0; i < strlen(str); i++)
-		if (!isdigit(str[i]))
-			return false;
-	return true;
-}
-
 int Server::createSocket(void)
 {
 	int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -223,7 +215,7 @@ bool Server::isUserInvited(std::string user, std::string channelName)
 
 bool Server::start(char *str)
 {
-	if (!isValidPort(str))
+	if (!Utils::isValidPort(str))
 		return false;
 	this->_port = atoi(str);
 	this->_socket = createSocket();
