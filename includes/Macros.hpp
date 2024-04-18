@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Macros.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 22:22:32 by jhogonca          #+#    #+#             */
-/*   Updated: 2024/04/17 07:41:48 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/18 12:59:35 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@
 
 // KILL
 #define ERR_NOPRIVILEGES(client) \
-	(" 481 " + client + " :Permission Denied- You're not an IRC operator\r\n")
+	(std::string(LOCAL) + " 481 " + client + " :Permission Denied- You're not an IRC operator\r\n")
 #define RPL_KILL(user_id, killed, comment) \
 	(user_id + " KILL " + killed + " " + comment + "\r\n")
 
@@ -79,7 +79,7 @@
 #define ERR_UMODEUNKNOWNFLAG(client) \
 	(std::string(LOCAL) + " 501 " + client + " :Unknown MODE flag\r\n")
 #define ERR_USERSDONTMATCH(client) \
-	(" 502 " + client + " :Cant change mode for other users\r\n")
+	(std::string(LOCAL) + " 502 " + client + " :Cant change mode for other users\r\n")
 #define MODE_CHANNELMSG(channel, mode) \
 	(std::string(LOCAL) + "MODE #" + channel + " " + mode + "\r\n")
 #define MODE_CHANNELMSGWITHPARAM(channel, mode, param) \
@@ -89,13 +89,13 @@
 #define RPL_CHANNELMODEISWITHKEY(client, channel, mode, password) \
 	(std::string(LOCAL) + " 324 " + client + " #" + channel + " " + mode + " " + password + "\r\n")
 #define ERR_CANNOTSENDTOCHAN(client, channel) \
-	(" 404 " + client + " #" + channel + " :Cannot send to channel\r\n")
+	(std::string(LOCAL) + " 404 " + client + " #" + channel + " :Cannot send to channel\r\n")
 #define ERR_CHANNELISFULL(client, channel) \
-	(" 471 " + client + " " + channel + " :Cannot join channel (+l)\r\n")
+	(std::string(LOCAL) + " 471 " + client + " " + channel + " :Cannot join channel (+l)\r\n")
 #define ERR_CHANOPRIVSNEEDED(client, channel) \
 	(std::string(LOCAL) + " 482 " + client.getNick() + " " + channel + " :You're not channel operator\r\n")
 #define ERR_INVALIDMODEPARAM(client, channel, mode, password) \
-	(" 696 " + client + " #" + channel + " " + mode + " " + password + " : password must only contained alphabetic character\r\n")
+	(std::string(LOCAL) + " 696 " + client + " #" + channel + " " + mode + " " + password + " : password must only contained alphabetic character\r\n")
 #define RPL_ADDVOICE(nickname, username, channel, mode, param) \
 	(":" + nickname + "!" + username + "@localhost MODE #" + channel + " " + mode + " " + param + "\r\n")
 
@@ -145,7 +145,7 @@
 
 // PART
 #define RPL_PART(channel, reason) \
-	(USER_ID(NICKNAME, USERNAME) + " PART " + channel + " " + (reason.empty() ? "." : reason ) + "\r\n")
+	(USER_ID(NICKNAME, USERNAME) + " PART " + channel + " " + (reason.empty() ? "Whitout any reason" : reason) + "\r\n")
 
 // PASS
 #define ERR_PASSWDMISMATCH(client) \

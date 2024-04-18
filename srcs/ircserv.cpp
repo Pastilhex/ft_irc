@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ircserv.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 13:07:13 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/17 07:34:49 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/18 13:01:00 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ std::string getInputChannel(std::string message)
 std::string getMsgToSend(std::string message)
 {
 	int begin = message.find_first_of(":") + 1;
-	int end = message.find_last_of(" \r\n", begin);
+	int end = message.find_last_not_of(" \r\n", begin); //find_last_not_of returns the position of the last character that is not in the string
 	return message.substr(begin, end - begin);
 }
 

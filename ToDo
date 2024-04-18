@@ -67,12 +67,11 @@
 
    CONTINUA COM ERRO: 
 
-
-         if(Utils::isValidUser(it->second, invitedUser))
-      {
-         SEND(client.getSocket(), ERR_USERONCHANNEL(client.getNick(), invitedUser, channel), "Error sending ERR_USERONCHANNEL (443)");
-         return;
-      }
+	if(Utils::isValidUser(it->second, invitedUser))
+	{
+		SEND(client.getSocket(), ERR_USERONCHANNEL(client.getNick(), invitedUser, channel), "Error sending ERR_USERONCHANNEL (443)");
+		return;
+	}
 
 // userLImit - verificar se ja esta no max
 - quando o user sai e tenta entrar de novo com outro limite
