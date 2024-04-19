@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/19 12:34:28 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/19 22:02:26 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void Server::JOIN(int clientSocket, Client &client)
 					channel.AddOperator(client.getNick());
 					setNewChannel(channelName, channel);
 					SEND(clientSocket, RPL_JOIN(client, channelName), "Erro ao entrar no canal.");
-					MODE("MODE", client);
+					MODE(client);
 					WHO(client.getSocket(), client);
 				}
 			}

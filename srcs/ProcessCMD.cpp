@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/19 13:22:06 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/19 22:13:27 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void Server::processCMD(Client &client, std::vector<pollfd> &fds, char *buffer, 
 		}
 		else if (isCMD(message, "MODE"))
 		{
-			MODE(message, client);
+			MODE(client);
 			fds[i].revents = 0;
 		}
 		else if (isCMD(message, "WHO"))
@@ -73,10 +73,7 @@ void Server::processCMD(Client &client, std::vector<pollfd> &fds, char *buffer, 
 		}
 		else if (message.find("QUIT") != std::string::npos)
 		{
-			close(fds[i].fd); // Fecha a conexão com o cliente
-			// Envie uma mensagem de saída para todos os usuarios dos canais que o cliente estava
-			// Remova o cliente de todos os canais
-			fds.erase(fds.begin() + i); // Remova o cliente do vector<pollfd>
+
 		}
 		else if (isCMD(message, "KICK"))
 		{

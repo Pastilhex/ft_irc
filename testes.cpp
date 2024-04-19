@@ -523,3 +523,52 @@ int main(int ac, char **av)
 	server.connectToClient(server.getSocket());
 	return EXIT_SUCCESS;
 }
+
+// std::cout << "Conexão fechada pelo cliente." << std::endl;
+// std::map<std::string, Channel> &channels = this->getChannels();
+// std::map<std::string, Channel>::iterator ch = channels.begin();
+
+// std::map<std::string, Client> &globalUsers = this->getGlobalUsers();
+// std::map<std::string, Client>::iterator gb = globalUsers.begin();
+// while (gb != globalUsers.end())
+// {
+// 	if (gb->first == client.getNick())
+// 		globalUsers.erase(gb++);
+// 	else
+// 		++gb;
+// }
+
+// while (ch != channels.end())
+// {
+// 	std::map<std::string, Client> &users = ch->second.getUsers();
+// 	std::map<std::string, Client>::iterator us = users.begin();
+// 	while (us != users.end())
+// 	{
+// 		if (us->first == client.getNick())
+// 			users.erase(us++);
+// 		else
+// 			++us;
+// 	}
+// 	std::vector<std::string> &operators = ch->second.getOperators();
+// 	std::vector<std::string>::iterator op = operators.begin();
+// 	while (op != operators.end())
+// 	{
+// 		if (*op == client.getNick())
+// 			operators.erase(op++);
+// 		else
+// 			++op;
+// 	}
+// 	std::vector<std::string> &invitedUsers = ch->second.getInvitedUsers();
+// 	std::vector<std::string>::iterator in = invitedUsers.begin();
+// 	while (in != invitedUsers.end())
+// 	{
+// 		if (*in == client.getNick())
+// 			invitedUsers.erase(in++);
+// 		else
+// 			++in;
+// 	}
+// 	++ch;
+// }
+// close(fds[i].fd);
+// fds.erase(fds.begin() + i);
+// --i;

@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/19 12:33:27 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/19 21:50:30 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ void Server::PRIVMSG(std::string message, Client client)
 	std::vector<std::string> input = getInput();
 	std::vector<std::string>::iterator inputIterator = input.begin();
 	std::string channelName = "";
+	std::string msgToSend = getMessage(message);
 
 	while (inputIterator != input.end())
 	{
@@ -34,7 +35,7 @@ void Server::PRIVMSG(std::string message, Client client)
 		std::map<std::string, Client>::iterator user_it = users.find(input[1]);
 		if (user_it != users.end())
 		{
-			SEND(user_it->second.getSocket(), RPL_PRIVMSG(channelName, getMsgToSend(message)), "Error sending message to user.");
+			SEND(user_it->second.getSocket(), RPL_PRIVMSG(channelName, msgToSend), "Error sending message to user.");
 		}
 		else
 			SEND(client.getSocket(), ERR_NOSUCHNICK(client, input[1]), "Error sending message to user.");
@@ -52,10 +53,17 @@ void Server::PRIVMSG(std::string message, Client client)
 			{
 				if (user_it->first != client.getNick())
 				{
-					SEND(user_it->second.getSocket(), RPL_PRIVMSG(channelName, getMsgToSend(message)), "Error sending message to channel.");
+					SEND(user_it->second.getSocket(), RPL_PRIVMSG(channelName, msgToSend), "Error sending message to channel.");
 				}
 				++user_it;
 			}
 		}
 	}
+}
+
+std::string getMessage(std::string message)
+{
+	int begin = message.find_first_of(":") + 1;
+	int end = message.find_first_of("\r\n", begin); //find_last_not_of returns the position of the last character that is not in the string
+	return message.substr(begin, end - begin);
 }

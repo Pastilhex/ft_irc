@@ -6,17 +6,15 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:36:38 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/19 12:36:41 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/19 22:10:11 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
-#include <iostream> // Add missing include statement
 
-void Server::MODE(std::string message, Client client)
+void Server::MODE(Client client)
 {
-	(void)message;
-	std::vector<std::string> mode_cmd = trimInput(message);
+	std::vector<std::string> mode_cmd = getInput();
 
 	if (checkInput(mode_cmd, client) || (mode_cmd.size() < 2))
 		return;

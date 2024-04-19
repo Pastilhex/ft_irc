@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 22:22:32 by jhogonca          #+#    #+#             */
-/*   Updated: 2024/04/19 13:27:05 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/19 21:09:29 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,8 +164,8 @@
 #define RPL_PONG(nickname, username, token) (USER_ID(nickname, username) + " PONG :" + token + "\r\n")
 
 // QUIT
-#define RPL_QUIT(user_id, reason) \
-	(user_id + " QUIT :Quit: " + reason + "\r\n")
+#define RPL_QUIT(nickname, reason) \
+	(nickname + " QUIT :" + reason + "\r\n")
 #define RPL_ERROR(user_id, reason) \
 	(user_id + " ERROR :" + reason + "\r\n")
 

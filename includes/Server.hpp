@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/19 13:22:04 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/19 22:24:32 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,7 +216,7 @@ public:
 	 * @param message The mode message.
 	 * @param client The client object.
 	 */
-	void MODE(std::string message, Client client);						
+	void MODE(Client client);
 	
 	/**
 	 * @brief Handles a PART command from a client.
@@ -248,6 +248,8 @@ public:
 	 * @param client The client object.
 	 */
 	void WHO(int clientSocket, const Client client);			
+
+	void QUIT(std::vector<pollfd> fds, int i, const Client client);
 
 	// Utils
 	/**

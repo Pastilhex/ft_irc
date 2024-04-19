@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ircserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 06:36:04 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/14 14:45:06 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/19 21:41:34 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ bool isCMD(std::string message, std::string cmd);
 std::string getInputCmd(std::string message, std::string cmd);
 std::string getInputChannel(std::string message);
 std::string getMsgToSend(std::string message);
+std::string getMessage(std::string message);
 void SEND(int socket, std::string msg, std::string error);
 
 #endif
