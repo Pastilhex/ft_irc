@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/16 16:39:45 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/19 13:22:04 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -350,7 +350,7 @@ public:
 	 * @param bytesRead The number of bytes read.
 	 * @param i The index of the client in the vector of file descriptors.
 	 */
-	void processMsg(Client &client, std::vector<pollfd> &fds, char *buffer, int bytesRead, int i);
+	void processCMD(Client &client, std::vector<pollfd> &fds, char *buffer, int bytesRead, int i);
 	
 	/**
 	 * @brief Starts the server.
