@@ -122,7 +122,14 @@ class Utils
          */
         void signalHandler(int signum);
 
-        static std::string getChannelByChannelName(const std::string& channel);
+        /**
+         * @brief Checks if a given string represents a valid port number.
+         * 
+         * @param str The string to be checked.
+         * @return true if the string represents a valid port number, false otherwise.
+         */
+        static bool isValidPort(char *str);
+
 };
 
 #endif

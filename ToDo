@@ -76,5 +76,5 @@
 // userLImit - verificar se ja esta no max
 - quando o user sai e tenta entrar de novo com outro limite
 
-
+- limpeza das funcoes no ircserv.hpp (realmente precisam ficar la? nao e melhor no server?)
 
