@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Macros.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 22:22:32 by jhogonca          #+#    #+#             */
-/*   Updated: 2024/04/20 09:46:16 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/20 17:52:41 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,8 @@
 
 /* Constructs a user ID string in the format ":nickname!username@hostname"
  * Example: :nick!user@localhost */
-#define USER_ID(nickname, username) (":" + nickname + "!" + username + "@" + getHostname())
+#define USER_ID(nickname, username) \
+	(":" + nickname + "!" + username + "@" + getHostname())
 
 /* Constructs a host string in the format ":hostname"
  * Example: :localhost */
@@ -279,8 +280,8 @@
 // QUIT
 
 /* nick QUIT :reason */
-#define RPL_QUIT(nickname, reason) \
-	(nickname + " QUIT :" + reason + "\r\n")
+#define RPL_QUIT(nickname, username, reason) \
+	(USER_ID(nickname, username) + " QUIT :" + reason + "\r\n")
 
 /* user_id ERROR :reason */
 #define RPL_ERROR(user_id, reason) \

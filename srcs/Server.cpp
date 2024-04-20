@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/20 08:53:30 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/20 17:53:15 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -295,8 +295,8 @@ std::string Server::getClientNick(std::string &channelName, std::string &clientN
 
 std::vector<std::string> Server::trimInput(std::string msg)
 {
-	int begin = msg.find_first_not_of(" \r\n\t");
-	int end = msg.find_last_not_of(" \r\n\t,");
+	int begin = msg.find_first_not_of(" \r\n\t:");
+	int end = msg.find_last_not_of(" \r\n\t:,");
 	std::string trimmed = msg.substr(begin, end - begin + 1);
 
 	// Substituir vírgulas por espaços

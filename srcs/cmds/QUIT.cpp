@@ -6,11 +6,11 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/19 22:22:54 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/20 16:55:09 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/ircserv.hpp"
+#include "../../includes/ircserv.hpp"
 
 void Server::QUIT(std::vector<pollfd> fds, int i, const Client client)
 {
@@ -38,7 +38,7 @@ void Server::QUIT(std::vector<pollfd> fds, int i, const Client client)
 				users.erase(us++);
 			else if (us->second.getNick() != client.getNick())
 			{
-				SEND(gb->second.getSocket(), RPL_QUIT(client.getNick(), getInput()[1]), "Error sending QUIT message");
+				SEND(us->second.getSocket(), RPL_QUIT(client.getNick(), client.getUsername(), getInput()[1]), "Error sending QUIT message");
 				us++;
 			}
 			else

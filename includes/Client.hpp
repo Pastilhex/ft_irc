@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/16 13:48:56 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/20 21:18:56 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ class Client {
 		 * @brief Get the username of the client.
 		 * @return The username of the client.
 		 */
-		std::string getUsername(void);
+		std::string getUsername(void) const;
 
 		/**
 		 * @brief Get the temporary password of the client.
@@ -116,7 +116,7 @@ class Client {
 		 * @param globalUsers The map of global users.
 		 * @param hostname The hostname of the server.
 		 */
-		void getClientLoginData(char *buffer, int bytesRead, std::map<std::string, Client> globalUsers, std::string hostname);
+		void getClientLoginData(std::string message, std::map<std::string, Client> globalUsers, std::string hostname);
 };
 
 #endif

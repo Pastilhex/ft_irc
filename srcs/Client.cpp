@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/16 16:24:48 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/20 21:18:13 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void Client::setNewClient(Client &client)
 	return (this->_nick);
 }
 
-std::string Client::getUsername(void)
+std::string Client::getUsername(void) const
 {
 	return this->_username;
 }
@@ -83,9 +83,8 @@ void Client::setTmpPassword(std::string pass)
 	this->_tmpPassword = pass;
 }
 
-void	Client::getClientLoginData(char* buffer, int bytesRead, std::map<std::string, Client> globalUsers, std::string hostname)
+void	Client::getClientLoginData(std::string message , std::map<std::string, Client> globalUsers, std::string hostname)
 {
-	std::string message(buffer, bytesRead);
 	if (isCMD(message, "NICK") || isCMD(message, "USER") || isCMD(message, "PASS"))
 	{
 		if (isCMD(message, "NICK"))

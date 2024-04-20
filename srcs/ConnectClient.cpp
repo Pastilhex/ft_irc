@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/19 22:24:11 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/20 21:33:44 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,35 +90,15 @@ void Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
 		// adicionamos o novo client_fd ao vector<pollfd>
 		fds.push_back(client.getClientPoll());
 
-		char buffer[1024];
-		while (client.getNick().empty() || client.getUsername().empty() || client.getTmpPassword().empty() || client.getTmpPassword() != this->getPassword())
-		{
-			int bytesRead = recv(client.getSocket(), buffer, sizeof(buffer), 0);
-			std::string message(buffer, bytesRead);
-
-			if (message.find("CAP LS") != std::string::npos)
-				SEND(client.getSocket(), ":* CAP * LS :42Porto Ft_IRCv1.0\r\n", "Error sending CAP LS message to client");
-
-			std::cout << "<< " + message << std::endl;
-			client.getClientLoginData(buffer, bytesRead, getGlobalUsers(), getHostname());
-
-			if (!client.getTmpPassword().empty() && client.getTmpPassword() != this->getPassword())
-			{
-				SEND(client.getSocket(), ERR_PASSWDMISMATCH(client), "Error while login");
-				continue; // Skip to the next iteration of the outer loop
-			}
-		}
-
-		// Adiciona o client à lista global de usuarios
+		// Adiciona o client à lista global de usuarios, mas vazio pq os dados serão preenchidos no loop processCMD
 		if (!addClientToGlobalUsers(client))
+		{
 			if (client.getSocket() == -1)
 			{
 				std::cerr << "Erro ao aceitar a conexão com o nick: " + client.getNick() + "." << std::endl;
 				close(serverSocket);
 				return;
 			}
-
-		if (!client.getNick().empty() && !client.getUsername().empty())
-			sendWelcome(client.getSocket(), client);
+		}
 	}
 }

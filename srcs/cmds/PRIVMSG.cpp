@@ -6,11 +6,11 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/19 21:50:30 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/20 13:59:05 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/ircserv.hpp"
+#include "../../includes/ircserv.hpp"
 
 void Server::PRIVMSG(std::string message, Client client)
 {

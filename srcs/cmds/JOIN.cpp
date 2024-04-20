@@ -6,11 +6,11 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/19 22:02:26 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/20 18:10:07 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/ircserv.hpp"
+#include "../../includes/ircserv.hpp"
 
 void Server::JOIN(int clientSocket, Client &client)
 {
@@ -65,6 +65,7 @@ void Server::JOIN(int clientSocket, Client &client)
 						it->second.setNewUser(client);
 						SEND(clientSocket, RPL_JOIN(client, channelName), "Erro ao entrar no canal.");
 						updateChannel(client, channelName);
+						MODE(client);
 						break;
 					}
 				}
