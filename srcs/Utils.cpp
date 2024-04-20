@@ -9,6 +9,11 @@ int Utils::logMessage(const std::string &message, int level)
 		std::cout << GREEN << "[INFO] " << RESET
 				  << logTime << " " << message << std::endl;
 	}
+	else if (level == 2)
+	{
+		std::cout << YELLOW << "[CONFIG] " << RESET
+				  << logTime << " " << message << std::endl;
+	}
 	else
 	{
 		std::cerr << RED << "[ERROR] " << RESET
@@ -17,6 +22,31 @@ int Utils::logMessage(const std::string &message, int level)
 	return level;
 }
 
+bool Utils::inputValidation(int argc, char *argv[ ])
+{
+	void signalHandler(int signum);
+	if (argc != 3)
+	{
+		Utils::logMessage("Usage: ./ircserv <port> <password>", EXIT_FAILURE);
+		return (false);
+	}
+	if (!Utils::isValidInput(argv[1], argv[2]))
+		return (false);
+	return (true);
+}
+
+void	Utils::printServerInfo(std::string hostname, \
+std::string port, std::string addressIP, std::string pass)
+{
+	std::cout << "Endereço IP do servidor: " \
+		<< WHITE << addressIP << std::endl << RESET;
+	std::cout << "Hostname do servidor: " \
+		<< WHITE << hostname << std::endl << RESET;
+	std::cout << "Porta do servidor: " 
+		<< WHITE << port << std::endl << RESET;
+	std::cout << "Password do servidor: " \
+		<< WHITE << pass << std::endl << RESET;
+}
 
 bool Utils::hasNonDigits(const std::string &str)
 {

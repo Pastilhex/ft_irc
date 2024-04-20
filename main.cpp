@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/23 17:28:47 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/14 10:48:04 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/20 08:19:36 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,30 +22,15 @@ void signalHandler(int signum)
 	}
 }
 
-bool isPassword(char *pass, Server &server)
-{
-	if (pass == server.getPassword())
-		return true;
-	else
-	{
-		Utils::logMessage("Please check your password", 1);
-		return false;
-	}
-}
-
 int main(int argc, char* argv[])
 {
-	Server	server(argv[2]);
-	signal(SIGINT, signalHandler);
-	if (argc == 3 && isPassword(argv[2], server))
-	{
-		if (server.start(argv[1]))
-		{
-			server.run();
-		}
-		close(server.getSocket());
-	}
-	else
-		return (Utils::logMessage("Usage: ./ircserv <port> <password>", 1));
-	return 0;
+	Server server;
+	
+	if (Utils::inputValidation(argc, argv) == false)
+		return (EXIT_FAILURE);
+	if (server.start(argv[1], argv[2]) == false)
+		return (Utils::logMessage("Error starting server", EXIT_FAILURE));
+	if (server.run() == false)
+		return (Utils::logMessage("Error running server", EXIT_FAILURE));
+	return (EXIT_SUCCESS);
 }

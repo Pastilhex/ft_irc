@@ -3,18 +3,26 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/19 13:06:26 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/20 08:53:30 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
 
-Server::Server(std::string password)
+Server::Server(void)
 {
-	this->_password = password;
+	this->_port = 0;
+	this->_socket = 0;
+	this->_hostname = "";
+	this->_password = "";
+	/* this->_address = {};
+	this->_input = {};
+	this->_channels = {};
+	this->serverPoll = {};
+	this->_globalUsers = {}; */
 }
 
 std::map<std::string, Client> &Server::getGlobalUsers(void)
@@ -62,9 +70,11 @@ void Server::setSocket(int newSocket)
 	this->_socket = newSocket;
 }
 
-void Server::setHostname(std::string hostname)
+bool Server::setHostname(void)
 {
-	this->_hostname = hostname;
+	if (!createHostname())
+		return false;
+	return true;
 }
 
 void Server::setAddress(struct sockaddr_in newAddress)
@@ -83,37 +93,36 @@ int Server::createSocket(void)
 
 	if (serverSocket == -1)
 	{
-		std::cerr << "Erro ao criar o socket." << std::endl;
+		Utils::logMessage("Erro ao criar o socket.", EXIT_FAILURE);
 		return -1;
 	}
-
 	if (fcntl(serverSocket, F_SETFL, O_NONBLOCK) == -1)
 	{
-		std::cerr << "Erro ao definir modo não-bloqueante para o socket do servidor." << std::endl;
+		Utils::logMessage("Erro ao definir modo não-bloqueante para o socket do servidor.", EXIT_FAILURE);
 		close(serverSocket);
 		return -1;
 	}
-
 	int optval = 1;
 	if ((setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval))) == -1)
 	{
-		std::cerr << "Erro ao reutilizar o socket do servidor." << std::endl;
+		Utils::logMessage("Erro ao reutilizar o socket do servidor.", EXIT_FAILURE);
+		close(serverSocket);
 		return -1;
 	}
-
 	return serverSocket;
 }
 
-void Server::createHostname(void)
+bool Server::createHostname(void)
 {
 	char hostname[256];
 	if (gethostname(hostname, sizeof(hostname)) == -1)
 	{
-		std::cerr << "Erro ao obter o nome do host." << std::endl;
-		return;
+		Utils::logMessage("Error creating hostname", 1);
+		return false;
 	}
-	this->setHostname((std::string)hostname);
-	std::cout << "Nome do servidor: " << hostname << std::endl;
+	this->_hostname = hostname;
+	Utils::logMessage("Hostname created successfully", EXIT_SUCCESS);
+	return true;
 }
 
 struct sockaddr_in Server::createAddress(int port)
@@ -124,6 +133,7 @@ struct sockaddr_in Server::createAddress(int port)
 	serverAddress.sin_family = AF_INET;
 	serverAddress.sin_addr.s_addr = INADDR_ANY;
 	serverAddress.sin_port = htons(port);
+	Utils::logMessage("Address created successfully", EXIT_SUCCESS);
 	return serverAddress;
 }
 
@@ -201,13 +211,33 @@ bool Server::isUserInvited(std::string user, std::string channelName)
 	return false;
 }
 
-bool Server::start(char *str)
+bool Server::start(const std::string &port, const std::string &password)
 {
-	if (!Utils::isValidPort(str))
-		return false;
-	this->_port = atoi(str);
-	this->_socket = createSocket();
+	this->_password = password;
+	this->_port = std::atoi(port.c_str());
 	this->_address = createAddress(this->_port);
+
+	if (!setHostname())
+		return false;
+	setSocket(createSocket());
+	if (this->_socket == -1)
+		return false;
+	if (!bindSocket(this->_socket, this->_address))
+		return false;
+	if (!listenSocket(this->_socket))
+		return false;
+	Utils::logMessage("Server started successfully", EXIT_SUCCESS);
+	return true;
+}
+
+bool Server::listenSocket(const int &serverSocket)
+{
+	if (listen(serverSocket, 5) == -1)
+	{
+		Utils::logMessage("Erro ao colocar o socket em modo de escuta.", EXIT_FAILURE);
+		close(serverSocket);
+		return false;
+	}
 	return true;
 }
 
@@ -215,33 +245,19 @@ bool Server::bindSocket(const int &serverSocket, const struct sockaddr_in &serve
 {
 	if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1)
 	{
-		std::cerr << "Erro ao associar o socket ao endereço." << std::endl;
+		Utils::logMessage("Error binding socket", 1);
 		close(serverSocket);
 		return false;
 	}
-	return true;
-}
-
-bool Server::checkConnections(const int &serverSocket)
-{
-	if (listen(serverSocket, 5) == -1)
-	{
-		std::cerr << "Erro ao colocar o socket em modo de escuta." << std::endl;
-		close(serverSocket);
-		return false;
-	}
+	Utils::logMessage("Socket bound successfully", EXIT_SUCCESS);
 	return true;
 }
 
 bool Server::run(void)
 {
-	if (getSocket() && bindSocket(getSocket(), getAddress()) && checkConnections(getSocket()))
-	{
-		createHostname();
-		std::cout << "Endereço IP do servidor: " + getAddressIP() << std::endl;
-		connectClient(getSocket());
-		return true;
-	}
+	Utils::printServerInfo(getHostname(), "6667", getAddressIP(), getPassword());
+	connectClient(getSocket());
+	return true;
 	return false;
 }
 

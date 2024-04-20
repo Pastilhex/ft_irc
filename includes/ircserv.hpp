@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ircserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 06:36:04 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/19 21:41:34 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/20 08:55:19 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,11 @@
 
 // Colors
 #define RESET "\033[0m"
-#define RED "\033[1;31m"
-#define GREEN "\033[1;32m"
-#define YELLOW "\033[1;33m"
-#define BLUE "\033[1;34m"
+#define RED "\033[1;31;1m"
+#define GREEN "\033[1;32;1m"
+#define YELLOW "\033[1;33;1m"
+#define BLUE "\033[1;34;1m"
+#define WHITE "\033[1;37;1m"
 
 #include <arpa/inet.h>
 #include <cctype>
