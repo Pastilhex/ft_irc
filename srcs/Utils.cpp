@@ -3,26 +3,24 @@
 int Utils::logMessage(const std::string &message, int level)
 {
 	std::string logTime = getCurrentDateTimeAsString();
+	std::ostream &out = (level == EXIT_FAILURE) ? std::cerr : std::cout;
 
-	if (level == EXIT_SUCCESS)
-	{
-		std::cout << GREEN << "[INFO] " << RESET
-				  << logTime << " " << message << std::endl;
+	switch (level) {
+	case EXIT_SUCCESS:
+		out << GREEN << "[INFO] " << RESET;
+		break;
+	case 2:
+		out << YELLOW << "[CONFIG] " << RESET;
+		break;
+	default:
+		out << RED << "[ERROR] " << RESET;
+		break;
 	}
-	else if (level == 2)
-	{
-		std::cout << YELLOW << "[CONFIG] " << RESET
-				  << logTime << " " << message << std::endl;
-	}
-	else
-	{
-		std::cerr << RED << "[ERROR] " << RESET
-				  << getCurrentDateTimeAsString() << " " << message << RESET << std::endl;
-	}
+	out << logTime << " " << message << std::endl;
 	return level;
 }
 
-bool Utils::inputValidation(int argc, char *argv[ ])
+bool Utils::inputValidation(int argc, char *argv[])
 {
 	void signalHandler(int signum);
 	if (argc != 3)
@@ -35,17 +33,21 @@ bool Utils::inputValidation(int argc, char *argv[ ])
 	return (true);
 }
 
-void	Utils::printServerInfo(std::string hostname, \
-std::string port, std::string addressIP, std::string pass)
+void Utils::printServerInfo(std::string hostname,
+							std::string port, std::string addressIP, std::string pass)
 {
-	std::cout << "Endereço IP do servidor: " \
-		<< WHITE << addressIP << std::endl << RESET;
-	std::cout << "Hostname do servidor: " \
-		<< WHITE << hostname << std::endl << RESET;
-	std::cout << "Porta do servidor: " 
-		<< WHITE << port << std::endl << RESET;
-	std::cout << "Password do servidor: " \
-		<< WHITE << pass << std::endl << RESET;
+	std::cout << "Endereço IP do servidor: "
+			  << WHITE << addressIP << std::endl
+			  << RESET;
+	std::cout << "Hostname do servidor: "
+			  << WHITE << hostname << std::endl
+			  << RESET;
+	std::cout << "Porta do servidor: "
+			  << WHITE << port << std::endl
+			  << RESET;
+	std::cout << "Password do servidor: "
+			  << WHITE << pass << std::endl
+			  << RESET;
 }
 
 bool Utils::hasNonDigits(const std::string &str)
@@ -166,7 +168,7 @@ std::vector<std::string> Utils::split(const std::string &str, const std::string 
 	return tokens;
 }
 
-std::vector<std::string> Utils::splitVector(const std::string& str, const std::string& delimiter)
+std::vector<std::string> Utils::splitVector(const std::string &str, const std::string &delimiter)
 {
 	std::vector<std::string> tokens;
 	size_t start = 0, end = 0;
@@ -176,7 +178,6 @@ std::vector<std::string> Utils::splitVector(const std::string& str, const std::s
 		start = end + delimiter.length();
 	}
 	return tokens;
-
 }
 
 bool Utils::isValidUser(Channel channel, std::string nickname)
@@ -199,7 +200,7 @@ bool Utils::isOperator(Channel channel, std::string nickname)
 
 bool Utils::isValidFlag(char flag)
 {
-	if(flag == 'k' || flag == 'l' || flag == 'i' || flag == 't' || flag == 'o')
+	if (flag == 'k' || flag == 'l' || flag == 'i' || flag == 't' || flag == 'o')
 		return true;
 	return false;
 }
