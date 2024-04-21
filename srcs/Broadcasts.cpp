@@ -6,7 +6,7 @@
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/21 08:23:52 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/21 10:14:39 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void Server::sendWelcome(int clientSocket, Client &client)
 	welcome += RPL_MOTD(" :                _ol''''  '',, dMF9MMMMMHo_ \r\n");
 	welcome += RPL_MOTD(" :             .o##'        `'MbHMMMMMMMMMMMHo. \r\n");
 	welcome += RPL_MOTD(" :           .oloo'         vodM*$&&HMMMMMMMMMM?. \r\n");
-	welcome += RPL_MOTD(" :          ,'              $M&ood,~'`(&##MMMMMMH'\' \r\n");
+	welcome += RPL_MOTD(" :          ,'              $M&ood,~'`(&##MMMMMMH' \r\n");
 	welcome += RPL_MOTD(" :         /               ,MMMMMMM#b?#bobMMMMHMMML \r\n");
 	welcome += RPL_MOTD(" :        &              ?MMMMMMMMMMMMMMMMM7MMM$R*Hk \r\n");
 	welcome += RPL_MOTD(" :       ?$.            :MMMMMMMMMMMMMMMMMMM/HMMM|`*L \r\n");

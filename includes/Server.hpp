@@ -6,7 +6,7 @@
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/21 09:39:43 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/21 16:15:57 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -451,7 +451,8 @@ public:
 	void handleUserLimitMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag);
 
 	void login(Client &client, std::vector<std::string> splitMessage);
-	bool isDCC_SEND(std::string message);
+	std::vector<std::string> isDCC_SEND(std::string message);
+	void DCC_ACCEPT(std::vector<std::string> words);
 
 };
 
