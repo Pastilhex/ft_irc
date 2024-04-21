@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Macros.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 22:22:32 by jhogonca          #+#    #+#             */
-/*   Updated: 2024/04/20 17:52:41 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/21 08:24:50 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,19 +45,14 @@
 #define RPL_WELCOME() \
 	(std::string(HOST) + " 001 " + NICKNAME + " :Welcome to the Internet Relay Network, " + NICKNAME + "!" + USERNAME + "@" + HOST + "!" + IP_ADDRESS + "\r\n")
 
-#define RPL_YOURHOST(client, servername, version) \
-	(std::string(HOST) + " 002 " + client + " :Your host is " + servername + " (localhost), running version " + version + "\r\n")
+#define RPL_YOURHOST() \
+	(std::string(HOST) + " 002 " + NICKNAME + " :Your host is " + HOST + ", running version FT_IRC_42Porto_v1.0\r\n")
 
-#define RPL_CREATED(client, datetime) \
-	(std::string(HOST) + " 003 " + client + " :This server was created " + datetime + "\r\n")
+#define RPL_CREATED() \
+	(std::string(HOST) + " 003 " + NICKNAME + " :This server was created " + getCurrentDateTime() + "\r\n")
 
-#define RPL_WELCOME_LOGO() \
-	(std::string(HOST) + " 372 " + NICKNAME + " :███████╗████████╗    ██╗██████╗  ██████╗\r\n") \
-	(std::string(HOST) + " 372 " + NICKNAME + " :██╔════╝╚══██╔══╝    ██║██╔══██╗██╔════╝\r\n") \
-	(std::string(HOST) + " 372 " + NICKNAME + " :█████╗     ██║       ██║██████╔╝██║     \r\n") \
-	(std::string(HOST) + " 372 " + NICKNAME + " :██╔══╝     ██║       ██║██╔══██╗██║     \r\n") \
-	(std::string(HOST) + " 372 " + NICKNAME + " :██║        ██║ ████╗ ██║██║  ██║╚██████╗\r\n") \
-	(std::string(HOST) + " 372 " + NICKNAME + " :╚═╝        ╚═╝  ╚══╝ ╚═╝╚═╝  ╚═╝ ╚═════╝\r\n")
+#define RPL_MOTD(msg) \
+	(std::string(HOST) + " 372 " + NICKNAME + msg)
 
 #define RPL_MYINFO(client, servername, version, user_modes, chan_modes, chan_param_modes) \
 	(std::string(HOST) + " 004 " + client + " " + servername + " " + version + " " + user_modes + " " + chan_modes + " " + chan_param_modes + "\r\n")
@@ -202,15 +197,9 @@
 #define RPL_MOTDSTART(client, servername) \
 	(std::string(HOST) + " 375 " + client + " :- " + servername + " Message of the day - \r\n")
 
-/* :localhost 372 user123 :motd_line */
-#define RPL_MOTD(client, motd_line) \
-	(std::string(HOST) + " 372 " + client + " :" + motd_line + "\r\n")
-
 /* :localhost 376 user123 :End of /MOTD command. */
-#define RPL_ENDOFMOTD(client) \
-	(std::string(HOST) + " 376 " + client + " :End of /MOTD command.\r\n")
-
-// NAMES
+#define RPL_ENDOFMOTD() \
+	(std::string(HOST) + " 376 " + NICKNAME + " :End of /MOTD command.\r\n")
 
 /* :localhost 353 user123 = channel :list_of_nicks */
 #define RPL_NAMREPLY(client, channel, list_of_nicks) \

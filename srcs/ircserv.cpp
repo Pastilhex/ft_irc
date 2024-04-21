@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ircserv.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 13:07:13 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/19 22:05:09 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/21 08:57:12 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,11 @@ bool isCMD(std::string message, std::string cmd)
 
 std::string getInputCmd(std::string message, std::string cmd)
 {
-	int msgSize = cmd.size() + 1;
-	return message.substr(message.find(cmd) + msgSize, message.find_first_of(" \n\r\t", message.find(cmd) + msgSize) - (message.find(cmd) + msgSize));
+	size_t msgSize = cmd.size() + 1;
+	if (message.size() <= msgSize)
+		return "";
+	else
+		return message.substr(message.find(cmd) + msgSize, message.find_first_of(" \n\r\t", message.find(cmd) + msgSize) - (message.find(cmd) + msgSize));
 }
 
 std::string getInputChannel(std::string message)
@@ -51,7 +54,7 @@ std::string getInputChannel(std::string message)
 std::string getMsgToSend(std::string message)
 {
 	int begin = message.find_first_of(":") + 1;
-	int end = message.find_last_not_of(" \r\n", begin); //find_last_not_of returns the position of the last character that is not in the string
+	int end = message.find_last_not_of(" \r\n", begin); // find_last_not_of returns the position of the last character that is not in the string
 	return message.substr(begin, end - begin);
 }
 
@@ -61,4 +64,3 @@ void SEND(int socket, std::string msg, std::string error)
 		std::cerr << error << std::endl;
 	std::cout << GREEN << ">> " << GREEN + msg;
 }
-

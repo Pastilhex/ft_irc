@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/20 17:53:15 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/21 06:20:22 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -295,7 +295,7 @@ std::string Server::getClientNick(std::string &channelName, std::string &clientN
 
 std::vector<std::string> Server::trimInput(std::string msg)
 {
-	int begin = msg.find_first_not_of(" \r\n\t:");
+	int begin = msg.find_first_not_of(":");
 	int end = msg.find_last_not_of(" \r\n\t:,");
 	std::string trimmed = msg.substr(begin, end - begin + 1);
 
@@ -315,7 +315,7 @@ std::vector<std::string> Server::trimInput(std::string msg)
 	{
 		if (word[0] == ':')
 		{
-			words.push_back(word);
+			words.push_back(word.substr(1));
 			while (ss >> word)
 			{
 				words.back() += " ";

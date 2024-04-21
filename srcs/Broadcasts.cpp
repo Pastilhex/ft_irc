@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Broadcasts.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/19 13:29:18 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/21 08:23:52 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,20 +16,48 @@ void Server::sendWelcome(int clientSocket, Client &client)
 {
 	std::string welcome;
 	welcome += RPL_WELCOME();
-	welcome += ":" + getHostname() + " 002 " + client.getNick() + " :Your host is " + getHostname() + ", running version FT_IRC_42Porto_v1.0\r\n";
-	welcome += ":" + getHostname() + " 003 " + client.getNick() + " :This server was created " + getCurrentDateTime() + "\r\n";
-	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :███████╗████████╗    ██╗██████╗  ██████╗\r\n";
-	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :██╔════╝╚══██╔══╝    ██║██╔══██╗██╔════╝\r\n";
-	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :█████╗     ██║       ██║██████╔╝██║     \r\n";
-	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :██╔══╝     ██║       ██║██╔══██╗██║     \r\n";
-	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :██║        ██║ ████╗ ██║██║  ██║╚██████╗\r\n";
-	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :╚═╝        ╚═╝  ╚══╝ ╚═╝╚═╝  ╚═╝ ╚═════╝\r\n";
-	welcome += ":" + getHostname() + " 372 " + client.getNick() + " :Project by:  ialves-m  lpicoli  jhogonca\r\n";
-	welcome += ":" + getHostname() + " 376 " + client.getNick() + " :End of /MOTD command.\r\n";
+	welcome += RPL_YOURHOST();
+	welcome += RPL_CREATED();
+	welcome += RPL_MOTD(" :                    _-o#&&*''''?d:>b-_ \r\n");
+	welcome += RPL_MOTD(" :                _ol''''  '',, dMF9MMMMMHo_ \r\n");
+	welcome += RPL_MOTD(" :             .o##'        `'MbHMMMMMMMMMMMHo. \r\n");
+	welcome += RPL_MOTD(" :           .oloo'         vodM*$&&HMMMMMMMMMM?. \r\n");
+	welcome += RPL_MOTD(" :          ,'              $M&ood,~'`(&##MMMMMMH'\' \r\n");
+	welcome += RPL_MOTD(" :         /               ,MMMMMMM#b?#bobMMMMHMMML \r\n");
+	welcome += RPL_MOTD(" :        &              ?MMMMMMMMMMMMMMMMM7MMM$R*Hk \r\n");
+	welcome += RPL_MOTD(" :       ?$.            :MMMMMMMMMMMMMMMMMMM/HMMM|`*L \r\n");
+	welcome += RPL_MOTD(" :      |               |MMMMMMMMMMMMMMMMMMMMbMH'   T, \r\n");
+	welcome += RPL_MOTD(" :      $H#:            `*MMMMMMMMMMMMMMMMMMMMb#}'  `? \r\n");
+	welcome += RPL_MOTD(" :      ]MMH#             ""*""""*#MMMMMMMMMMMMM'    - \r\n");
+	welcome += RPL_MOTD(" :      MMMMMb_                   |MMMMMMMMMMMP'     : \r\n");
+	welcome += RPL_MOTD(" :      HMMMMMMMHo                 `MMMMMMMMMT       . \r\n");
+	welcome += RPL_MOTD(" :      ?MMMMMMMMP                  9MMMMMMMM}       - \r\n");
+	welcome += RPL_MOTD(" :      -?MMMMMMM                  |MMMMMMMMM?,d-    ' \r\n");
+	welcome += RPL_MOTD(" :       :|MMMMMM-                 `MMMMMMMT .M|.   : \r\n");
+	welcome += RPL_MOTD(" :        .9MMM[                    &MMMMM*' `'    . \r\n");
+	welcome += RPL_MOTD(" :         :9MMk                    `MMM#'        - \r\n");
+	welcome += RPL_MOTD(" :           &Ml                     `          .- \r\n");
+	welcome += RPL_MOTD(" :            `&.                             . \r\n");
+	welcome += RPL_MOTD(" :              `~,   .                     ./ \r\n");
+	welcome += RPL_MOTD(" :                  . _                  .- \r\n");
+	welcome += RPL_MOTD(" :                    '`--._,dd###pp=""' \r\n");
+	welcome += RPL_MOTD(" : \r\n");
+	welcome += RPL_MOTD(" :         ███████╗████████╗    ██╗██████╗  ██████╗\r\n");
+	welcome += RPL_MOTD(" :         ██╔════╝╚══██╔══╝    ██║██╔══██╗██╔════╝\r\n");
+	welcome += RPL_MOTD(" :         █████╗     ██║       ██║██████╔╝██║     \r\n");
+	welcome += RPL_MOTD(" :         ██╔══╝     ██║       ██║██╔══██╗██║     \r\n");
+	welcome += RPL_MOTD(" :         ██║        ██║ ████╗ ██║██║  ██║╚██████╗\r\n");
+	welcome += RPL_MOTD(" :         ╚═╝        ╚═╝  ╚══╝ ╚═╝╚═╝  ╚═╝ ╚═════╝\r\n");
+	welcome += RPL_MOTD(" :██╗  ██╗██████╗ ██████╗  ██████╗ ██████╗ ████████╗ ██████╗ \r\n");
+	welcome += RPL_MOTD(" :██║  ██║╚════██╗██╔══██╗██╔═══██╗██╔══██╗╚══██╔══╝██╔═══██╗\r\n");
+	welcome += RPL_MOTD(" :███████║ █████╔╝██████╔╝██║   ██║██████╔╝   ██║   ██║   ██║\r\n");
+	welcome += RPL_MOTD(" :╚════██║██╔═══╝ ██╔═══╝ ██║   ██║██╔══██╗   ██║   ██║   ██║\r\n");
+	welcome += RPL_MOTD(" :     ██║███████╗██║     ╚██████╔╝██║  ██║   ██║   ╚██████╔╝\r\n");
+	welcome += RPL_MOTD(" :     ╚═╝╚══════╝╚═╝      ╚═════╝ ╚═╝  ╚═╝   ╚═╝    ╚═════╝ \r\n");
+	welcome += RPL_MOTD(" :Project by:  ialves-m  lpicoli  jhogonca\r\n");
+	welcome += RPL_ENDOFMOTD();
 	if (send(clientSocket, welcome.c_str(), welcome.length(), 0) == -1)
-	{
 		std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
-	}
 }
 
 void Server::updateChannel(Client client, std::string channelName)

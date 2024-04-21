@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   PART.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/20 13:59:01 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/21 06:42:37 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,32 +23,16 @@ void Server::PART(std::string message, Client &client)
 		std::map<std::string, Client>::iterator us = users.begin();
 		while (us != users.end())
 		{
-			if (us->second.getNick() == client.getNick())
-			{
-				SEND(client.getSocket(), RPL_PART(channelName, getMsgToSend(message)), "Erro ao enviar mensagem de saída de canal.");
-				users.erase(us);
-				if (it->second.getNbrUsers() == 0)
-				{
-					std::string closeChannel = ":" + getHostname() + " PART " + getInputCmd(message, "PART");
-					if (send(client.getSocket(), closeChannel.c_str(), closeChannel.length(), 0) == -1)
-					{
-						std::cerr << "Erro ao enviar mensagem de fecho de canal." << std::endl;
-					}
-					else
-					{
-						channels.erase(it);
-						std::cout << closeChannel << std::endl;
-					}
-				}
-				else
-					updateChannel(client, channelName);
-				break;
-			}
+			SEND(us->second.getSocket(), RPL_PART(channelName, this->getInput()[2]), "Erro ao enviar mensagem de saída de canal.");
+			users.erase(us);
+			if (it->second.getNbrUsers() == 0)
+				channels.erase(it);
+			else
+				updateChannel(client, channelName);
+			break;
 			++us;
 		}
 	}
 	else
-	{
 		std::cout << "Canal não encontrado." << std::endl;
-	}
 }
