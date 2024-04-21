@@ -20,7 +20,7 @@
  */
 class Client {
 
-	private:
+	protected:
 		std::string _nick; 				/* The nickname of the client. */
 		std::string _serverPassword; 	/* The password for connecting to the server. */
 		std::string _tmpPassword; 		/* Temporary password for authentication. */
@@ -32,6 +32,8 @@ class Client {
 		 * @brief Default constructor for the Client class.
 		 */
 		Client(void);
+
+		virtual ~Client(void);
 
 		/**
 		 * @brief Get the nickname of the client.
@@ -117,6 +119,8 @@ class Client {
 		 * @param hostname The hostname of the server.
 		 */
 		void getClientLoginData(std::string message, std::map<std::string, Client> globalUsers, std::string hostname);
+		
+		virtual void dummy() {}
 };
 
 #endif

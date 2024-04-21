@@ -46,6 +46,7 @@
 #include "Channel.hpp"
 #include "Utils.hpp"
 #include "Macros.hpp"
+#include "Bot.hpp"
 #include <exception>
 
 std::string getCurrentDateTime();

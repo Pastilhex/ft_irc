@@ -13,6 +13,7 @@
 #include "../includes/ircserv.hpp"
 
 Client::Client(void) {}
+Client::~Client(void){}
 
 void Client::setNewClient(Client &client)
 {

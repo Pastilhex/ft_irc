@@ -321,7 +321,7 @@ public:
 	 * @param fds The vector of file descriptors.
 	 * @param serverSocket The server socket.
 	 */
-	void createNewClient(std::vector<pollfd> &fds, const int &serverSocket);
+	Client* createNewClient(std::vector<pollfd> &fds, const int &serverSocket);
 
 	/**
 	 * @brief Trims the input command string and splits it into a vector of strings.
