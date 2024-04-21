@@ -3,16 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   PRIVMSG.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/21 16:20:08 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/21 20:26:00 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/ircserv.hpp"
 
-//:Lenovo!ivo@ivo-Yoga-7-14ITL5 PRIVMSG ivo :DCC SEND microshell.c 2130706433 35159 1512
 void Server::PRIVMSG(std::string message, Client client)
 {
 	std::vector<std::string> input = getInput();
@@ -36,8 +35,8 @@ void Server::PRIVMSG(std::string message, Client client)
 		std::map<std::string, Client>::iterator user_it = users.find(input[1]);
 		if (user_it != users.end())
 		{
-			if (isDCC_SEND(input[2]))
-				DCC_ACCEPT(input[2]);
+			if (!isDCC_SEND(input[2], client.getNick()))
+				return;
 			SEND(user_it->second.getSocket(), RPL_PRIVMSG(channelName, msgToSend), "Error sending message to user.");
 		}
 		else
@@ -70,14 +69,14 @@ std::string getMessage(std::string message)
 	return message.substr(begin, end - begin);
 }
 
-std::vector<std::string> Server::isDCC_SEND(std::string message)
+bool Server::isDCC_SEND(std::string message, std::string sender)
 {
 	if (message.find("DCC SEND") != std::string::npos)
 	{
-		std::vector<std::string> words;
-		std::string word;
 		int begin = message.find('\001');
 		int end = message.find_last_of('\001');
+		std::vector<std::string> words;
+		std::string word;
 		std::string trimmed = message.substr(begin, end - begin + 1);
 		std::stringstream ss(trimmed);
 		int i = 0;
@@ -91,95 +90,54 @@ std::vector<std::string> Server::isDCC_SEND(std::string message)
 				words.push_back(word);
 			}
 		}
-		if (words[0] != "DCC")
-			return;
-		if (words[1] != "SEND")
-			return;
-		if (words[2].empty())
-			return
-		return words;
+		std::string file = words[2];
+		std::string ip = words[3];
+		std::string port = words[4];
+		if (words[0] != "DCC" && words[1] != "SEND" && !isValidIPAddress(ip) && !isValidPort(port))
+			return false;
+		DCC_ACCEPT(sender, file, ip, port);
+		return true;
 	}
-	return;
+	return false;
 }
 
-void Server::DCC_ACCEPT(std::vector<std::string> words)
+void Server::DCC_ACCEPT(std::string sender, std::string file, std::string ip, std::string port)
 {
-	
+	std::map<std::string, Client> &users = getGlobalUsers();
+	std::map<std::string, Client>::iterator user_it = users.find(sender);
+	SEND(user_it->second.getSocket(), RPL_DCC_ACCEPT(sender, file, ip, port), "Error sending DCC ACCEPT message to user.");
 }
 
-bool isValidIPAddress(unsigned int ip)
+bool Server::isValidIPAddress(std::string word)
 {
-    // Converter o número inteiro para uma string
-    std::ostringstream oss;
-    oss << ((ip >> 24) & 0xFF) << '.' << ((ip >> 16) & 0xFF) << '.' << ((ip >> 8) & 0xFF) << '.' << (ip & 0xFF);
-    std::string ipString = oss.str();
+	char *endptr;
+	unsigned int ip = static_cast<unsigned int>(std::strtoul(word.c_str(), &endptr, 10));
+	// Converter o número inteiro para uma string
+	std::ostringstream oss;
+	oss << ((ip >> 24) & 0xFF) << '.' << ((ip >> 16) & 0xFF) << '.' << ((ip >> 8) & 0xFF) << '.' << (ip & 0xFF);
+	std::string ipString = oss.str();
 
-    // Verificar se cada octeto está no intervalo válido (0 a 255)
-    std::istringstream iss(ipString);
-    int octet;
-    char dot;
-    for (int i = 0; i < 4; ++i) {
-        iss >> octet >> dot;
-        if (octet < 0 || octet > 255 || dot != '.') {
-            return false;
-        }
-    }
-    // Verificar se não há caracteres adicionais após o último octeto
-    char c;
-    if (iss >> c) {
-        return false;
-    }
-    return true;
+	// Verificar se cada octeto está no intervalo válido (0 a 255)
+	std::istringstream iss(ipString);
+	int octet;
+	char dot;
+	for (int i = 0; i < 4; ++i) {
+		iss >> octet >> dot;
+		if (octet < 0 || octet > 255 || dot != '.') {
+			return false;
+		}
+	}
+	// Verificar se não há caracteres adicionais após o último octeto
+	char c;
+	if (iss >> c) {
+		return false;
+	}
+	return true;
 }
 
-bool isPort(int port)
+bool Server::isValidPort(std::string word)
 {
+	char *endptr;
+	unsigned int port = static_cast<unsigned int>(std::strtoul(word.c_str(), &endptr, 10));
     return port == 6667;
 }
-
-// char buffer[1024]; // Buffer para armazenar os dados recebidos
-//     int bytesRead;
-
-//     // Loop para receber dados até que a conexão seja encerrada
-//     while ((bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0)) > 0) {
-//         // Processar os dados recebidos, por exemplo, salvar em um arquivo local
-//         if (!saveDataToFile("arquivo_recebido.txt", buffer, bytesRead)) {
-//             std::cerr << "Erro ao salvar os dados recebidos em um arquivo." << std::endl;
-//             return 1;
-//         }
-//     }
-
-//     if (bytesRead == 0) {
-//         std::cout << "Conexão encerrada pelo cliente." << std::endl;
-//     } else if (bytesRead == -1) {
-//         std::cerr << "Erro ao receber dados do cliente." << std::endl;
-//         return 1;
-//     }
-
-// // Função para aceitar uma conexão DCC
-// void acceptDCC(const std::string& sender, const std::string& fileName, int fileSize) {
-//     // Verificar se a conexão está sendo aceita do remetente esperado
-//     if (sender == "remetente_esperado") {
-//         // Verificar se o tamanho do arquivo é razoável
-//         if (fileSize > 0 && fileSize < 1000000) { // Exemplo de verificação de tamanho
-//             std::cout << "Aceitando conexão DCC de " << sender << " para o arquivo " << fileName << std::endl;
-//             // Aqui você pode iniciar a transferência do arquivo
-//         } else {
-//             std::cout << "Tamanho do arquivo inválido." << std::endl;
-//         }
-//     } else {
-//         std::cout << "Conexão DCC não autorizada." << std::endl;
-//     }
-// }
-
-// int main() {
-//     // Simulando uma mensagem DCC recebida
-//     std::string sender = "remetente_esperado";
-//     std::string fileName = "example.txt";
-//     int fileSize = 500000; // Exemplo de tamanho de arquivo
-
-//     // Chamando a função para aceitar a conexão DCC
-//     acceptDCC(sender, fileName, fileSize);
-
-//     return 0;
-// }

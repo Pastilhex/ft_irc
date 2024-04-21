@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Macros.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 22:22:32 by jhogonca          #+#    #+#             */
-/*   Updated: 2024/04/21 08:24:50 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/21 18:16:54 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -295,6 +295,13 @@
 #define RPL_PRIVMSG(channel, message) \
 	(USER_ID(NICKNAME, USERNAME) + " PRIVMSG " + ((channel == "") ? input[1] : channel) + " :" + message + "\r\n")
 
+//:receiver!user@host PRIVMSG sender :DCC ACCEPT microshell.c 192.168.1.100 12345
+#define RPL_DCC_ACCEPT(sender, file, ip, port) \
+	(std::string(HOST) + " PRIVMSG " + sender + " :DCC ACCEPT " + file + " " + ip + " " + port + "\r\n")
+
+
+
+
 // TOPIC
 
 /* :localhost 332 user123 #channel :topic */
@@ -310,4 +317,5 @@
 /* :localhost 462 user123 :You may not reregister. */
 #define ERR_ALREADYREGISTERED(client) \
 	(std::string(HOST) + " 462 " + client + " :You may not reregister.\r\n")
+
 #endif

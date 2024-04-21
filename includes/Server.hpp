@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/21 16:15:57 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/21 18:27:06 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -451,8 +451,10 @@ public:
 	void handleUserLimitMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag);
 
 	void login(Client &client, std::vector<std::string> splitMessage);
-	std::vector<std::string> isDCC_SEND(std::string message);
-	void DCC_ACCEPT(std::vector<std::string> words);
+	bool isDCC_SEND(std::string message, std::string sender);
+	void DCC_ACCEPT(std::string sender, std::string file, std::string ip, std::string port);
+	bool isValidIPAddress(std::string word);
+	bool isValidPort(std::string word);
 
 };
 
