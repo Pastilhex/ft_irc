@@ -65,6 +65,11 @@ void Server::setNewChannel(std::string channel_name, Channel channel)
 	_channels.insert(std::make_pair(channel_name, channel));
 }
 
+void Server::setBot(Client bot)
+{
+	this->_bot = bot;
+}
+
 void Server::setSocket(int newSocket)
 {
 	this->_socket = newSocket;
@@ -167,6 +172,11 @@ std::string Server::getAddressIP(void)
 		std::cerr << "Nenhum endereço IP encontrado para o host local" << std::endl;
 	}
 	return ipAddress;
+}
+
+Client Server::getBot()
+{
+	return this->_bot;
 }
 
 bool Server::addClientToGlobalUsers(Client client)

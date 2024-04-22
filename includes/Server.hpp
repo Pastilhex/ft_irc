@@ -14,8 +14,9 @@
 #define _SERVER_
 
 #include "ircserv.hpp"
+#include "Client.hpp"
 class Channel;
-class Client;
+//class Client;
 
 /**
  * @brief The Server class represents an IRC server.
@@ -36,6 +37,7 @@ private:
 	std::map<std::string, Client> _globalUsers; /* The map of global users, where the key is the client nickname and the value is the Client object. */
 	std::vector<std::string> _input;			/* The vector of input commands received by the server. */
 	pollfd serverPoll;							/* The pollfd structure used for polling server events. */
+	Client _bot;
 
 public:
 	/**
@@ -62,6 +64,13 @@ public:
 	 * @return The address structure associated with the server.
 	 */
 	struct sockaddr_in getAddress(void);
+
+	/**
+	 * @brief Sets the bot client for the server.
+	 * 
+	 * @param bot The bot client to set.
+	 */
+	void setBot(Client bot);
 
 	/**
 	 * @brief Returns the hostname of the server.
@@ -91,6 +100,8 @@ public:
 	 */
 	std::map<std::string, Client> &getGlobalUsers(void);
 
+	Client getBot(void);
+	
 	/**
 	 * @brief Returns the IP address of the server.
 	 *

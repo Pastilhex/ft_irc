@@ -19,8 +19,8 @@ void Bot::welcomeNewClient(Client client) {
     
     std::cout << "Welcome to the server!" << client.getNick() << std::endl;
 
-    std::string msg = ":" + BOT_NICKNAME + "!" + BOT_NICKNAME + "@" + server.getHostname() + " PRIVMSG " + BOT_NICKNAME + " :" + "Welcome to the server, " + client.getNick() + "!\r\n";
-    send(server.getSocket(), msg.c_str(), msg.length(), 0);
+    //std::string msg = ":" + BOT_NICKNAME + "!" + BOT_NICKNAME + "@" + server.getHostname() + " PRIVMSG " + BOT_NICKNAME + " :" + "Welcome to the server, " + client.getNick() + "!\r\n";
+    //send(server.getSocket(), msg.c_str(), msg.length(), 0);
 }
 
 

@@ -22,9 +22,11 @@ void Server::connectClient(const int &serverSocket)
 
 	fds.push_back(this->serverPoll);
 
-	Client *bot = new Bot("Marvin", this->getPassword(), *this);
+	Client *bot = new Bot("b", this->getPassword(), *this);
+	bot->setSocket(createSocket());
 	this->addClientToGlobalUsers(*bot);
 	Bot *botPtr = dynamic_cast<Bot*>(bot);
+	this->setBot(*bot);
 
 	while (true)
 	{
