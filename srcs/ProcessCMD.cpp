@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ProcessCMD.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/21 08:42:37 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/23 13:02:09 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void Server::processCMD(Client &client, std::vector<pollfd> &fds, char *buffer, int bytesRead, int i)
 {
 	std::string message(buffer, bytesRead);
-	
+
 	std::vector<std::string> splitMessage = Utils::splitVector(message, "\n");
 
 	while (splitMessage.size())
@@ -24,50 +24,52 @@ void Server::processCMD(Client &client, std::vector<pollfd> &fds, char *buffer, 
 			return;
 		else
 			setInput(splitMessage[0]);
-		std::cout << RED << "<< " << RED + splitMessage[0] << RESET << std::endl;
+
+		if (!(splitMessage[0].find("PING") != std::string::npos))
+			std::cout << RED << "<< " << RED + splitMessage[0] << RESET << std::endl;
 
 		if (splitMessage[0].find("CAP LS") != std::string::npos)
 			SEND(client.getSocket(), ":* CAP * LS :42Porto Ft_IRCv1.0\r\n", "Error sending CAP LS message to client");
-		
+
 		else if (splitMessage[0].find("CAP END") != std::string::npos)
 			SEND(fds[i].fd, ":* CAP * END\r\n", "Error sending CAP LS message to client");
-		
+
 		else if (isCMD(splitMessage[0], "PING"))
 			SEND(client.getSocket(), RPL_PONG(client.getNick(), client.getUsername(), getInput()[1]), "Error sending PONG message");
-		
+
 		else if (isCMD(splitMessage[0], "PRIVMSG"))
 			PRIVMSG(message, client);
-		
+
 		else if (isCMD(splitMessage[0], "NICK") || isCMD(splitMessage[0], "USER ") || isCMD(splitMessage[0], "PASS"))
 			login(client, splitMessage);
-		
+
 		else if (isCMD(splitMessage[0], "MODE"))
 			MODE(client);
-		
+
 		else if (isCMD(splitMessage[0], "WHO"))
 			WHO(fds[i].fd, client);
-		
+
 		else if (isCMD(splitMessage[0], "LIST"))
 			LIST(fds[i].fd, client);
-		
+
 		else if (isCMD(splitMessage[0], "JOIN"))
 			JOIN(fds[i].fd, client);
-		
+
 		else if (isCMD(splitMessage[0], "PART"))
 			PART(message, client);
-		
+
 		else if (splitMessage[0].find("QUIT") != std::string::npos)
 			QUIT(fds, i, client);
-		
+
 		else if (isCMD(splitMessage[0], "KICK"))
 			KICK(message, client);
-		
+
 		else if (isCMD(splitMessage[0], "TOPIC"))
 			TOPIC(client);
-		
+
 		else if (isCMD(splitMessage[0], "INVITE"))
 			INVITE(client);
-		
+
 		splitMessage.erase(splitMessage.begin());
 	}
 }

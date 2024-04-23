@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/21 09:39:43 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/23 11:38:15 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -450,7 +450,7 @@ public:
 	 * @param client The client object.
 	 * @return The nickname of the operator.
 	 */
-	std::string handleOperatorMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag, Client client);
+	std::string handleOperatorMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeOption, char modeFlag, Client client);
 
 	/**
 	 * @brief Handles the user limit mode of a channel.
@@ -459,10 +459,13 @@ public:
 	 * @param it The iterator pointing to the channel in the map of channels.
 	 * @param modeFlag The mode flag.
 	 */
-	void handleUserLimitMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag);
+	void handleUserLimitMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag, Client client);
 
 	void login(Client &client, std::vector<std::string> splitMessage);
-	bool isDCC_SEND(std::string message);
+	bool isDCC_SEND(std::string message, std::string sender);
+	void DCC_ACCEPT(std::string sender, std::string file, std::string ip, std::string port);
+	bool isValidIPAddress(std::string word);
+	bool isValidPort(std::string word);
 
 };
 

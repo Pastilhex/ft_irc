@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:41:57 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/16 17:49:04 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/23 09:52:58 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,18 @@ int Channel::getUserLimit(void)
 
 std::vector<char> Channel::getModes(void)
 {
-	return this->_modes;	
+	return this->_modes;
+}
+
+bool Channel::isNewMode(char mode)
+{
+	std::vector<char> modes = this->getModes();
+	for (size_t i = 0; i < modes.size(); i++)
+	{
+		if (modes[i] == mode)
+			return false;
+	}
+	return true;
 }
 
 std::vector<std::string> &Channel::getInvitedUsers(void)

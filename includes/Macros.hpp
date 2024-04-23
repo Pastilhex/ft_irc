@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Macros.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 22:22:32 by jhogonca          #+#    #+#             */
-/*   Updated: 2024/04/21 08:24:50 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/23 12:35:46 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 #define HOST ":" + getHostname()
 
 /* Represents an unlimited number of users in a channel */
-#define UNLIMITED_USERS -1
+#define UNLIMITED_USERS 9999
 
 /* Retrieves the nickname of the client
  * Example: nick */
@@ -154,15 +154,15 @@
 
 /* :localhost MODE #channel1 +m */
 #define MODE_CHANNELMSG(channel, mode) \
-	(std::string(HOST) + "MODE #" + channel + " " + mode + "\r\n")
+	(std::string(HOST) + " MODE " + channel + " " + mode + "\r\n")
 
 /* :localhost MODE #channel1 +l 10 */
-#define MODE_CHANNELMSGWITHPARAM(channel, mode, param) \
-	(std::string(HOST) + "MODE #" + channel + " " + mode + " " + param + "\r\n")
+#define MODE_CHANNELMSGWITHPARAM(client, channel, mode, param) \
+	(std::string(HOST) + " 324 " + client + " " + channel + " " + mode + " " + param + "\r\n")
 
 /* :localhost 324 user123 #channel1 +m */
 #define RPL_CHANNELMODEIS(client, channel, mode) \
-	(std::string(HOST) + " 324 " + client + " #" + channel + " " + mode + "\r\n")
+	(std::string(HOST) + " 324 " + client + " " + channel + " " + mode + "\r\n")
 
 /* :localhost 324 user123 #channel1 +k password */
 #define RPL_CHANNELMODEISWITHKEY(client, channel, mode, password) \
@@ -264,7 +264,7 @@
 // PASS
 /* :localhost 464 user123 :Server password incorrect. \r\n */
 #define ERR_PASSWDMISMATCH(client) \
-	(std::string(HOST) + " 464 " + client.getNick() + " :Server password incorrect.\r\n")
+	(std::string(HOST) + " 464 " + client.getNick() + " :Channel password incorrect.\r\n")
 
 // PING :pastilhex!ivo@localhost PONG :LAG1713199744574
 #define RPL_PONG(nickname, username, token) (USER_ID(nickname, username) + " PONG :" + token + "\r\n")
@@ -298,6 +298,13 @@
 #define RPL_PRIVMSG(channel, message) \
 	(USER_ID(NICKNAME, USERNAME) + " PRIVMSG " + ((channel == "") ? input[1] : channel) + " :" + message + "\r\n")
 
+//:receiver!user@host PRIVMSG sender :DCC ACCEPT microshell.c 192.168.1.100 12345
+#define RPL_DCC_ACCEPT(sender, file, ip, port) \
+	(std::string(HOST) + " PRIVMSG " + sender + " :DCC ACCEPT " + file + " " + ip + " " + port + "\r\n")
+
+
+
+
 // TOPIC
 
 /* :localhost 332 user123 #channel :topic */
@@ -313,4 +320,5 @@
 /* :localhost 462 user123 :You may not reregister. */
 #define ERR_ALREADYREGISTERED(client) \
 	(std::string(HOST) + " 462 " + client + " :You may not reregister.\r\n")
+
 #endif

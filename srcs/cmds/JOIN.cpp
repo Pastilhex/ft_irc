@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   JOIN.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/20 18:10:07 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/22 23:43:20 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 void Server::JOIN(int clientSocket, Client &client)
 {
+	bool canJoin = true;
 	std::vector<std::string> input = getInput();
 	std::vector<std::string>::iterator inputIterator = input.begin();
 	std::string channelName;
@@ -28,22 +29,20 @@ void Server::JOIN(int clientSocket, Client &client)
 			if (it != channels.end())
 			{
 				if(it->second.getUsers().size() >= (size_t)it->second.getUserLimit())
-					return (SEND(client.getSocket(), ERR_CHANNELISFULL(client.getNick(), it->first), "Error sending JOIN message with mode +l advise to user"));
+				{
+					SEND(client.getSocket(), ERR_CHANNELISFULL(client.getNick(), it->first), "Error sending JOIN message with mode +l advise to user");
+					canJoin = false;
+				}
 				std::vector<char> mode = it->second.getModes();
 				std::vector<char>::iterator mode_it = mode.begin();
 				for (; mode_it != mode.end(); ++mode_it)
 				{
 					if (*mode_it == 'i')
 					{
-						if (isUserInvited(client.getNick(), channelName))
+						if (!isUserInvited(client.getNick(), channelName))
 						{
-							if (!Utils::isOperator(it->second, client.getNick())) // operadores nunca saem da lista de convidados do canal
-								it->second.RemoveInvited(client.getNick());
-							continue;
-						}
-						else
-						{
-							return (SEND(client.getSocket(), ERR_INVITEONLYCHAN(client, channelName), "Error sending JOIN message with mode +i advise to user"));
+							SEND(client.getSocket(), ERR_INVITEONLYCHAN(client, channelName), "Error sending JOIN message with mode +i advise to user");
+							canJoin = false;
 						}
 					}
 					if (*mode_it == 'k')
@@ -51,12 +50,14 @@ void Server::JOIN(int clientSocket, Client &client)
 						if (input[2].empty() || input[2] != getPassword())
 						{
 							SEND(client.getSocket(), ERR_PASSWDMISMATCH(client), "Error sending JOIN message with mode +k advise to user");
-							return;
+							canJoin = false;
 						}
 					}
 				}
+				if (!Utils::isOperator(it->second, client.getNick()) && canJoin)
+					it->second.RemoveInvited(client.getNick());
 			}
-			if ((*inputIterator)[0] == '#' || (*inputIterator)[0] == '&')
+			if (((*inputIterator)[0] == '#' || (*inputIterator)[0] == '&') && canJoin)
 			{
 				for (it = channels.begin(); it != channels.end(); ++it)
 				{

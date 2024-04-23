@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   WHO.cpp.cpp                                        :+:      :+:    :+:   */
+/*   WHO.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/20 13:59:13 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/23 14:14:17 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void Server::WHO(int clientSocket, const Client client)
 				if ((*op_it).find(nickname, 1) != std::string::npos)
 				{
 					nickname = *op_it;
-					break; // Interrompe o loop assim que encontrar uma correspondência
+					break;
 				}
 				++op_it;
 			}
