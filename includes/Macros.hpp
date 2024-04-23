@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Macros.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 22:22:32 by jhogonca          #+#    #+#             */
-/*   Updated: 2024/04/21 18:16:54 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/22 23:48:40 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 #define HOST ":" + getHostname()
 
 /* Represents an unlimited number of users in a channel */
-#define UNLIMITED_USERS -1
+#define UNLIMITED_USERS 9999
 
 /* Retrieves the nickname of the client
  * Example: nick */

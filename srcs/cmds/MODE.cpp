@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   MODE.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:36:38 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/20 13:58:58 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/22 23:57:21 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,24 +50,24 @@ void Server::MODE(Client client)
 	{
 		msg = handleOperatorMode(mode_cmd, it, modeFlag, client);
 	}
-	else if (modeOption == 'i' && mode_cmd.size() == 3)
+	if (modeOption == 'i' && mode_cmd.size() == 3)
 	{
 		handlePrivateAccessMode(it, modeOption, modeFlag, client);
 	}
-	else if (modeOption == 't' && mode_cmd.size() == 3)
+	if (modeOption == 't' && mode_cmd.size() == 3)
 	{
 		handleRestrictedTopicMode(it, modeFlag, client, modeOption);
 	}
-	else if (modeOption == 'k')
+	if (modeOption == 'k')
 	{
 		handlePasswordMode(mode_cmd, it, modeFlag, client, modeOption);
 	}
-	else if (modeOption == 'l')
+	if (modeOption == 'l')
 	{
 		handleUserLimitMode(mode_cmd, it, modeFlag);
 	}
-	else if(Utils::isValidFlag(modeOption)) //for the cas the flag is valid but with the wrong number of arguments
-		return;
+	// if(Utils::isValidFlag(modeOption)) //for the cas the flag is valid but with the wrong number of arguments
+	// 	return;
 }
 
 std::string Server::handleOperatorMode(const std::vector<std::string> &mode_cmd, std::map<std::string, Channel>::iterator it, char modeFlag, Client client)
@@ -191,6 +191,7 @@ void Server::handleUserLimitMode(const std::vector<std::string> &mode_cmd, std::
 				return (Utils::logMessage("You can't set the same user limit", 0), void());
 			it->second.setUserLimit(roundedLimit);
 			it->second.setNewMode('l');
+			SEND(it->second.getSocket(),RPL_CHANNELMODEIS(), "Error sending MODE message");
 			return (Utils::logMessage("New user limit is now set", 0), void());
 		}
 		catch (const std::exception &e)
