@@ -74,6 +74,7 @@ void Server::JOIN(int clientSocket, Client &client)
 				{
 					bool state = (input[1][0] == '#') ? false : true;
 					Channel channel = Channel(channelName, state);
+					//channel.setNewUser(getBot());
 					channel.setNewUser(client);
 					channel.AddOperator(client.getNick());
 					setNewChannel(channelName, channel);

@@ -19,12 +19,15 @@ void Server::INVITE(Client client)
 	std::string invitedUser = getInput()[1];
 	std::string channel = getInput()[2];
 
+	std::cout << "INVITE command" << std::endl;
+	std::cout << "Invited user: " << invitedUser << std::endl;
+
 	if (getInput().size() != 3)
 		return;
 
 	const std::map<std::string, Channel>::iterator it = getChannels().find(channel);
 
-	if (!it->second.getInvisibility())
+	if(!it->second.getInvisibility() && invitedUser != this->getBot().getNick())
 		return;
 
 	if (it == getChannels().end())
@@ -61,9 +64,22 @@ void Server::INVITE(Client client)
 		}
 		++ch;
 	}
-
 	if (userAvailable)
+	{
 		ch->second.AddInvited(invitedUser);
+		if(invitedUser == this->getBot().getNick())
+		{
+			Client bot = this->getBot();
+			it->second.setNewUser(bot); // Adicione esta linha se 'setNewUser' não estiver funcionando
+			std::cout << bot.getNick() << " entrou no canal " << it->first << std::endl;
+			SEND(client.getSocket(), RPL_JOIN(bot, it->first), "Erro ao entrar no canal.");
+			MODE(bot);
+			WHO(bot.getSocket(), client);
+			std::cout << client.getSocket() << std::endl;
+			std::cout << bot.getSocket() << std::endl;
+			return;
+		}
+	}
 	else
 		return (SEND(client.getSocket(), ERR_NOSUCHNICK(client, invitedUser), "Error sending msg ERR_NOSUCHNICK"));
 
