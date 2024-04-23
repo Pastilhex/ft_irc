@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/20 13:58:55 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/23 14:12:03 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,14 @@ void Server::LIST(int clientSocket, Client &client)
 	{
 		std::string channelName = it->first;
 		size_t pos = channelName.find('\n');
+
 		if (pos != std::string::npos)
-		{
 			channelName.erase(pos, 1);
-		}
+
 		int nbrUser = it->second.getNbrUsers();
-		char nbrUserStr[20];				// Tamanho suficiente para armazenar um inteiro
-		sprintf(nbrUserStr, "%d", nbrUser); // Formatar o inteiro como uma string
+		char nbrUserStr[20];
+
+		sprintf(nbrUserStr, "%d", nbrUser);
 		std::string channel = RPL_LIST(client, nbrUserStr, it);
 		channel += RPL_LISTEND(client);
 		SEND(clientSocket, channel, "Error updating LIST");

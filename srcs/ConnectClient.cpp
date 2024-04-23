@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConnectClient.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/21 05:20:27 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/23 12:55:53 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,10 @@
 void Server::connectClient(const int &serverSocket)
 {
 	std::vector<pollfd> fds;
-
 	this->serverPoll.fd = serverSocket;
 	this->serverPoll.events = POLLIN;
 	this->serverPoll.revents = 0;
-
 	fds.push_back(this->serverPoll);
-
 	while (true)
 	{
 		int activity = poll(fds.data(), fds.size(), -1);
@@ -36,7 +33,6 @@ void Server::connectClient(const int &serverSocket)
 			if (fds[i].revents & POLLIN)
 			{
 				Client client;
-
 				std::map<std::string, Client>::iterator it_begin = _globalUsers.begin();
 				std::map<std::string, Client>::iterator it_end = _globalUsers.end();
 				for (std::map<std::string, Client>::iterator &it = it_begin; it != it_end; ++it)
@@ -69,14 +65,11 @@ void Server::connectClient(const int &serverSocket)
 
 void Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
 {
-	// verifica se a ligação estabelicida através do poll() é para o server(novo client) ou para um client(client já conectado)
 	if (fds[0].revents & POLLIN)
 	{
 		Client client;
 		struct sockaddr_in clientAddress;
 		socklen_t clientAddressSize = sizeof(clientAddress);
-
-		// declaração de um novo client_fd (struct do tipo pollfd)
 		client.setPoll_fd(accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressSize));
 		if (client.getSocket() == -1)
 		{
@@ -86,11 +79,7 @@ void Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
 		}
 		client.setPoll_events();
 		client.setPoll_revents();
-
-		// adicionamos o novo client_fd ao vector<pollfd>
 		fds.push_back(client.getClientPoll());
-
-		// Adiciona o client à lista global de usuarios, mas vazio pq os dados serão preenchidos no loop processCMD
 		if (!addClientToGlobalUsers(client))
 		{
 			if (client.getSocket() == -1)

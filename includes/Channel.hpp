@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/15 07:45:11 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/23 09:52:27 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,8 @@ public:
 	 * @return The modes of the channel.
 	 */
 	std::vector<char> getModes(void);
+	
+	bool isNewMode(char mode);
 
 	/**
 	 * @brief Gets the map of users in the channel.

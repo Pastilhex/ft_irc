@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/21 06:20:22 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/23 12:58:10 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,6 @@ Server::Server(void)
 	this->_socket = 0;
 	this->_hostname = "";
 	this->_password = "";
-	/* this->_address = {};
-	this->_input = {};
-	this->_channels = {};
-	this->serverPoll = {};
-	this->_globalUsers = {}; */
 }
 
 std::map<std::string, Client> &Server::getGlobalUsers(void)
@@ -142,30 +137,19 @@ std::string Server::getAddressIP(void)
 	char hostname[256];
 	char *ipAddress = NULL;
 
-	// Obtém o nome do host local
 	if (gethostname(hostname, sizeof(hostname)) != 0)
-	{
 		std::cerr << "Erro ao obter o nome do host local" << std::endl;
-	}
 
-	// Obtém as informações do host local
 	struct hostent *host = gethostbyname(hostname);
 	if (host == NULL)
-	{
 		std::cerr << "Erro ao obter informações do host local" << std::endl;
-	}
 
-	// Extrai o endereço IPv4 local do host
 	struct in_addr **addr_list = reinterpret_cast<struct in_addr **>(host->h_addr_list);
 	if (addr_list[0] != NULL)
-	{
-		// Converte o endereço IP local para uma string
 		ipAddress = inet_ntoa(*addr_list[0]);
-	}
 	else
-	{
 		std::cerr << "Nenhum endereço IP encontrado para o host local" << std::endl;
-	}
+
 	return ipAddress;
 }
 
@@ -295,11 +279,12 @@ std::string Server::getClientNick(std::string &channelName, std::string &clientN
 
 std::vector<std::string> Server::trimInput(std::string msg)
 {
+	std::vector<std::string> words;
+	std::string word;
+
 	int begin = msg.find_first_not_of(":");
 	int end = msg.find_last_not_of(" \r\n\t:,");
 	std::string trimmed = msg.substr(begin, end - begin + 1);
-
-	// Substituir vírgulas por espaços
 	for (size_t i = 0; i < trimmed.size(); ++i)
 	{
 		if (trimmed[i] == ',')
@@ -308,8 +293,6 @@ std::vector<std::string> Server::trimInput(std::string msg)
 		}
 	}
 
-	std::vector<std::string> words;
-	std::string word;
 	std::stringstream ss(trimmed);
 	while (ss >> word)
 	{
@@ -325,7 +308,6 @@ std::vector<std::string> Server::trimInput(std::string msg)
 		else
 			words.push_back(word);
 	}
-
 	return words;
 }
 
@@ -343,18 +325,15 @@ bool Server::checkInput(std::vector<std::string> input, Client client)
 	cmd.push_back("KICK");
 	cmd.push_back("INVITE");
 	cmd.push_back("PRIVMSG");
-
 	for (size_t i = 0; i < cmd.size(); ++i)
 	{
 		if (input[0] == cmd[i])
 			errorDetected = false;
 	}
-
 	if (input.size() > 1 && input[1][0] != '#' && input[1][0] != '&')
 	{
 		SEND(client.getSocket(), ERR_NOSUCHCHANNEL(client, input[1]), "Error while sending wrong channel");
 		return true;
 	}
-
 	return errorDetected;
 }

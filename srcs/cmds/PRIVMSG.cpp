@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/21 20:26:00 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/23 14:13:41 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void Server::PRIVMSG(std::string message, Client client)
 std::string getMessage(std::string message)
 {
 	int begin = message.find_first_of(":") + 1;
-	int end = message.find_first_of("\r\n", begin); //find_last_not_of returns the position of the last character that is not in the string
+	int end = message.find_first_of("\r\n", begin);
 	return message.substr(begin, end - begin);
 }
 
@@ -112,24 +112,23 @@ bool Server::isValidIPAddress(std::string word)
 {
 	char *endptr;
 	unsigned int ip = static_cast<unsigned int>(std::strtoul(word.c_str(), &endptr, 10));
-	// Converter o número inteiro para uma string
 	std::ostringstream oss;
 	oss << ((ip >> 24) & 0xFF) << '.' << ((ip >> 16) & 0xFF) << '.' << ((ip >> 8) & 0xFF) << '.' << (ip & 0xFF);
 	std::string ipString = oss.str();
-
-	// Verificar se cada octeto está no intervalo válido (0 a 255)
 	std::istringstream iss(ipString);
 	int octet;
 	char dot;
-	for (int i = 0; i < 4; ++i) {
+	for (int i = 0; i < 4; ++i)
+	{
 		iss >> octet >> dot;
-		if (octet < 0 || octet > 255 || dot != '.') {
+		if (octet < 0 || octet > 255 || dot != '.')
+		{
 			return false;
 		}
 	}
-	// Verificar se não há caracteres adicionais após o último octeto
 	char c;
-	if (iss >> c) {
+	if (iss >> c)
+	{
 		return false;
 	}
 	return true;
@@ -139,5 +138,5 @@ bool Server::isValidPort(std::string word)
 {
 	char *endptr;
 	unsigned int port = static_cast<unsigned int>(std::strtoul(word.c_str(), &endptr, 10));
-    return port == 6667;
+	return port == 6667;
 }
