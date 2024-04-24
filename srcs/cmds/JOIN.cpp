@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   JOIN.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/22 23:43:20 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/24 22:49:29 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,6 @@ void Server::JOIN(int clientSocket, Client &client)
 				{
 					bool state = (input[1][0] == '#') ? false : true;
 					Channel channel = Channel(channelName, state);
-					//channel.setNewUser(getBot());
 					channel.setNewUser(client);
 					channel.AddOperator(client.getNick());
 					setNewChannel(channelName, channel);

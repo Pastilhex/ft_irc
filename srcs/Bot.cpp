@@ -15,23 +15,24 @@ Bot::Bot(std::string nick, Server &server) : Client() {
     this->_realname = "Bot";
 }
 
-void Bot::createBot(Server *server, std::string channel)
+Client Bot::createBot(Server *server, std::string channel)
 {
     Client *bot = new Bot("Bot", *server);
     bot->setUsername("Marvin");
 
     std::map<std::string, Channel>::iterator it = server->getChannels().find(channel);
     if (it == server->getChannels().end())
-        return ;
+        return 0;
     std::map<std::string, Client> &users = it->second.getUsers();
     std::map<std::string, Client>::iterator us = users.begin();
     while (us != users.end())
     {
         if (us->second.getRealName() == "Bot")
-            return ;
+            return NULL;
         us++;
     }
     users.insert(std::pair<std::string, Client>("Bot", *bot));
+    return *bot;
 }
 
 void Bot::welcomeNewClient(Client client) {

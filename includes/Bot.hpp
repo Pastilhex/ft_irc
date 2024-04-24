@@ -13,7 +13,7 @@ class Bot : public Client {
 		~Bot() {};
 
 		void welcomeNewClient(Client client);
-		static void createBot(Server *server, std::string channel);
+		static Client createBot(Server *server, std::string channel);
 		//void setServer(Server &server) const;
 		//pomodoro
 		//help 

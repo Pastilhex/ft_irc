@@ -6,7 +6,7 @@
 /*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/24 22:30:50 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/24 22:51:20 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void Server::processCMD(Client &client, std::vector<pollfd> &fds, char *buffer, 
 {
 	std::string message(buffer, bytesRead);
 
-	std::vector<std::string> splitMessage = Utils::splitVector(message, "\n");
+	std::vector<std::string> splitMessage = Utils::splitVector(message, "\r\n");
 
 	while (splitMessage.size())
 	{
