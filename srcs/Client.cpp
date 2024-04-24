@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/20 21:18:13 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/24 21:30:15 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,12 @@ void Client::setNewClient(Client &client)
 	client._serverPassword.clear();
 	client._tmpPassword.clear();
 	client._username.clear();
+	client._realname.clear();
+}
+
+std::string Client::getRealName(void)
+{
+	return this->_realname;
 }
 
  std::string Client::getNick(void) const

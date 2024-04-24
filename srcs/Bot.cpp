@@ -1,19 +1,38 @@
 #include "../includes/Bot.hpp"
 #include "../includes/Macros.hpp"
+#include <sys/socket.h>
 
 
 #define BOT_NICKNAME this->getNick()
 
-Bot::Bot(std::string nick, std::string serverPassword, Server server) : Client(){
+Bot::Bot(std::string nick, Server &server) : Client() {
+    if (nick.empty())
+        this->setNick("Bot");
+    else
+        this->setNick(nick);
     this->server = server;
-    this->_nick = nick;
-    this->_username = nick;
-    this->_serverPassword = serverPassword;
+    this->_username = "Marvin";
+    this->_realname = "Bot";
 }
 
-Bot::~Bot(){}
+void Bot::createBot(Server *server, std::string channel)
+{
+    Client *bot = new Bot("Bot", *server);
+    bot->setUsername("Marvin");
 
-#include <sys/socket.h>
+    std::map<std::string, Channel>::iterator it = server->getChannels().find(channel);
+    if (it == server->getChannels().end())
+        return ;
+    std::map<std::string, Client> &users = it->second.getUsers();
+    std::map<std::string, Client>::iterator us = users.begin();
+    while (us != users.end())
+    {
+        if (us->second.getRealName() == "Bot")
+            return ;
+        us++;
+    }
+    users.insert(std::pair<std::string, Client>("Bot", *bot));
+}
 
 void Bot::welcomeNewClient(Client client) {
     

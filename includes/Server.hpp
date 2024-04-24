@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/23 11:38:15 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/24 21:57:01 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,6 +247,7 @@ public:
 	 */
 	void PRIVMSG(std::string message, Client client);
 
+	bool BOT(Client &client, std::vector<std::string> &input);
 	/**
 	 * @brief Handles a TOPIC command from a client.
 	 *
@@ -332,7 +333,7 @@ public:
 	 * @param fds The vector of file descriptors.
 	 * @param serverSocket The server socket.
 	 */
-	Client* createNewClient(std::vector<pollfd> &fds, const int &serverSocket);
+	void createNewClient(std::vector<pollfd> &fds, const int &serverSocket);
 
 	/**
 	 * @brief Trims the input command string and splits it into a vector of strings.

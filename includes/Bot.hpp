@@ -5,15 +5,17 @@
 
 class Bot : public Client {
 
-    public:
-        Server server;
+	public:
+		Server server;
 
-        Bot(std::string nick, std::string serverPassword, Server server);
-        ~Bot();
+		// Constructor
+		Bot(std::string nick, Server &server);
+		~Bot() {};
 
-        void welcomeNewClient(Client client);
-        //void setServer(Server &server) const;
-        //pomodoro
-        //help 
+		void welcomeNewClient(Client client);
+		static void createBot(Server *server, std::string channel);
+		//void setServer(Server &server) const;
+		//pomodoro
+		//help 
 };
 #endif

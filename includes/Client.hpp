@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/20 21:18:56 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/24 21:29:45 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,9 @@ class Client {
 		std::string _serverPassword; 	/* The password for connecting to the server. */
 		std::string _tmpPassword; 		/* Temporary password for authentication. */
 		std::string _username; 			/* The username of the client. */
+		std::string _realname;			/* The real name of the client. */
 		pollfd clientPoll; 				/* The pollfd structure for polling events on the client's socket. */
+		
 
 	public:
 		/**
@@ -35,6 +37,12 @@ class Client {
 
 		virtual ~Client(void);
 
+		/**
+		 * @brief Get the real name of the client.
+		 * @return The real name of the client.
+		 */
+		std::string getRealName(void);
+		
 		/**
 		 * @brief Get the nickname of the client.
 		 * @return The nickname of the client.

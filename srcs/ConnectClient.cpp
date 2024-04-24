@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConnectClient.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/23 12:55:53 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/24 20:58:12 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,7 @@ void Server::connectClient(const int &serverSocket)
 	this->serverPoll.events = POLLIN;
 	this->serverPoll.revents = 0;
 	fds.push_back(this->serverPoll);
-
-	Client *bot = new Bot("b", this->getPassword(), *this);
-	bot->setSocket(createSocket());
-	this->addClientToGlobalUsers(*bot);
-	Bot *botPtr = dynamic_cast<Bot*>(bot);
-	this->setBot(*bot);
-  
+ 
 	while (true)
 	{
 		int activity = poll(fds.data(), fds.size(), -1);
@@ -35,13 +29,7 @@ void Server::connectClient(const int &serverSocket)
 			break;
 		}
 		
-		Client *client = createNewClient(fds, serverSocket);
-		if (client != NULL)
-		{
-			if(botPtr)
-				botPtr->welcomeNewClient(*client);
-		}
-
+		createNewClient(fds, serverSocket);
 
 		for (size_t i = 1; i < fds.size(); ++i)
 		{
@@ -78,7 +66,7 @@ void Server::connectClient(const int &serverSocket)
 	close(serverSocket);
 }
 
-Client* Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
+void Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
 {
     // Verifica se a ligação estabelecida através do poll() é para o servidor (novo cliente) ou para um cliente já conectado
     if (fds[0].revents & POLLIN)
@@ -95,7 +83,7 @@ Client* Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocke
             std::cerr << "Erro ao aceitar conexão do cliente." << std::endl;
             close(serverSocket);
             delete client; // Libera a memória alocada para o objeto Client
-            return NULL; // Retorna nullptr indicando falha na criação do cliente
+            return ;
         }
         client->setPoll_events();
         client->setPoll_revents();
@@ -111,12 +99,12 @@ Client* Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocke
                 std::cerr << "Erro ao aceitar a conexão com o nick: " + client->getNick() + "." << std::endl;
                 close(serverSocket);
                 delete client; // Libera a memória alocada para o objeto Client
-                return NULL; // Retorna nullptr indicando falha na criação do cliente
+                return; // Retorna nullptr indicando falha na criação do cliente
             }
         }
-        return client; // Retorna o ponteiro para o cliente criado
+        return ; // Retorna o ponteiro para o cliente criado
     }
-    return NULL; // Retorna nullptr se não houver atividade no poll()
+    return ; // Retorna nullptr se não houver atividade no poll()
 	if (fds[0].revents & POLLIN)
 	{
 		Client client;
@@ -138,7 +126,7 @@ Client* Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocke
 			{
 				std::cerr << "Erro ao aceitar a conexão com o nick: " + client.getNick() + "." << std::endl;
 				close(serverSocket);
-				return;
+				return ;
 			}
 		}
 	}

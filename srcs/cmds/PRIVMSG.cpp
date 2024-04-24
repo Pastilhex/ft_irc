@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   PRIVMSG.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/23 14:13:41 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/24 22:28:26 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@ void Server::PRIVMSG(std::string message, Client client)
 	std::string channelName = "";
 	std::string msgToSend = getMessage(message);
 
+	if (msgToSend[0] && msgToSend[0] == '!' && BOT(client, input))
+		return ;
 	while (inputIterator != input.end())
 	{
 		if ((*inputIterator)[0] == '#' || (*inputIterator)[0] == '&')

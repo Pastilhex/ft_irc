@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Broadcasts.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/21 10:14:39 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/24 22:20:26 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,8 @@ void Server::updateChannel(Client client, std::string channelName)
 		std::map<std::string, Client>::iterator user_it = users.begin();
 		while (user_it != users.end())
 		{
-			WHO(user_it->second.getSocket(), user_it->second);
+			if (!(user_it->second.getRealName() == "Bot"))
+				WHO(user_it->second.getSocket(), user_it->second);
 			++user_it;
 		}
 		return;
