@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   PRIVMSG.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/24 22:28:26 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/25 15:55:444 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,38 @@ void Server::PRIVMSG(std::string message, Client client)
 	std::string channelName = "";
 	std::string msgToSend = getMessage(message);
 
-	if (msgToSend[0] && msgToSend[0] == '!' && BOT(client, input))
-		return ;
+	if (msgToSend[0] && msgToSend[0] == '!' && BOT(input)) // Check if the command is a bot command
+	{
+		std::string cmd = msgToSend.substr(1);
+		std::vector<std::string> botCMD = getBotCMD();
+		std::vector<std::string>::const_iterator cmd_it = find(botCMD.begin(), botCMD.end(), cmd);
+		if (cmd_it != botCMD.end())
+		{
+			if (*cmd_it == "create")
+			{
+				std::map<std::string, Channel>::iterator it = getChannels().find(input[1]);
+				if (it != this->getChannels().end())
+				{
+					std::map<std::string, Client> &users = it->second.getUsers();
+					Client *bot = new Bot("Bot", *this);
+					users.insert(std::pair<std::string, Client>("Bot", *bot));
+					updateChannel(*bot, channelName);
+				}
+				return;
+			}
+			else if (*cmd_it == "delete")
+			{
+				// deleteBot();
+			}
+			else if (*cmd_it == "help")
+			{
+				// helpBot();
+			}
+		}
+		
+		return;
+	}
+
 	while (inputIterator != input.end())
 	{
 		if ((*inputIterator)[0] == '#' || (*inputIterator)[0] == '&')
@@ -39,7 +69,8 @@ void Server::PRIVMSG(std::string message, Client client)
 		{
 			if (!isDCC_SEND(input[2], client.getNick()))
 				return;
-			SEND(user_it->second.getSocket(), RPL_PRIVMSG(channelName, msgToSend), "Error sending message to user.");
+			if (user_it->second.getRealName() != "Bot")
+				SEND(user_it->second.getSocket(), RPL_PRIVMSG(channelName, msgToSend), "Error sending message to user.");
 		}
 		else
 			SEND(client.getSocket(), ERR_NOSUCHNICK(client, input[1]), "Error sending message to user.");
@@ -54,7 +85,7 @@ void Server::PRIVMSG(std::string message, Client client)
 			std::map<std::string, Client>::iterator user_it = users.begin();
 			while (user_it != users.end())
 			{
-				if (user_it->first != client.getNick())
+				if (user_it->first != client.getNick() && user_it->second.getRealName() != "Bot")
 				{
 					SEND(user_it->second.getSocket(), RPL_PRIVMSG(channelName, msgToSend), "Error sending message to channel.");
 				}

@@ -6,6 +6,8 @@
 class Utils
 {
 private:
+
+
     /**
      * Checks if a given string contains non-digit characters.
      *

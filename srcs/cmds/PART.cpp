@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/23 13:31:13 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/25 13:50:08 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,8 @@ void Server::PART(std::string message, Client &client)
 		while (us != users.end())
 		{
 			std::string reason = (this->getInput().size() > 2) ? this->getInput()[2] : "Leaving";
-			SEND(us->second.getSocket(), RPL_PART(channelName, reason), "Erro ao enviar mensagem de saída de canal.");
+			if (us->second.getRealName() != "Bot")
+				SEND(us->second.getSocket(), RPL_PART(channelName, reason), "Erro ao enviar mensagem de saída de canal.");
 			std::map<std::string, Client>::iterator tmp = us;
 			++us;
 			if (client.getNick() == tmp->first)

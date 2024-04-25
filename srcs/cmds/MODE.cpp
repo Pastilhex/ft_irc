@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   MODE.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:36:38 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/24 22:43:10 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/25 13:53:39 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,8 @@ std::string Server::handleOperatorMode(const std::vector<std::string> &mode_cmd,
 		std::map<std::string, Client>::iterator us = users.begin();
 		while (us != users.end())
 		{
-			SEND(us->second.getSocket(), ":" + client.getNick() + " MODE " + it->first + " " + modeFlag + modeOption + "\r\n", "Error sending MODE message");
+			if (us->second.getRealName() != "Bot")
+				SEND(us->second.getSocket(), ":" + client.getNick() + " MODE " + it->first + " " + modeFlag + modeOption + "\r\n", "Error sending MODE message");
 			++us;
 		}
 		updateChannel(client, mode_cmd[1]);
@@ -89,7 +90,8 @@ std::string Server::handleOperatorMode(const std::vector<std::string> &mode_cmd,
 			std::map<std::string, Client>::iterator us = users.begin();
 			while (us != users.end())
 			{
-				SEND(us->second.getSocket(), ":" + client.getNick() + " MODE " + it->first + " " + modeFlag + modeOption + "\r\n", "Error sending MODE message");
+				if (us->second.getRealName() != "Bot")
+					SEND(us->second.getSocket(), ":" + client.getNick() + " MODE " + it->first + " " + modeFlag + modeOption + "\r\n", "Error sending MODE message");
 				++us;
 			}
 			updateChannel(client, mode_cmd[1]);
@@ -114,7 +116,8 @@ void Server::handlePrivateAccessMode(std::map<std::string, Channel>::iterator it
 		std::map<std::string, Client>::iterator us = users.begin();
 		while (us != users.end())
 		{
-			SEND(us->second.getSocket(), ":" + client.getNick() + " MODE " + it->first + " " + modeFlag + modeOption + "\r\n", "Error sending MODE message");
+			if (us->second.getRealName() != "Bot")
+				SEND(us->second.getSocket(), ":" + client.getNick() + " MODE " + it->first + " " + modeFlag + modeOption + "\r\n", "Error sending MODE message");
 			++us;
 		}
 		return (Utils::logMessage("Channel is now private", 0), void());
@@ -129,7 +132,8 @@ void Server::handlePrivateAccessMode(std::map<std::string, Channel>::iterator it
 			std::map<std::string, Client>::iterator us = users.begin();
 			while (us != users.end())
 			{
-				SEND(us->second.getSocket(), ":" + client.getNick() + " MODE " + it->first + " " + modeFlag + modeOption + "\r\n", "Error sending MODE message");
+				if (us->second.getRealName() != "Bot")
+					SEND(us->second.getSocket(), ":" + client.getNick() + " MODE " + it->first + " " + modeFlag + modeOption + "\r\n", "Error sending MODE message");
 				++us;
 			}
 			return (Utils::logMessage("Channel is now public", 0), void());
@@ -154,7 +158,8 @@ void Server::handleRestrictedTopicMode(std::map<std::string, Channel>::iterator 
 		std::map<std::string, Client>::iterator us = users.begin();
 		while (us != users.end())
 		{
-			SEND(us->second.getSocket(), ":" + getHostname() + " MODE " + channelName + " " + modeFlag + modeOption + "\r\n", "Error sending MODE message");
+			if (us->second.getRealName() != "Bot")
+				SEND(us->second.getSocket(), ":" + getHostname() + " MODE " + channelName + " " + modeFlag + modeOption + "\r\n", "Error sending MODE message");
 			++us;
 		}
 		return (Utils::logMessage("Channel topic is now restricted", 0), void());
@@ -169,7 +174,8 @@ void Server::handleRestrictedTopicMode(std::map<std::string, Channel>::iterator 
 			std::map<std::string, Client>::iterator us = users.begin();
 			while (us != users.end())
 			{
-				SEND(us->second.getSocket(), ":" + getHostname() + " MODE " + channelName + " " + modeFlag + modeOption + "\r\n", "Error sending MODE message");
+				if (us->second.getRealName() != "Bot")
+					SEND(us->second.getSocket(), ":" + getHostname() + " MODE " + channelName + " " + modeFlag + modeOption + "\r\n", "Error sending MODE message");
 				++us;
 			}
 			return (Utils::logMessage("Channel topic is now unrestricted", 0), void());
@@ -192,7 +198,8 @@ void Server::handlePasswordMode(const std::vector<std::string> &mode_cmd, std::m
 		std::map<std::string, Client>::iterator us = users.begin();
 		while (us != users.end())
 		{
-			SEND(us->second.getSocket(), ":" + client.getNick() + " MODE " + it->first + " " + modeFlag + modeOption + " :" + it->second.getPassword() + "\r\n", "Error sending MODE message");
+			if (us->second.getRealName() != "Bot")
+				SEND(us->second.getSocket(), ":" + client.getNick() + " MODE " + it->first + " " + modeFlag + modeOption + " :" + it->second.getPassword() + "\r\n", "Error sending MODE message");
 			++us;
 		}
 		return (Utils::logMessage("New channel key is now set", 0), void());
@@ -208,7 +215,8 @@ void Server::handlePasswordMode(const std::vector<std::string> &mode_cmd, std::m
 		std::map<std::string, Client>::iterator us = users.begin();
 		while (us != users.end())
 		{
-			SEND(us->second.getSocket(), ":" + client.getNick() + " MODE " + it->first + " " + modeFlag + modeOption + " :" + it->second.getPassword() + "\r\n", "Error sending MODE message");
+			if (us->second.getRealName() != "Bot")
+				SEND(us->second.getSocket(), ":" + client.getNick() + " MODE " + it->first + " " + modeFlag + modeOption + " :" + it->second.getPassword() + "\r\n", "Error sending MODE message");
 			++us;
 		}
 		return (Utils::logMessage("Channel key is now removed", 0), void());
@@ -234,7 +242,8 @@ void Server::handleUserLimitMode(const std::vector<std::string> &mode_cmd, std::
 			std::map<std::string, Client>::iterator us = users.begin();
 			while (us != users.end())
 			{
-				SEND(us->second.getSocket(), MODE_CHANNELMSGWITHPARAM(client.getNick(), it->first, mode_cmd[2], mode_cmd[3]), "Error sending MODE message");
+				if (us->second.getRealName() != "Bot")
+					SEND(us->second.getSocket(), MODE_CHANNELMSGWITHPARAM(client.getNick(), it->first, mode_cmd[2], mode_cmd[3]), "Error sending MODE message");
 				++us;
 			}
 			return (Utils::logMessage("New user limit is now set", 0), void());
@@ -254,7 +263,8 @@ void Server::handleUserLimitMode(const std::vector<std::string> &mode_cmd, std::
 		std::map<std::string, Client>::iterator us = users.begin();
 		while (us != users.end())
 		{
-			SEND(us->second.getSocket(), MODE_CHANNELMSGWITHPARAM(client.getNick(), it->first, mode_cmd[2], mode_cmd[3]), "Error sending MODE message");
+			if (us->second.getRealName() != "Bot")
+				SEND(us->second.getSocket(), MODE_CHANNELMSGWITHPARAM(client.getNick(), it->first, mode_cmd[2], mode_cmd[3]), "Error sending MODE message");
 			++us;
 		}
 		return (Utils::logMessage("User limit is now removed", 0), void());

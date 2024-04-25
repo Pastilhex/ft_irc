@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/24 21:57:01 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/25 15:58:19 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ private:
 	std::vector<std::string> _input;			/* The vector of input commands received by the server. */
 	pollfd serverPoll;							/* The pollfd structure used for polling server events. */
 	Client _bot;
+	std::vector<std::string> _botCommands;		/* The vector of bot commands. */
 
 public:
 	/**
@@ -101,6 +102,7 @@ public:
 	std::map<std::string, Client> &getGlobalUsers(void);
 
 	Client getBot(void);
+	std::vector<std::string> getBotCMD() const;
 	
 	/**
 	 * @brief Returns the IP address of the server.
@@ -247,7 +249,7 @@ public:
 	 */
 	void PRIVMSG(std::string message, Client client);
 
-	bool BOT(Client &client, std::vector<std::string> &input);
+	bool BOT(std::vector<std::string> &input);
 	/**
 	 * @brief Handles a TOPIC command from a client.
 	 *

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ircserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 06:36:04 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/20 08:55:19 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/25 15:23:25 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #define BLUE "\033[1;34;1m"
 #define WHITE "\033[1;37;1m"
 
+#include <iostream>
 #include <arpa/inet.h>
 #include <cctype>
 #include <cerrno>
@@ -29,7 +30,6 @@
 #include <cstring>
 #include <ctime>
 #include <fcntl.h>
-#include <iostream>
 #include <map>
 #include <netdb.h>
 #include <netinet/in.h>
@@ -41,13 +41,15 @@
 #include <sys/socket.h>
 #include <sys/poll.h>
 #include <sstream>
+#include <exception>
+#include <algorithm>
+
 #include "Server.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "Utils.hpp"
 #include "Macros.hpp"
 #include "Bot.hpp"
-#include <exception>
 
 std::string getCurrentDateTime();
 bool isCMD(std::string message, std::string cmd);

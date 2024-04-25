@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Broadcasts.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/24 22:20:26 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/25 13:52:14 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ void Server::updateChannel(Client client, std::string channelName)
 		std::map<std::string, Client>::iterator user_it = users.begin();
 		while (user_it != users.end())
 		{
-			if (!(user_it->second.getRealName() == "Bot"))
+			if (user_it->second.getRealName() != "Bot")
 				WHO(user_it->second.getSocket(), user_it->second);
 			++user_it;
 		}
@@ -89,7 +89,8 @@ void Server::broadcastTOPIC(Client client, std::string channelName)
 		std::map<std::string, Client>::iterator user_it = users.begin();
 		while (user_it != users.end())
 		{
-			SEND(user_it->second.getSocket(), RPL_TOPIC(client, it->second), "Erro ao enviar mensagem de alteração de TOPIC.");
+			if (user_it->second.getRealName() != "Bot")
+				SEND(user_it->second.getSocket(), RPL_TOPIC(client, it->second), "Erro ao enviar mensagem de alteração de TOPIC.");
 			++user_it;
 		}
 		return;
@@ -106,7 +107,7 @@ void Server::broadcastKICK(Client client, std::string kicked, std::string channe
 		std::map<std::string, Client>::iterator user_it = users.begin();
 		while (user_it != users.end())
 		{
-			if (user_it->first != client.getNick())
+			if (user_it->first != client.getNick() && user_it->second.getRealName() != "Bot")
 				SEND(user_it->second.getSocket(), RPL_KICK(client, channelName, kicked, reason), "Error informing all users");
 			++user_it;
 		}

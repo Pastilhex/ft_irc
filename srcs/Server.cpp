@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/23 12:58:10 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/25 15:58:20 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,15 @@ Server::Server(void)
 	this->_socket = 0;
 	this->_hostname = "";
 	this->_password = "";
+
+	this->_botCommands.push_back("create");
+	this->_botCommands.push_back("delete");
+	this->_botCommands.push_back("help");
+}
+
+std::vector<std::string> Server::getBotCMD() const
+{
+	return this->_botCommands;
 }
 
 std::map<std::string, Client> &Server::getGlobalUsers(void)

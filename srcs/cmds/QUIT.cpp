@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/23 14:06:20 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/25 13:56:21 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void Server::QUIT(std::vector<pollfd> fds, int i, const Client client)
 		{
 			if (us->first == client.getNick())
 				users.erase(us++);
-			else if (us->second.getNick() != client.getNick())
+			else if (us->second.getNick() != client.getNick() && us->second.getRealName() != "Bot")
 			{
 				SEND(us->second.getSocket(), RPL_QUIT(client.getNick(), client.getUsername(), reason), "Error sending QUIT message");
 				us++;
