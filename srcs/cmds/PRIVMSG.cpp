@@ -34,13 +34,24 @@ void Server::PRIVMSG(std::string message, Client client)
 					std::map<std::string, Client> &users = it->second.getUsers();
 					Client *bot = new Bot("Bot", *this);
 					users.insert(std::pair<std::string, Client>("Bot", *bot));
-					updateChannel(*bot, channelName);
+					updateChannel(*bot, it->first);
 				}
 				return;
 			}
-			else if (*cmd_it == "delete")
+			else if (*cmd_it == "delete") // o delete não está a funcionar pq ao passar no BOT ele recebe return false
 			{
-				// deleteBot();
+				std::map<std::string, Channel>::iterator it = getChannels().find(input[1]);
+				if (it != this->getChannels().end())
+				{
+					std::map<std::string, Client> &users = it->second.getUsers();
+					std::map<std::string, Client>::iterator user_it = users.find("Bot");
+					if (user_it != users.end())
+					{
+						users.erase(user_it);
+						updateChannel(user_it->second, it->first);
+					}
+				}
+				return;
 			}
 			else if (*cmd_it == "help")
 			{

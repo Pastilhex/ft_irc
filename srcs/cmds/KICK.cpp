@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   KICK.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/23 14:11:29 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/26 07:30:40 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void Server::KICK(std::string message, Client client)
 		}
 		else if (isKickerOp && !isKickedOp)
 		{
-			std::map<std::string, Client> &users = it->second.getUsers();
+			std::map<std::string, Client>& users = it->second.getUsers();
 			std::map<std::string, Client>::iterator us = users.begin();
 			while (us != users.end())
 			{
@@ -69,8 +69,10 @@ void Server::KICK(std::string message, Client client)
 					std::string leaveChannel = RPL_KICK(client, channelName, kickNick, reason);
 					SEND(client.getSocket(), leaveChannel, "Erro ao enviar mensagem de KICK.");
 					broadcastKICK(client, kickNick, channelName, reason);
-					users.erase(us);
+					std::map<std::string, Client>::iterator tmp = us;
+					users.erase(tmp);
 					updateChannel(client, channelName);
+					break;
 				}
 				++us;
 			}
