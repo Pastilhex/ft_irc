@@ -65,7 +65,7 @@ void Server::JOIN(int clientSocket, Client &client)
 					{
 						it->second.setNewUser(client);
 						SEND(clientSocket, RPL_JOIN(client, channelName), "Erro ao entrar no canal.");
-						updateChannel(client, channelName);
+						updateChannel(it->second);
 						MODE(client);
 						break;
 					}

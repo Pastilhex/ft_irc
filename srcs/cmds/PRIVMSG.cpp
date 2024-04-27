@@ -19,46 +19,39 @@ void Server::PRIVMSG(std::string message, Client client)
 	std::string channelName = "";
 	std::string msgToSend = getMessage(message);
 
-	if (msgToSend[0] && msgToSend[0] == '!' && BOT(input)) // Check if the command is a bot command
+	//precisamos fazer trim da mensagem, nao esta funcionando com "!create    " por exemplo 
+	if (msgToSend[0] && msgToSend[0] == '!') // Check if the command is a bot command
 	{
 		std::string cmd = msgToSend.substr(1);
 		std::vector<std::string> botCMD = getBotCMD();
 		std::vector<std::string>::const_iterator cmd_it = find(botCMD.begin(), botCMD.end(), cmd);
+		std::map<std::string, Channel>::iterator it = getChannels().find(input[1]);
+		if (it == this->getChannels().end())
+			return ; 
+	
 		if (cmd_it != botCMD.end())
 		{
 			if (*cmd_it == "create")
 			{
-				std::map<std::string, Channel>::iterator it = getChannels().find(input[1]);
-				if (it != this->getChannels().end())
-				{
-					std::map<std::string, Client> &users = it->second.getUsers();
-					Client *bot = new Bot("Bot", *this);
-					users.insert(std::pair<std::string, Client>("Bot", *bot));
-					updateChannel(*bot, it->first);
-				}
+				Bot::create(it->second, "marvin");
+				updateChannel(it->second);
 				return;
 			}
-			else if (*cmd_it == "delete") // o delete não está a funcionar pq ao passar no BOT ele recebe return false
+			if(!it->second.botExists())
+				return ; 
+
+			if (*cmd_it == "delete")
 			{
-				std::map<std::string, Channel>::iterator it = getChannels().find(input[1]);
-				if (it != this->getChannels().end())
-				{
-					std::map<std::string, Client> &users = it->second.getUsers();
-					std::map<std::string, Client>::iterator user_it = users.find("Bot");
-					if (user_it != users.end())
-					{
-						users.erase(user_it);
-						updateChannel(user_it->second, it->first);
-					}
-				}
+				Bot::remove(it->second);
+				updateChannel(it->second);
 				return;
 			}
 			else if (*cmd_it == "help")
 			{
-				// helpBot();
+				std::cout << "Help command" << std::endl;
+				Bot::help();
 			}
 		}
-		
 		return;
 	}
 

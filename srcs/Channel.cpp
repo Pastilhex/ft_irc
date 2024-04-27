@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:41:57 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/23 09:52:58 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/27 20:35:48 by lpicoli-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,6 +192,23 @@ void Channel::setModeRestrictedAccess(bool mode)
 }
 
 /**
+ * Checks if a bot exists in the channel.
+ * 
+ * @return true if a bot exists in the channel, false otherwise.
+ */
+bool Channel::botExists()
+{
+	std::map<std::string, Client>::iterator it = this->_clients.begin();
+	while (it != this->_clients.end())
+	{
+		if (it->second.getRealName() == "Bot")
+			return true;
+		++it;
+	}
+	return false;
+}
+
+/**
  * @brief Adds a new user to the channel.
  * 
  * This function inserts a new user into the channel's list of clients.
@@ -241,6 +258,16 @@ void Channel::setPassword(std::string password)
 void Channel::setRestrictedTopic(bool mode)
 {
 	this->_restrictedTopic = mode;
+}
+
+void Channel::setBot(Client *bot)
+{
+	this->_bot = bot;
+}
+
+Client *Channel::getBot(void)
+{
+	return this->_bot;
 }
 
 /**

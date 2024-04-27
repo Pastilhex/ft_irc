@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   INVITE.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/23 14:10:54 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/27 20:38:19 by lpicoli-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void Server::INVITE(Client client)
 
 	const std::map<std::string, Channel>::iterator it = getChannels().find(channel);
 
-	if(!it->second.getInvisibility() && invitedUser != this->getBot().getNick())
+	if(!it->second.getInvisibility())
 		return;
 
 	if (it == getChannels().end())
@@ -65,21 +65,7 @@ void Server::INVITE(Client client)
 		++ch;
 	}
 	if (userAvailable)
-	{
 		ch->second.AddInvited(invitedUser);
-		if(invitedUser == this->getBot().getNick())
-		{
-			Client bot = this->getBot();
-			it->second.setNewUser(bot); // Adicione esta linha se 'setNewUser' não estiver funcionando
-			std::cout << bot.getNick() << " entrou no canal " << it->first << std::endl;
-			SEND(client.getSocket(), RPL_JOIN(bot, it->first), "Erro ao entrar no canal.");
-			MODE(bot);
-			WHO(bot.getSocket(), client);
-			std::cout << client.getSocket() << std::endl;
-			std::cout << bot.getSocket() << std::endl;
-			return;
-		}
-	}
 	else
 		return (SEND(client.getSocket(), ERR_NOSUCHNICK(client, invitedUser), "Error sending msg ERR_NOSUCHNICK"));
 

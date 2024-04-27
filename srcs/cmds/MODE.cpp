@@ -78,7 +78,7 @@ std::string Server::handleOperatorMode(const std::vector<std::string> &mode_cmd,
 				SEND(us->second.getSocket(), ":" + client.getNick() + " MODE " + it->first + " " + modeFlag + modeOption + "\r\n", "Error sending MODE message");
 			++us;
 		}
-		updateChannel(client, mode_cmd[1]);
+		updateChannel(it->second);
 		return (mode_cmd[3] + " " + it->first + " :User added as an operator\r\n");
 	}
 	else if (modeFlag == '-')
@@ -94,7 +94,7 @@ std::string Server::handleOperatorMode(const std::vector<std::string> &mode_cmd,
 					SEND(us->second.getSocket(), ":" + client.getNick() + " MODE " + it->first + " " + modeFlag + modeOption + "\r\n", "Error sending MODE message");
 				++us;
 			}
-			updateChannel(client, mode_cmd[1]);
+			updateChannel(it->second);
 			return (mode_cmd[3] + " " + it->first + " :User removed as an operator\r\n");
 		}
 		return (mode_cmd[3] + " " + it->first + " :User can't be removed of the operator's list because it's not an operator\r\n");

@@ -80,6 +80,12 @@ class Client {
 		void setNick(std::string nick);
 
 		/**
+		 * @brief Set the real name of the client.
+		 * @param realname The real name to set.
+		 */
+		void setRealName(std::string realname);
+
+		/**
 		 * @brief Set the username of the client.
 		 * @param username The username to set.
 		 */
@@ -128,7 +134,7 @@ class Client {
 		 */
 		void getClientLoginData(std::string message, std::map<std::string, Client> globalUsers, std::string hostname);
 		
-		virtual void dummy() {}
+		virtual void help() {}
 };
 
 #endif

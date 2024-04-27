@@ -7,7 +7,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/ircserv",
       "args": [
-        "6667",
+        "2448",
         "pass"
       ],
       "stopAtEntry": false,

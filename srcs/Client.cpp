@@ -55,6 +55,11 @@ void Client::setSocket(int fd)
 	this->clientPoll.fd = fd;
 }
 
+void Client::setRealName(std::string realname)
+{
+	this->_realname = realname;
+}
+
 int Client::getSocket(void) const
 {
 	return this->clientPoll.fd;

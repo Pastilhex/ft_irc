@@ -13,7 +13,7 @@ SRCDIR = srcs
 OBJDIR = objs
 
 # Arquivos fonte
-SRCS := $(wildcard $(SRCDIR)/*.cpp) $(wildcard $(SRCDIR)/cmds/*.cpp) main.cpp
+SRCS := $(wildcard $(SRCDIR)/*.cpp) $(wildcard $(SRCDIR)/cmds/*.cpp) $(wildcard $(SRCDIR)/bot/*.cpp) main.cpp
 OBJS := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SRCS))
 
 # Contagem de compilação
@@ -31,6 +31,7 @@ $(NAME): $(OBJS)
 # Regras de compilação
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@mkdir -p $(OBJDIR)/cmds
+	@mkdir -p $(OBJDIR)/bot
 	@$(CXX) $(CXXFLAGS) $(WWWFLAGS) -c $< -o $@
 	@$(eval COMPILE_COUNT=$(shell echo $$(($(COMPILE_COUNT)+1))))
 	@printf "\r[\033[32m%3d%%\033[0m] Compiling: $<    " $$(($(COMPILE_COUNT) * 100 / $(NUM_SRCS)))

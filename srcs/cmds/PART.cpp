@@ -34,7 +34,7 @@ void Server::PART(std::string message, Client &client)
 		if (it->second.getNbrUsers() == 0)
 			channels.erase(it);
 		else
-			updateChannel(client, channelName);
+			updateChannel(it->second);
 	}
 	else
 		std::cout << "Canal não encontrado." << std::endl;

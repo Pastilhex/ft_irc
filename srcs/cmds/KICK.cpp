@@ -71,7 +71,7 @@ void Server::KICK(std::string message, Client client)
 					broadcastKICK(client, kickNick, channelName, reason);
 					std::map<std::string, Client>::iterator tmp = us;
 					users.erase(tmp);
-					updateChannel(client, channelName);
+					updateChannel(it->second);
 					break;
 				}
 				++us;

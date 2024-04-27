@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/25 15:58:19 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/27 20:32:33 by lpicoli-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,13 +67,6 @@ public:
 	struct sockaddr_in getAddress(void);
 
 	/**
-	 * @brief Sets the bot client for the server.
-	 * 
-	 * @param bot The bot client to set.
-	 */
-	void setBot(Client bot);
-
-	/**
 	 * @brief Returns the hostname of the server.
 	 *
 	 * @return The hostname of the server.
@@ -101,7 +94,6 @@ public:
 	 */
 	std::map<std::string, Client> &getGlobalUsers(void);
 
-	Client getBot(void);
 	std::vector<std::string> getBotCMD() const;
 	
 	/**
@@ -392,7 +384,7 @@ public:
 	 * @param client The client object.
 	 * @param channelName The name of the channel.
 	 */
-	void updateChannel(Client client, std::string channelName);
+	void updateChannel(Channel channel);
 
 	/**
 	 * @brief Broadcasts a KICK message to all clients in a channel.

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/25 15:58:20 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/27 20:32:57 by lpicoli-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,11 +67,6 @@ std::map<std::string, Channel> &Server::getChannels(void)
 void Server::setNewChannel(std::string channel_name, Channel channel)
 {
 	_channels.insert(std::make_pair(channel_name, channel));
-}
-
-void Server::setBot(Client bot)
-{
-	this->_bot = bot;
 }
 
 void Server::setSocket(int newSocket)
@@ -165,11 +160,6 @@ std::string Server::getAddressIP(void)
 		std::cerr << "Nenhum endereço IP encontrado para o host local" << std::endl;
 
 	return ipAddress;
-}
-
-Client Server::getBot()
-{
-	return this->_bot;
 }
 
 bool Server::addClientToGlobalUsers(Client client)

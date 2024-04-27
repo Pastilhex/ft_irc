@@ -28,7 +28,10 @@ void Server::sendWelcome(int clientSocket, Client &client)
 	welcome += RPL_MOTD(" :       ?$.            :MMMMMMMMMMMMMMMMMMM/HMMM|`*L \r\n");
 	welcome += RPL_MOTD(" :      |               |MMMMMMMMMMMMMMMMMMMMbMH'   T, \r\n");
 	welcome += RPL_MOTD(" :      $H#:            `*MMMMMMMMMMMMMMMMMMMMb#}'  `? \r\n");
-	welcome += RPL_MOTD(" :      ]MMH#             ""*""""*#MMMMMMMMMMMMM'    - \r\n");
+	welcome += RPL_MOTD(" :      ]MMH#             "
+						"*"
+						""
+						"*#MMMMMMMMMMMMM'    - \r\n");
 	welcome += RPL_MOTD(" :      MMMMMb_                   |MMMMMMMMMMMP'     : \r\n");
 	welcome += RPL_MOTD(" :      HMMMMMMMHo                 `MMMMMMMMMT       . \r\n");
 	welcome += RPL_MOTD(" :      ?MMMMMMMMP                  9MMMMMMMM}       - \r\n");
@@ -40,7 +43,8 @@ void Server::sendWelcome(int clientSocket, Client &client)
 	welcome += RPL_MOTD(" :            `&.                             . \r\n");
 	welcome += RPL_MOTD(" :              `~,   .                     ./ \r\n");
 	welcome += RPL_MOTD(" :                  . _                  .- \r\n");
-	welcome += RPL_MOTD(" :                    '`--._,dd###pp=""' \r\n");
+	welcome += RPL_MOTD(" :                    '`--._,dd###pp="
+						"' \r\n");
 	welcome += RPL_MOTD(" : \r\n");
 	welcome += RPL_MOTD(" :         ███████╗████████╗    ██╗██████╗  ██████╗\r\n");
 	welcome += RPL_MOTD(" :         ██╔════╝╚══██╔══╝    ██║██╔══██╗██╔════╝\r\n");
@@ -60,23 +64,23 @@ void Server::sendWelcome(int clientSocket, Client &client)
 		std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
 }
 
-void Server::updateChannel(Client client, std::string channelName)
+/**
+ * @brief Updates the channel by sending a WHO command to all users in the channel, excluding the "Bot" user.
+ *
+ * @param client The client who triggered the update.
+ * @param channelName The name of the channel to update.
+ */
+void Server::updateChannel(Channel channel)
 {
-	(void)client;
-	std::map<std::string, Channel> channels = getChannels();
-	std::map<std::string, Channel>::iterator it = channels.find(channelName);
-	if (it != channels.end())
+	std::map<std::string, Client> &users = channel.getUsers();
+	std::map<std::string, Client>::iterator user_it = users.begin();
+	while (user_it != users.end())
 	{
-		std::map<std::string, Client> &users = it->second.getUsers();
-		std::map<std::string, Client>::iterator user_it = users.begin();
-		while (user_it != users.end())
-		{
-			if (user_it->second.getRealName() != "Bot")
-				WHO(user_it->second.getSocket(), user_it->second);
-			++user_it;
-		}
-		return;
+		if (user_it->second.getRealName() != "Bot")
+			WHO(user_it->second.getSocket(), user_it->second);
+		++user_it;
 	}
+	return;
 }
 
 void Server::broadcastTOPIC(Client client, std::string channelName)
