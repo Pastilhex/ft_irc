@@ -19,7 +19,32 @@ void Server::PRIVMSG(std::string message, Client client)
 	std::string channelName = "";
 	std::string msgToSend = getMessage(message);
 
+	/* if (getQuizMode())
+	{
+		std::map<std::string, Client> &users = getGlobalUsers();
+		std::map<std::string, Client>::iterator user_it = users.find(input[1]);
+		if (user_it != users.end())
+		{
+			if (user_it->second.getRealName() == "Bot")
+			{
+				std::string answer = user_it->second.getAnswer();
+				if (msgToSend == answer)
+				{
+					SEND(client.getSocket(), RPL_PRIVMSG(input[1], "Correct answer!"), "Error sending message to user.");
+					user_it->second.setScore(user_it->second.getScore() + 1);
+				}
+				else
+				{
+					SEND(client.getSocket(), RPL_PRIVMSG(input[1], "Wrong answer!"), "Error sending message to user.");
+				}
+				user_it->second.setAnswer("");
+				setQuizMode(false);
+			}
+		}
+		return;
+	} */
 	//precisamos fazer trim da mensagem, nao esta funcionando com "!create    " por exemplo 
+	trim(msgToSend);
 	if (msgToSend[0] && msgToSend[0] == '!') // Check if the command is a bot command
 	{
 		std::string cmd = msgToSend.substr(1);

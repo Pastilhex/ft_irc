@@ -23,7 +23,6 @@ private:
      * @return True if the string is a valid port number, false otherwise.
      */
     static bool isValidPort(const std::string &portStr);
-
     /**
      * Checks if a given string is a valid password.
      *
@@ -43,6 +42,8 @@ public:
      * @return true if the input is valid, false otherwise.
      */
     static bool isValidInput(const std::string &password, const std::string &port);
+
+    static void trim(std::string &str);
 
     /**
      * @brief Get the current date and time as a string.

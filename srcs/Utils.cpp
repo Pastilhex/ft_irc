@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/25 14:51:18 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/25 14:58:11 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/28 22:11:52 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,8 @@ int Utils::logMessage(const std::string &message, int level)
 	std::string logTime = getCurrentDateTimeAsString();
 	std::ostream &out = (level == EXIT_FAILURE) ? std::cerr : std::cout;
 
-	switch (level) {
+	switch (level)
+	{
 	case EXIT_SUCCESS:
 		out << GREEN << "[INFO] " << RESET;
 		break;
@@ -43,6 +44,19 @@ bool Utils::inputValidation(int argc, char *argv[])
 	if (!Utils::isValidInput(argv[1], argv[2]))
 		return (false);
 	return (true);
+}
+
+void Utils::trim(std::string &str)
+{
+	// Find the first non-whitespace character
+	size_t first = str.find_first_not_of(" ");
+	if (first == std::string::npos)
+	{
+		str.clear();
+		return;
+	}
+	size_t last = str.find_last_not_of(" ");
+	str = str.substr(first, last - first + 1);
 }
 
 void Utils::printServerInfo(std::string hostname,
@@ -224,4 +238,3 @@ bool Utils::isValidPort(char *str)
 			return false;
 	return true;
 }
-

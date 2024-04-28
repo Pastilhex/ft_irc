@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/27 20:32:57 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/04/28 22:11:53 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ Server::Server(void)
 	this->_socket = 0;
 	this->_hostname = "";
 	this->_password = "";
+	this->_quizMode = false;
 
 	this->_botCommands.push_back("create");
 	this->_botCommands.push_back("delete");
@@ -234,6 +235,13 @@ bool Server::listenSocket(const int &serverSocket)
 	return true;
 }
 
+std::string Server::getPort(void)
+{
+	std::stringstream ss;
+	ss << this->_port;
+	return ss.str();
+}
+
 bool Server::bindSocket(const int &serverSocket, const struct sockaddr_in &serverAddress)
 {
 	if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1)
@@ -248,7 +256,7 @@ bool Server::bindSocket(const int &serverSocket, const struct sockaddr_in &serve
 
 bool Server::run(void)
 {
-	Utils::printServerInfo(getHostname(), "6667", getAddressIP(), getPassword());
+	Utils::printServerInfo(getHostname(), getPort(), getAddressIP(), getPassword());
 	connectClient(getSocket());
 	return true;
 	return false;

@@ -34,9 +34,9 @@
       "request": "launch",
       "args": [],
       "stopAtEntry": false,
-      "externalConsole": false,
-      "cwd": "/home/jhogonca/sgoinfre/projects/ft_irc",
-      "program": "/home/jhogonca/sgoinfre/projects/ft_irc/build/Debug/outDebug",
+      "externalConsole": true,
+      "cwd": "c:/Users/Asus/OneDrive/Documentos/Projetos/42Core/ft_irc",
+      "program": "c:/Users/Asus/OneDrive/Documentos/Projetos/42Core/ft_irc/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

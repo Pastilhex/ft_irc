@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/27 20:32:33 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/04/28 22:11:53 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,8 @@ private:
 	std::map<std::string, Client> _globalUsers; /* The map of global users, where the key is the client nickname and the value is the Client object. */
 	std::vector<std::string> _input;			/* The vector of input commands received by the server. */
 	pollfd serverPoll;							/* The pollfd structure used for polling server events. */
-	Client _bot;
+	Client _bot;								/* The bot object. */
+	bool _quizMode;								/* The quiz mode flag. */
 	std::vector<std::string> _botCommands;		/* The vector of bot commands. */
 
 public:
@@ -59,6 +60,13 @@ public:
 	 */
 	int getSocket(void);
 
+	/**
+	 * @brief Returns the port number on which the server is running.
+	 *
+	 * @return The port number on which the server is running.
+	 */
+	std::string getPort(void);
+	
 	/**
 	 * @brief Returns the address structure associated with the server.
 	 *
