@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Macros.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 22:22:32 by jhogonca          #+#    #+#             */
-/*   Updated: 2024/04/23 12:35:46 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/29 21:23:22 by lpicoli-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,6 @@
 // Server messages
 #define RPL_WELCOME() \
 	(std::string(HOST) + " 001 " + NICKNAME + " :Welcome to the Internet Relay Network, " + NICKNAME + "!" + USERNAME + "@" + HOST + "!" + IP_ADDRESS + "\r\n")
-
-#define RPL_WELCOME_FROM_BOT (server) \
-    (":" + BOT_NICKNAME + "!" + BOT_NICKNAME + "@" + server.getHostname() + " 001 " + BOT_NICKNAME + " :Welcome to the Internet Relay Network, " + BOT_NICKNAME + "!" + BOT_NICKNAME + "@" + server.getHostname() + "!" + server.getAddressIP() + "\r\n")
 
 #define RPL_YOURHOST() \
 	(std::string(HOST) + " 002 " + NICKNAME + " :Your host is " + HOST + ", running version FT_IRC_42Porto_v1.0\r\n")

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/28 22:11:53 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/29 20:34:28 by lpicoli-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ Server::Server(void)
 	this->_botCommands.push_back("create");
 	this->_botCommands.push_back("delete");
 	this->_botCommands.push_back("help");
+	this->_botCommands.push_back("welcome");
+
 }
 
 std::vector<std::string> Server::getBotCMD() const

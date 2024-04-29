@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   JOIN.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/24 22:49:29 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/29 22:11:02 by lpicoli-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,8 @@ void Server::JOIN(int clientSocket, Client &client)
 						SEND(clientSocket, RPL_JOIN(client, channelName), "Erro ao entrar no canal.");
 						updateChannel(it->second);
 						MODE(client);
+						if(it->second.botExists())
+							Bot::sendWelcome(*this, it->second, client);
 						break;
 					}
 				}

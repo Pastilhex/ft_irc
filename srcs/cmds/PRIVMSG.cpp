@@ -44,7 +44,7 @@ void Server::PRIVMSG(std::string message, Client client)
 		return;
 	} */
 	//precisamos fazer trim da mensagem, nao esta funcionando com "!create    " por exemplo 
-	trim(msgToSend);
+	Utils::trim(msgToSend);
 	if (msgToSend[0] && msgToSend[0] == '!') // Check if the command is a bot command
 	{
 		std::string cmd = msgToSend.substr(1);
@@ -58,8 +58,8 @@ void Server::PRIVMSG(std::string message, Client client)
 		{
 			if (*cmd_it == "create")
 			{
-				Bot::create(it->second, "marvin");
 				updateChannel(it->second);
+				Bot::create(*this, it->second, "marvin", client);
 				return;
 			}
 			if(!it->second.botExists())
@@ -67,7 +67,7 @@ void Server::PRIVMSG(std::string message, Client client)
 
 			if (*cmd_it == "delete")
 			{
-				Bot::remove(it->second);
+				Bot::remove(*this, it->second, client);
 				updateChannel(it->second);
 				return;
 			}
@@ -75,6 +75,11 @@ void Server::PRIVMSG(std::string message, Client client)
 			{
 				std::cout << "Help command" << std::endl;
 				Bot::help();
+			}
+			else if(*cmd_it == "welcome") //precisa ser integrado ao join quando um novo client entra 
+			{
+				//Bot::setHostname(getHostname());
+				Bot::sendWelcome(*this, it->second, client);
 			}
 		}
 		return;

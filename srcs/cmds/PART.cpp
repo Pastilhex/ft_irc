@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   PART.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/25 13:50:08 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/29 22:21:17 by lpicoli-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ void Server::PART(std::string message, Client &client)
 	{
 		std::map<std::string, Client> &users = it->second.getUsers();
 		std::map<std::string, Client>::iterator us = users.begin();
+		Bot::sendGoodbye(*this, it->second, client);
 		while (us != users.end())
 		{
 			std::string reason = (this->getInput().size() > 2) ? this->getInput()[2] : "Leaving";

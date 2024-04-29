@@ -7,10 +7,11 @@ class Bot
 {
 	public:
 
-		static void create(Channel &channel, std::string bot_nick);
-		static void remove(Channel &channel);
+		static void create(Server &server, Channel &channel, std::string bot_nick, Client &client);
+		static void remove(Server &server, Channel &channel, Client &client);
 		static void help();
- 
+		static void sendWelcome(Server server, Channel &channel, Client &client);
+		static void sendGoodbye(Server server, Channel &channel, Client &client);
 		virtual void execute() = 0; 
 		
 };

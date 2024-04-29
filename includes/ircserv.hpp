@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ircserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 06:36:04 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/25 15:23:25 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/29 22:42:39 by lpicoli-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #define YELLOW "\033[1;33;1m"
 #define BLUE "\033[1;34;1m"
 #define WHITE "\033[1;37;1m"
+# define BOLD_GREEN		"\001\033[1;92m\002"
 
 #include <iostream>
 #include <arpa/inet.h>

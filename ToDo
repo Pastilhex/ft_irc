@@ -78,3 +78,6 @@
 
 - limpeza das funcoes no ircserv.hpp (realmente precisam ficar la? nao e melhor no server?)
 
+
+- arrumar user limit (esta apenas com 2)
+- enviar mensagem de create e delete do bot para todos e nao apenas para o que enviou msg 
