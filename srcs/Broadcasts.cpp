@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/25 13:52:14 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/30 22:24:31 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,3 +118,22 @@ void Server::broadcastKICK(Client client, std::string kicked, std::string channe
 		return;
 	}
 }
+
+void Server::broadcastBot(Client client, Server server, std::string message, std::string channelName)
+{
+	std::map<std::string, Channel> channels = getChannels();
+	std::map<std::string, Channel>::iterator it = channels.find(channelName);
+	if (it != channels.end())
+	{
+		std::map<std::string, Client> &users = it->second.getUsers();
+		std::map<std::string, Client>::iterator user_it = users.begin();
+		while (user_it != users.end())
+		{
+			if (user_it->second.getRealName() != "Bot")
+				SEND(user_it->second.getSocket(), ":Marvin!" + client.getUsername() + "@" + server.getHostname() + " PRIVMSG " + channelName + " :" + message, "Error sending PART message to client.");
+			++user_it;
+		}
+		return;
+	}
+}
+

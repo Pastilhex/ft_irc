@@ -58,7 +58,7 @@ void Server::PRIVMSG(std::string message, Client client)
 		{
 			if (*cmd_it == "create")
 			{
-				updateChannel(it->second);
+				//updateChannel(it->second);
 				Bot::create(*this, it->second, "marvin", client);
 				return;
 			}

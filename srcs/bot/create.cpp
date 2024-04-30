@@ -3,20 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   create.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/27 19:50:15 by lpicoli-          #+#    #+#             */
-/*   Updated: 2024/04/29 22:33:30 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/04/30 22:29:31 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-				
 #include "../../includes/ircserv.hpp"
 
 void Bot::create(Server &server, Channel &channel, std::string bot_nick, Client &client)
 {
 	Client *bot = new Client();
-	if(bot_nick.empty())
+	if (bot_nick.empty())
 	{
 		bot->setNick("Bot");
 		bot->setUsername("Bot");
@@ -29,9 +28,7 @@ void Bot::create(Server &server, Channel &channel, std::string bot_nick, Client 
 	bot->setRealName("Bot");
 	channel.setNewUser(*bot);
 	channel.setBot(bot);
-
 	std::string message = "🤖 Beep boop! I'm alive! Hi everyone, I'm " + bot->getNick() + ", your new bot friend.\r\n";
-	
-	SEND(client.getSocket(), ":Marvin!"+client.getUsername()+"@"\
-    + server.getHostname()+" PRIVMSG "+channel.getName()+" :" + message, "Error sending PART message to client.");
+	server.broadcastBot(client, server, message, channel.getName());
+	server.updateChannel(channel);
 }

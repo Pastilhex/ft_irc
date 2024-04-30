@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/29 20:34:28 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/04/30 22:36:41 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -355,4 +355,9 @@ bool Server::checkInput(std::vector<std::string> input, Client client)
 		return true;
 	}
 	return errorDetected;
+}
+
+bool Server::isBotInChannel()
+{
+	
 }

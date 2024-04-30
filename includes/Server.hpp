@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/28 22:11:53 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/30 22:34:57 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,13 +178,13 @@ public:
 
 	bool listenSocket(const int &serverSocket);
 
-		/**
-		 * @brief Adds a new channel to the map of channels.
-		 *
-		 * @param channel_name The name of the new channel.
-		 * @param channel The Channel object representing the new channel.
-		 */
-		void setNewChannel(std::string channel_name, Channel channel);
+	/**
+	 * @brief Adds a new channel to the map of channels.
+	 *
+	 * @param channel_name The name of the new channel.
+	 * @param channel The Channel object representing the new channel.
+	 */
+	void setNewChannel(std::string channel_name, Channel channel);
 
 	/**
 	 * @brief Sets the vector of input commands received by the server.
@@ -469,7 +469,8 @@ public:
 	void DCC_ACCEPT(std::string sender, std::string file, std::string ip, std::string port);
 	bool isValidIPAddress(std::string word);
 	bool isValidPort(std::string word);
-
+	void broadcastBot(Client client, Server server, std::string message, std::string channelName);
+	bool isBotInChannel();
 };
 
 #endif
