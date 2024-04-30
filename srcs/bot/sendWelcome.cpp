@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   sendWelcome.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 20:23:27 by lpicoli-          #+#    #+#             */
-/*   Updated: 2024/04/30 22:31:28 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/01 00:05:08 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,7 @@ void Bot::sendWelcome(Server server, Channel &channel, Client &client)
     welcomeMsg += " 🤖💬 Feel free to explore, ask questions, and engage with the community.";
     welcomeMsg += " If you need assistance at any point, just type !help and"; 
     welcomeMsg += " I'll be here to lend a hand. We're thrilled to have you here! 🚀✨\r\n";
-	server.broadcastBot(client, server, welcomeMsg, channel.getName());
-	server.updateChannel(channel);
-    // SEND(client.getSocket(), ":Marvin!"+client.getUsername()+"@"+server.getHostname()+" PRIVMSG "+channel.getName()+" :" + welcomeMsg, "Error sending JOIN message to client.");
+    SEND(client.getSocket(), ":Marvin!"+client.getUsername()+"@"+server.getHostname()+" PRIVMSG "+channel.getName()+" :" + welcomeMsg, "Error sending JOIN message to client.");
 }
 
 //:Zilio!lpicoli-@c2r4s6.42porto.com PRIVMSG #40 :dsdfdsfsd

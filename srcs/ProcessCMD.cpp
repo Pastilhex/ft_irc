@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ProcessCMD.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/24 22:51:20 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/04/30 23:56:02 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void Server::processCMD(Client &client, std::vector<pollfd> &fds, char *buffer, 
 {
 	std::string message(buffer, bytesRead);
 
-	std::vector<std::string> splitMessage = Utils::splitVector(message, "\r\n");
+	std::vector<std::string> splitMessage = Utils::splitVector(message, "\n");
 
 	while (splitMessage.size())
 	{

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/30 22:34:57 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/30 23:03:26 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -470,7 +470,7 @@ public:
 	bool isValidIPAddress(std::string word);
 	bool isValidPort(std::string word);
 	void broadcastBot(Client client, Server server, std::string message, std::string channelName);
-	bool isBotInChannel();
+	bool isBotInChannel(std::string &channelName);
 };
 
 #endif

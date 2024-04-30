@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   JOIN.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/29 22:11:02 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/05/01 00:07:02 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,8 @@ void Server::JOIN(int clientSocket, Client &client)
 					{
 						it->second.setNewUser(client);
 						SEND(clientSocket, RPL_JOIN(client, channelName), "Erro ao entrar no canal.");
+						if (isBotInChannel(channelName))
+							sendWelcome(clientSocket, client);
 						updateChannel(it->second);
 						MODE(client);
 						if(it->second.botExists())

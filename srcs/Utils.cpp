@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/25 14:51:18 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/28 22:11:52 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/05/01 00:00:38 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,7 +198,7 @@ std::vector<std::string> Utils::splitVector(const std::string &str, const std::s
 {
 	std::vector<std::string> tokens;
 	size_t start = 0, end = 0;
-	while ((end = str.find(delimiter, start)) != std::string::npos)
+	while ((end = str.find_first_of(delimiter, start)) != std::string::npos)
 	{
 		tokens.push_back(str.substr(start, end - start));
 		start = end + delimiter.length();

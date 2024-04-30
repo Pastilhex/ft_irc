@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/30 22:42:52 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/30 23:15:47 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ Server::Server(void)
 	this->_botCommands.push_back("delete");
 	this->_botCommands.push_back("help");
 	this->_botCommands.push_back("welcome");
-
 }
 
 std::vector<std::string> Server::getBotCMD() const
@@ -357,7 +356,7 @@ bool Server::checkInput(std::vector<std::string> input, Client client)
 	return errorDetected;
 }
 
-bool Server::isBotInChannel(std::string &channelName, std::string &clientName)
+bool Server::isBotInChannel(std::string &channelName)
 {
 	std::map<std::string, Channel> channels = getChannels();
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
@@ -373,4 +372,5 @@ bool Server::isBotInChannel(std::string &channelName, std::string &clientName)
 		}
 		return false;
 	}
+	return false;
 }
