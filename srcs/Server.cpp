@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/30 22:36:41 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/04/30 22:42:52 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -357,7 +357,20 @@ bool Server::checkInput(std::vector<std::string> input, Client client)
 	return errorDetected;
 }
 
-bool Server::isBotInChannel()
+bool Server::isBotInChannel(std::string &channelName, std::string &clientName)
 {
-	
+	std::map<std::string, Channel> channels = getChannels();
+	std::map<std::string, Channel>::iterator it = channels.find(channelName);
+	if (it != channels.end())
+	{
+		std::map<std::string, Client> &users = it->second.getUsers();
+		std::map<std::string, Client>::iterator user_it = users.begin();
+		while (user_it != users.end())
+		{
+			if (user_it->second.getRealName() == "Bot")
+				return true;
+			++user_it;
+		}
+		return false;
+	}
 }
