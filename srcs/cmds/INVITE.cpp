@@ -6,7 +6,7 @@
 /*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/27 20:38:19 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/05/01 17:23:12 by lpicoli-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,6 @@ void Server::INVITE(Client client)
 	std::string invitedUser = getInput()[1];
 	std::string channel = getInput()[2];
 
-	std::cout << "INVITE command" << std::endl;
-	std::cout << "Invited user: " << invitedUser << std::endl;
 
 	if (getInput().size() != 3)
 		return;

@@ -6,7 +6,7 @@
 /*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/29 22:21:17 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/05/01 17:24:27 by lpicoli-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,4 @@ void Server::PART(std::string message, Client &client)
 		else
 			updateChannel(it->second);
 	}
-	else
-		std::cout << "Canal não encontrado." << std::endl;
 }

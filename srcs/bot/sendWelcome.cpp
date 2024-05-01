@@ -6,7 +6,7 @@
 /*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 20:23:27 by lpicoli-          #+#    #+#             */
-/*   Updated: 2024/05/01 16:27:32 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/05/01 17:23:05 by lpicoli-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 void Bot::sendWelcome(Server server, Channel &channel, Client &client)
 {
-    std::cout << client.getNick() << " joined " << channel.getName() << std::endl;
     std::string welcomeMsg =+ "👋 Hey " + client.getNick() + ", welcome to "+ channel.getName() +" 🎉 I'm Marvin, ";
     welcomeMsg += "your friendly bot here to assist you on this exciting journey!";
     welcomeMsg += " 🤖💬 Feel free to explore, ask questions, and engage with the community.";

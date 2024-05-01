@@ -6,7 +6,7 @@
 /*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:41:57 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/27 20:35:48 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/05/01 17:26:52 by lpicoli-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ Channel::Channel(std::string name, bool isPrivate)
 	this->_isPrivate = isPrivate;
 	this->_isInviteOnly = false;
 	this->_restrictedTopic = true;
+	this->_userLimit = UNLIMITED_USERS;
 	this->_modes.push_back('n');
 	this->_modes.push_back('t');
 	this->_creationTime = time(0);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   QUIT.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/25 13:56:21 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/01 17:24:51 by lpicoli-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void Server::QUIT(std::vector<pollfd> fds, int i, const Client client)
 {
-	std::cout << "Conexão fechada pelo cliente." << std::endl;
+	std::cout << "Connection closed by the client." << std::endl;
 	std::map<std::string, Channel> &channels = this->getChannels();
 	std::map<std::string, Channel>::iterator ch = channels.begin();
 

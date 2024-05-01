@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/30 23:03:26 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/01 17:19:41 by lpicoli-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -471,6 +471,10 @@ public:
 	bool isValidPort(std::string word);
 	void broadcastBot(Client client, Server server, std::string message, std::string channelName);
 	bool isBotInChannel(std::string &channelName);
+	bool isChannelFull(Channel &channel);
+	bool canJoinChannel(const Client &client, Channel &channel);
+	void joinChannel(int clientSocket, Client &client, std::string &channelName);
+
 };
 
 #endif
