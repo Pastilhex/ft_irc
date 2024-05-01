@@ -3,14 +3,26 @@
 /*                                                        :::      ::::::::   */
 /*   ConnectClient.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/30 23:27:51 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/01 17:37:08 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
+
+int server = 0;
+
+void	signalHandler(int signum)
+{
+	std::cout << RED << "Signal (" << signum << ") received." << std::endl;
+	std::cout << RESET << std::endl;
+	if (signum == SIGINT)
+		server = 1;
+	else if (signum == SIGTSTP)
+		server = 2;
+}
 
 void Server::connectClient(const int &serverSocket)
 {
@@ -20,8 +32,12 @@ void Server::connectClient(const int &serverSocket)
 	this->serverPoll.revents = 0;
 	fds.push_back(this->serverPoll);
  
+	signal(SIGINT, signalHandler);
+	signal(SIGTSTP, signalHandler);
 	while (true)
 	{
+		if (server == 1)
+			break ;
 		int activity = poll(fds.data(), fds.size(), -1);
 		if (activity == -1)
 		{
@@ -51,7 +67,7 @@ void Server::connectClient(const int &serverSocket)
 				{
 					std::cerr << "Erro ao receber dados do cliente." << std::endl;
 				}
-				else if (bytesRead == 0)
+				else if (bytesRead == 0 || server == 2)
 				{
 					QUIT(fds, i, client);
 				}

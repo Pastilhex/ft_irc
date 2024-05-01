@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/25 14:51:18 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/01 00:00:38 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/01 17:34:42 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,15 +86,6 @@ bool Utils::hasNonDigits(const std::string &str)
 		}
 	}
 	return false;
-}
-
-void Utils::signalHandler(int signum)
-{
-	if (signum == SIGINT)
-	{
-		logMessage("SIGINT received. Exiting...", EXIT_SUCCESS);
-		exit(EXIT_SUCCESS);
-	}
 }
 
 bool Utils::isValidPassword(const std::string &str)
