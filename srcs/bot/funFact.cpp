@@ -6,7 +6,7 @@
 /*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/01 16:27:02 by lpicoli-          #+#    #+#             */
-/*   Updated: 2024/05/01 16:39:43 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/05/01 17:34:47 by lpicoli-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,5 +45,5 @@ void Bot::funFact(Server server, Channel &channel, Client &client)
     std::srand(std::time(0));
     int randomIndex = std::rand() % funFacts.size();
     std::string randomFact = funFacts[randomIndex];
-    SEND(client.getSocket(), ":Marvin!" + client.getUsername() + "@" + server.getHostname() + " PRIVMSG " + channel.getName() + " :" + randomFact + "\r\n", "Error sending JOIN message to client.");
+    SEND(client.getSocket(), ":Marvin!" + client.getUsername() + "@" + server.getHostname() + " PRIVMSG " + channel.getName() + " :Did you know that...? 🤓 " + randomFact + "\r\n", "Error sending JOIN message to client.");
 }
