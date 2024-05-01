@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/30 23:15:47 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/01 14:18:00 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@ Server::Server(void)
 	this->_botCommands.push_back("delete");
 	this->_botCommands.push_back("help");
 	this->_botCommands.push_back("welcome");
+	this->_botCommands.push_back("goodbye");
+	this->_botCommands.push_back("quote");
 }
 
 std::vector<std::string> Server::getBotCMD() const

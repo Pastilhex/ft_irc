@@ -73,13 +73,19 @@ void Server::PRIVMSG(std::string message, Client client)
 			}
 			else if (*cmd_it == "help")
 			{
-				std::cout << "Help command" << std::endl;
-				Bot::help();
+				Bot::help(*this, it->second, client);
 			}
-			else if(*cmd_it == "welcome") //precisa ser integrado ao join quando um novo client entra 
+			else if (*cmd_it == "quote")
 			{
-				//Bot::setHostname(getHostname());
+				Bot::quote(*this, it->second, client);
+			}
+			else if(*cmd_it == "welcome")
+			{
 				Bot::sendWelcome(*this, it->second, client);
+			}
+			else if(*cmd_it == "goodbye")
+			{
+				Bot::sendGoodbye(*this, it->second, client);
 			}
 		}
 		return;

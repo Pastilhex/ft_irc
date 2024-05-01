@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   sendGoodbye.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 20:23:27 by lpicoli-          #+#    #+#             */
-/*   Updated: 2024/05/01 00:05:14 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/01 14:38:45 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,3 @@ void Bot::sendGoodbye(Server server, Channel &channel, Client &client)
     goodbyeMsg += " Until then, take care and see you soon! 👋😢\r\n";
     SEND(client.getSocket(), ":Marvin!"+client.getUsername()+"@"+server.getHostname()+" PRIVMSG "+channel.getName()+" :" + goodbyeMsg, "Error sending PART message to client.");
 }
-
-
-//:Zilio!lpicoli-@c2r4s6.42porto.com PRIVMSG #40 :dsdfdsfsd
