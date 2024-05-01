@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConnectClient.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/01 17:37:08 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/05/01 22:23:37 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int server = 0;
 
-void	signalHandler(int signum)
+void signalHandler(int signum)
 {
 	std::cout << RED << "Signal (" << signum << ") received." << std::endl;
 	std::cout << RESET << std::endl;
@@ -31,24 +31,27 @@ void Server::connectClient(const int &serverSocket)
 	this->serverPoll.events = POLLIN;
 	this->serverPoll.revents = 0;
 	fds.push_back(this->serverPoll);
- 
+
 	signal(SIGINT, signalHandler);
 	signal(SIGTSTP, signalHandler);
+	char buffer[1024] = {};
+	int bytesTotal = 0;
 	while (true)
 	{
+		char tmp[1024] = {};
 		if (server == 1)
-			break ;
+			break;
 		int activity = poll(fds.data(), fds.size(), -1);
 		if (activity == -1)
 		{
 			std::cerr << "Erro ao chamar poll()." << std::endl;
 			break;
 		}
-		
+
 		createNewClient(fds, serverSocket);
 		for (size_t i = 1; i < fds.size(); ++i)
 		{
-				if (fds[i].revents & POLLIN)
+			if (fds[i].revents & POLLIN)
 			{
 				Client client;
 				std::map<std::string, Client>::iterator it_begin = _globalUsers.begin();
@@ -61,8 +64,14 @@ void Server::connectClient(const int &serverSocket)
 				if (client.getSocket() == 0)
 					throw std::runtime_error("Cliente não encontrado");
 
-				char buffer[1024];
-				int bytesRead = recv(fds[i].fd, buffer, sizeof(buffer), 0);
+				
+				int bytesRead = recv(fds[i].fd, tmp, sizeof(buffer), 0);
+				strcat(buffer, tmp);
+				bytesTotal += bytesRead;
+				char *ptr = strchr(tmp, '\n');
+				if (ptr == NULL)
+					break;
+				
 				if (bytesRead == -1)
 				{
 					std::cerr << "Erro ao receber dados do cliente." << std::endl;
@@ -73,7 +82,10 @@ void Server::connectClient(const int &serverSocket)
 				}
 				else
 				{
-					processCMD(client, fds, buffer, bytesRead, i);
+					processCMD(client, fds, buffer, bytesTotal, i);
+					memset(buffer, '\0', sizeof(buffer));
+					memset(tmp, '\0', sizeof(tmp));
+					bytesTotal = 0;
 				}
 			}
 		}
@@ -83,43 +95,43 @@ void Server::connectClient(const int &serverSocket)
 
 void Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
 {
-    // Verifica se a ligação estabelecida através do poll() é para o servidor (novo cliente) ou para um cliente já conectado
-    if (fds[0].revents & POLLIN)
-    {
-        Client *client = new Client(); // Aloca dinamicamente um novo objeto Client
+	// Verifica se a ligação estabelecida através do poll() é para o servidor (novo cliente) ou para um cliente já conectado
+	if (fds[0].revents & POLLIN)
+	{
+		Client *client = new Client(); // Aloca dinamicamente um novo objeto Client
 
-        struct sockaddr_in clientAddress;
-        socklen_t clientAddressSize = sizeof(clientAddress);
+		struct sockaddr_in clientAddress;
+		socklen_t clientAddressSize = sizeof(clientAddress);
 
-        // Declaração de um novo client_fd (struct do tipo pollfd)
-        client->setPoll_fd(accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressSize));
-        if (client->getSocket() == -1)
-        {
-            std::cerr << "Erro ao aceitar conexão do cliente." << std::endl;
-            close(serverSocket);
-            delete client; // Libera a memória alocada para o objeto Client
-            return ;
-        }
-        client->setPoll_events();
-        client->setPoll_revents();
+		// Declaração de um novo client_fd (struct do tipo pollfd)
+		client->setPoll_fd(accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressSize));
+		if (client->getSocket() == -1)
+		{
+			std::cerr << "Erro ao aceitar conexão do cliente." << std::endl;
+			close(serverSocket);
+			delete client; // Libera a memória alocada para o objeto Client
+			return;
+		}
+		client->setPoll_events();
+		client->setPoll_revents();
 
-        // Adiciona o novo client_fd ao vector<pollfd>
-        fds.push_back(client->getClientPoll());
+		// Adiciona o novo client_fd ao vector<pollfd>
+		fds.push_back(client->getClientPoll());
 
-        // Adiciona o cliente à lista global de usuários, mas vazio porque os dados serão preenchidos no loop processCMD
-        if (!addClientToGlobalUsers(*client))
-        {
-            if (client->getSocket() == -1)
-            {
-                std::cerr << "Erro ao aceitar a conexão com o nick: " + client->getNick() + "." << std::endl;
-                close(serverSocket);
-                delete client; // Libera a memória alocada para o objeto Client
-                return; // Retorna nullptr indicando falha na criação do cliente
-            }
-        }
-        return ; // Retorna o ponteiro para o cliente criado
-    }
-    return ; // Retorna nullptr se não houver atividade no poll()
+		// Adiciona o cliente à lista global de usuários, mas vazio porque os dados serão preenchidos no loop processCMD
+		if (!addClientToGlobalUsers(*client))
+		{
+			if (client->getSocket() == -1)
+			{
+				std::cerr << "Erro ao aceitar a conexão com o nick: " + client->getNick() + "." << std::endl;
+				close(serverSocket);
+				delete client; // Libera a memória alocada para o objeto Client
+				return;		   // Retorna nullptr indicando falha na criação do cliente
+			}
+		}
+		return; // Retorna o ponteiro para o cliente criado
+	}
+	return; // Retorna nullptr se não houver atividade no poll()
 	if (fds[0].revents & POLLIN)
 	{
 		Client client;
@@ -141,7 +153,7 @@ void Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
 			{
 				std::cerr << "Erro ao aceitar a conexão com o nick: " + client.getNick() + "." << std::endl;
 				close(serverSocket);
-				return ;
+				return;
 			}
 		}
 	}
