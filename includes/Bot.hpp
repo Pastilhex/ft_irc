@@ -12,6 +12,8 @@ public:
 	static void sendWelcome(Server server, Channel &channel, Client &client);
 	static void sendGoodbye(Server server, Channel &channel, Client &client);
 	static void quote(Server server, Channel &channel, Client &client);
+	static void funFact(Server server, Channel &channel, Client &client);
+
 	virtual void execute() = 0;
 };
 

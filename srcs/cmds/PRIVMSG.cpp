@@ -56,9 +56,13 @@ void Server::PRIVMSG(std::string message, Client client)
 	
 		if (cmd_it != botCMD.end())
 		{
+			if(*cmd_it == "create" || *cmd_it == "delete")
+				if(!Utils::isOperator(it->second, client.getNick()))
+					return (SEND(client.getSocket(), ERR_CHANOPRIVSNEEDED(client, it->first), "Error sending ERR_CHANOPRIVSNEEDED (482)"));	
+
 			if (*cmd_it == "create")
 			{
-				//updateChannel(it->second);
+				updateChannel(it->second);
 				Bot::create(*this, it->second, "marvin", client);
 				return;
 			}
@@ -78,6 +82,10 @@ void Server::PRIVMSG(std::string message, Client client)
 			else if (*cmd_it == "quote")
 			{
 				Bot::quote(*this, it->second, client);
+			}
+			else if (*cmd_it == "funfact")
+			{
+				Bot::funFact(*this, it->second, client);
 			}
 			else if(*cmd_it == "welcome")
 			{
