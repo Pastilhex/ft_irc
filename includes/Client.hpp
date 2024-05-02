@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/24 21:29:45 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/05/02 11:50:17 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #define _CLIENT_
 
 #include "ircserv.hpp"
+class Server;
 
 /**
  * @brief Represents a client in the IRC server.
@@ -132,7 +133,7 @@ class Client {
 		 * @param globalUsers The map of global users.
 		 * @param hostname The hostname of the server.
 		 */
-		void getClientLoginData(std::string message, std::map<std::string, Client> globalUsers, std::string hostname);
+		void getClientLoginData(Server server, std::string message, std::map<std::string, Client> globalUsers, std::string hostname);
 		
 		virtual void help() {}
 };

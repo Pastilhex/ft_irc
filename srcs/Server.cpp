@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/01 16:35:55 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/05/02 14:06:24 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ Server::Server(void)
 	this->_hostname = "";
 	this->_password = "";
 	this->_quizMode = false;
-
 	this->_botCommands.push_back("create");
 	this->_botCommands.push_back("delete");
 	this->_botCommands.push_back("help");

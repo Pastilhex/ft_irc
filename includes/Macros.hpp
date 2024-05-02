@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Macros.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 22:22:32 by jhogonca          #+#    #+#             */
-/*   Updated: 2024/04/29 21:23:22 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/05/02 14:03:43 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,7 +212,7 @@
 //LIST
 /* :localhost 322 user123 #channel 5 :topic */
 #define RPL_LIST(client, nbrUserStr, it) \
-	(":" + this->getHostname() + " 322 " + client.getNick() + " " + channelName + " " + std::string(nbrUserStr) + " :" + it->second.getTopic() + "\r\n")
+	(":" + this->getHostname() + " 322 " + client + " " + channelName + " " + std::string(nbrUserStr) + " :" + it->second.getTopic() + "\r\n")
 
 /* :localhost 323 user123 :End of /LIST */
 #define RPL_LISTEND(client) \
@@ -220,8 +220,8 @@
 
 // NICK
 /* :localhost 431 user123 :There is no nickname. */
-#define ERR_NONICKNAMEGIVEN(client) \
-	(std::string(HOST) + " 431 " + client + " :There is no nickname.\r\n")
+#define ERR_NONICKNAMEGIVEN(client, server) \
+	(server.getHostname() + " 431 " + client + " :There is no nickname.\r\n")
 
 /* :localhost 432 user123 bad_nick :Erroneous nickname */
 #define ERR_ERRONEUSNICKNAME(client, nickname) \

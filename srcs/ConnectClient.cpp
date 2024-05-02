@@ -6,13 +6,13 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/01 22:23:37 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/02 14:47:42 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
 
-int server = 0;
+volatile sig_atomic_t server = 0;
 
 void signalHandler(int signum)
 {
@@ -34,6 +34,7 @@ void Server::connectClient(const int &serverSocket)
 
 	signal(SIGINT, signalHandler);
 	signal(SIGTSTP, signalHandler);
+
 	char buffer[1024] = {};
 	int bytesTotal = 0;
 	while (true)
@@ -66,12 +67,13 @@ void Server::connectClient(const int &serverSocket)
 
 				
 				int bytesRead = recv(fds[i].fd, tmp, sizeof(buffer), 0);
-				strcat(buffer, tmp);
+				// strcat(buffer, tmp);
+				memcpy(buffer, tmp, bytesRead);
 				bytesTotal += bytesRead;
 				char *ptr = strchr(tmp, '\n');
-				if (ptr == NULL)
+				if (ptr == NULL && bytesRead != 0)
 					break;
-				
+
 				if (bytesRead == -1)
 				{
 					std::cerr << "Erro ao receber dados do cliente." << std::endl;
@@ -95,43 +97,37 @@ void Server::connectClient(const int &serverSocket)
 
 void Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
 {
-	// Verifica se a ligação estabelecida através do poll() é para o servidor (novo cliente) ou para um cliente já conectado
 	if (fds[0].revents & POLLIN)
 	{
-		Client *client = new Client(); // Aloca dinamicamente um novo objeto Client
+		Client *client = new Client();
 
 		struct sockaddr_in clientAddress;
 		socklen_t clientAddressSize = sizeof(clientAddress);
 
-		// Declaração de um novo client_fd (struct do tipo pollfd)
 		client->setPoll_fd(accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressSize));
 		if (client->getSocket() == -1)
 		{
 			std::cerr << "Erro ao aceitar conexão do cliente." << std::endl;
 			close(serverSocket);
-			delete client; // Libera a memória alocada para o objeto Client
+			delete client;
 			return;
 		}
 		client->setPoll_events();
 		client->setPoll_revents();
-
-		// Adiciona o novo client_fd ao vector<pollfd>
 		fds.push_back(client->getClientPoll());
-
-		// Adiciona o cliente à lista global de usuários, mas vazio porque os dados serão preenchidos no loop processCMD
 		if (!addClientToGlobalUsers(*client))
 		{
 			if (client->getSocket() == -1)
 			{
 				std::cerr << "Erro ao aceitar a conexão com o nick: " + client->getNick() + "." << std::endl;
 				close(serverSocket);
-				delete client; // Libera a memória alocada para o objeto Client
-				return;		   // Retorna nullptr indicando falha na criação do cliente
+				delete client;
+				return;	
 			}
 		}
-		return; // Retorna o ponteiro para o cliente criado
+		return;
 	}
-	return; // Retorna nullptr se não houver atividade no poll()
+	return;
 	if (fds[0].revents & POLLIN)
 	{
 		Client client;

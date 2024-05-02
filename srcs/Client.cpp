@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/24 21:30:15 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/05/02 14:03:48 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,26 +95,44 @@ void Client::setTmpPassword(std::string pass)
 	this->_tmpPassword = pass;
 }
 
-void	Client::getClientLoginData(std::string message , std::map<std::string, Client> globalUsers, std::string hostname)
+void	Client::getClientLoginData(Server server, std::string message , std::map<std::string, Client> globalUsers, std::string hostname)
 {
 	if (isCMD(message, "NICK") || isCMD(message, "USER") || isCMD(message, "PASS"))
 	{
-		if (isCMD(message, "NICK"))
+		if (server.getInput().size() >= 1 && server.getInput()[0] == "NICK")
 		{
-			std::string nickname = getInputCmd(message, "NICK");
-			std::map<std::string, Client>::iterator gb = globalUsers.find(nickname);
-			if (gb != globalUsers.end())
-				SEND(getSocket(), ERR_NICKNAMEINUSE(hostname, nickname), "Error while getting nickname");
-			else
+			if (server.getInput().size() == 2)
 			{
-				std::string oldNick = getNick(); 
-				globalUsers.erase(oldNick);
-				setNick(nickname);
+				std::string nickname = server.getInput()[1];
+				std::map<std::string, Client>::iterator gb = globalUsers.find(nickname);
+				if (gb != globalUsers.end())
+					SEND(getSocket(), ERR_NICKNAMEINUSE(hostname, nickname), "Error while getting nickname");
+				else
+				{
+					std::string oldNick = getNick(); 
+					globalUsers.erase(oldNick);
+					setNick(nickname);
+				}
+				
 			}
+			else
+				SEND(this->getSocket(), ERR_NONICKNAMEGIVEN("Error", server), "Error sending login msg");
 		}
-		if (isCMD(message, "USER "))
-			setUsername(getInputCmd(message, "USER"));
-		if (isCMD(message, "PASS"))
-			setTmpPassword(getInputCmd(message, "PASS"));
+			
+		if (server.getInput().size() >= 1 && server.getInput()[0] == "USER")
+		{
+			if (server.getInput().size() >= 4 && !server.getInput()[1].empty() && !server.getInput()[2].empty() && !server.getInput()[3].empty())
+				setUsername(server.getInput()[1]);
+			else
+				SEND(this->getSocket(), "Error: USER <username> <hostname> <servername> :<Real Name>\r\n", "Error sending login msg");
+
+			if (server.getInput().size() == 5 && !server.getInput()[4].empty())
+				setRealName(server.getInput()[4]);
+		}
+		if (server.getInput().size() == 1 && server.getInput()[0] == "PASS")
+			SEND(this->getSocket(), (server.getHostname() + " 461 " + this->getNick() + " PASS :Not enough parameters.\r\n"), "Error sending login msg");
+		else if (server.getInput().size() >= 1 && server.getInput()[0] == "PASS")
+			setTmpPassword(server.getInput()[1]);
+			
 	}
 }
