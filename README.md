@@ -2,7 +2,7 @@
 
 ## About
 
-The 42 IRC Server project is a minimalist IRC server implementation developed as part of the 42 school curriculum. The aim is to provide a basic server infrastructure for hosting IRC chat rooms, managing user connections, and facilitating communication between clients. The project is implemented in [programming language] and follows the standards and specifications of the IRC protocol.
+The 42 IRC Server project is a minimalist IRC server implementation developed as part of the 42 school curriculum. The aim is to provide a basic server infrastructure for hosting IRC chat rooms, managing user connections, and facilitating communication between clients. The project is implemented in C++ and follows the standards and specifications of the IRC protocol.
 
 To access the complete project description, click [here](https://github.com/Pastilhex/ft_irc/blob/main/en.subject.pdf).
 
