@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConnectClient.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/02 14:47:42 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/03 20:08:15 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,17 @@
 
 volatile sig_atomic_t server = 0;
 
-void signalHandler(int signum)
+void sigintHandler(int sig_num)
 {
-	std::cout << RED << "Signal (" << signum << ") received." << std::endl;
-	std::cout << RESET << std::endl;
-	if (signum == SIGINT)
-		server = 1;
-	else if (signum == SIGTSTP)
-		server = 2;
+	(void)sig_num;
+	signal(SIGINT, SIG_IGN);
+	std::cout << BLUE << "Servidor encerrado." << RESET << std::endl;
+	server = 1;
+}
+
+void signalHandler(void)
+{
+	signal(SIGINT, sigintHandler);
 }
 
 void Server::connectClient(const int &serverSocket)
@@ -32,16 +35,13 @@ void Server::connectClient(const int &serverSocket)
 	this->serverPoll.revents = 0;
 	fds.push_back(this->serverPoll);
 
-	signal(SIGINT, signalHandler);
-	signal(SIGTSTP, signalHandler);
+	signalHandler();
 
 	char buffer[1024] = {};
 	int bytesTotal = 0;
 	while (true)
 	{
 		char tmp[1024] = {};
-		if (server == 1)
-			break;
 		int activity = poll(fds.data(), fds.size(), -1);
 		if (activity == -1)
 		{
@@ -64,8 +64,11 @@ void Server::connectClient(const int &serverSocket)
 				}
 				if (client.getSocket() == 0)
 					throw std::runtime_error("Cliente não encontrado");
-
-				
+				if (server == 1)
+				{
+					std::cout << "Servidor encerrado." << std::endl;
+					break ;
+				}
 				int bytesRead = recv(fds[i].fd, tmp, sizeof(buffer), 0);
 				// strcat(buffer, tmp);
 				memcpy(buffer, tmp, bytesRead);
