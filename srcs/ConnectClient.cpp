@@ -6,13 +6,13 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/04 11:34:28 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/04 13:09:33 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
 
-// volatile sig_atomic_t server = 0;
+volatile sig_atomic_t server = 0;
 
 void sigintHandler(int sig_num)
 {
@@ -37,11 +37,10 @@ void Server::connectClient(const int &serverSocket)
 
 	signalHandler();
 
-	// char buffer[1024] = {};
 	int bytesTotal = 0;
 	while (true)
 	{
-		char tmp[1024] = {};
+		char tmp[2048] = {};
 		int activity = poll(fds.data(), fds.size(), -1);
 		if (activity == -1)
 		{
@@ -54,45 +53,67 @@ void Server::connectClient(const int &serverSocket)
 		{
 			if (fds[i].revents & POLLIN)
 			{
-				Client client;
 				std::map<std::string, Client>::iterator it_begin = _globalUsers.begin();
 				std::map<std::string, Client>::iterator it_end = _globalUsers.end();
 				for (std::map<std::string, Client>::iterator &it = it_begin; it != it_end; ++it)
 				{
 					if (it->second.getSocket() == fds[i].fd)
-						client = it->second;
-				}
-				
-				if (client.getSocket() == 0)
-					throw std::runtime_error("Cliente não encontrado");
-				if (server == 1)
-				{
-					std::cout << "Servidor encerrado." << std::endl;
-					break ;
-				}
-				int bytesRead = recv(fds[i].fd, tmp, sizeof(buffer), 0);
-				// strcat(buffer, tmp);
-				memcpy(buffer, tmp, bytesRead);
-				bytesTotal += bytesRead;
-				char *ptr = strchr(tmp, '\n');
-				if (ptr == NULL && bytesRead != 0)
-					break;
+					{
+						Client &client = it->second;
+						if (client.getSocket() == 0)
+							throw std::runtime_error("Cliente não encontrado");
+						if (server == 1)
+						{
+							std::cout << "Servidor encerrado." << std::endl;
+							break ;
+						}
+						
+						
+						/*
+							A minha ideia seria verificar se o comando que chega tem quebra de linha "\n", que é o que o nc envia no final dos comandos.
+							Enquanto não receber "\n" ele acumula os comandos no buffer do seu próprio cliente.
+						*/
+						int bytesRead = recv(fds[i].fd, tmp, sizeof(tmp), 0);
+						bytesTotal += bytesRead;
+						char *ptr = strchr(tmp, '\n');
+						if (ptr == NULL && bytesRead != 0)
+						{
+							if (strlen(client.getBuffer()) != 0)
+							{
+								char buffer[2048] = {};
+								memcpy(buffer, client.getBuffer(), bytesTotal - bytesRead);
+								strcat(buffer, tmp);
+								client.setBuffer(buffer);
+							}							
+							else
+								client.setBuffer(tmp);
+							break;
+						}
+						else
+						{
+							char buffer[2048] = {};
+							memcpy(buffer, client.getBuffer(), bytesTotal - bytesRead);
+							strcat(buffer, tmp);
+							client.setBuffer(buffer);
+						}
 
-				if (bytesRead == -1)
-				{
-					std::cerr << "Erro ao receber dados do cliente." << std::endl;
-				}
-				else if (bytesRead == 0)// || server == 2
-				{
-					QUIT(fds, i, client);
-				}
-				else
-				{
-					std::string message(client.getBuffer(), bytesRead);
-					processCMD(client, fds, message, i);
-					// memset(buffer, '\0', sizeof(buffer));
-					// memset(tmp, '\0', sizeof(tmp));
-					bytesTotal = 0;
+						if (bytesRead == -1)
+						{
+							std::cerr << "Erro ao receber dados do cliente." << std::endl;
+						}
+						else if (bytesRead == 0) // || server == 2
+						{
+							QUIT(fds, i, client);
+						}
+						else
+						{
+							std::string message(client.getBuffer(), bytesTotal);
+							processCMD(client, fds, message, i);
+							// memset(buffer, '\0', sizeof(buffer));
+							// memset(tmp, '\0', sizeof(tmp));
+							bytesTotal = 0;
+						}
+					}
 				}
 			}
 		}
