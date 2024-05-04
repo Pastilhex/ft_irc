@@ -3,19 +3,31 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/23 17:28:47 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/02 14:25:07 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/04 01:51:58 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/ircserv.hpp"
 
+bool server_shutdown = false;
+
+void signalHandler(int signum)
+{
+	if (signum == SIGINT)
+	{
+		server_shutdown = true;
+		Utils::logMessage("Server shutting down...", EXIT_SUCCESS);
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	Server server;
 	
+	signal(SIGINT, signalHandler);
 	if (Utils::inputValidation(argc, argv) == false)
 		return (EXIT_FAILURE);
 	if (server.start(argv[1], argv[2]) == false)

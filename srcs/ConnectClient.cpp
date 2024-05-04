@@ -3,29 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   ConnectClient.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/04 13:09:33 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/04 15:35:59 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
-
-volatile sig_atomic_t server = 0;
-
-void sigintHandler(int sig_num)
-{
-	(void)sig_num;
-	signal(SIGINT, SIG_IGN);
-	std::cout << BLUE << "Servidor encerrado." << RESET << std::endl;
-	server = 1;
-}
-
-void signalHandler(void)
-{
-	signal(SIGINT, sigintHandler);
-}
 
 void Server::connectClient(const int &serverSocket)
 {
@@ -35,19 +20,18 @@ void Server::connectClient(const int &serverSocket)
 	this->serverPoll.revents = 0;
 	fds.push_back(this->serverPoll);
 
-	signalHandler();
-
 	int bytesTotal = 0;
 	while (true)
 	{
+		if (server_shutdown == true)
+			break;
 		char tmp[2048] = {};
 		int activity = poll(fds.data(), fds.size(), -1);
-		if (activity == -1)
+		if (activity == -1 && !server_shutdown)
 		{
 			std::cerr << "Erro ao chamar poll()." << std::endl;
 			break;
 		}
-
 		createNewClient(fds, serverSocket);
 		for (size_t i = 1; i < fds.size(); ++i)
 		{
@@ -61,14 +45,7 @@ void Server::connectClient(const int &serverSocket)
 					{
 						Client &client = it->second;
 						if (client.getSocket() == 0)
-							throw std::runtime_error("Cliente não encontrado");
-						if (server == 1)
-						{
-							std::cout << "Servidor encerrado." << std::endl;
-							break ;
-						}
-						
-						
+							throw std::runtime_error("Cliente não encontrado");						
 						/*
 							A minha ideia seria verificar se o comando que chega tem quebra de linha "\n", que é o que o nc envia no final dos comandos.
 							Enquanto não receber "\n" ele acumula os comandos no buffer do seu próprio cliente.
@@ -118,6 +95,7 @@ void Server::connectClient(const int &serverSocket)
 			}
 		}
 	}
+	std::cout << BLUE << "Servidor encerrado." << std::endl;
 	close(serverSocket);
 }
 
