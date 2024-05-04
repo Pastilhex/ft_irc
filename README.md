@@ -2,7 +2,9 @@
 
 ## About
 
-The 42 IRC Server project is a minimalist IRC server implementation developed as part of the 42 school curriculum. The aim is to provide a basic server infrastructure for hosting IRC chat rooms, managing user connections, and facilitating communication between clients. The project is implemented in C++ and follows the standards and specifications of the IRC protocol.
+The 42 IRC Server project is a minimalist IRC server implementation developed as part of the [42 school](https://www.42porto.com/en/) curriculum. 
+
+The aim is to provide a basic server infrastructure for hosting IRC chat rooms, managing user connections, and facilitating communication between clients. The project is implemented in `C++` and follows the standards and specifications of the [IRC protocol](https://www.ietf.org/rfc/rfc1459.txt).
 
 To access the complete project description, click [here](https://github.com/Pastilhex/ft_irc/blob/main/en.subject.pdf).
 
@@ -16,29 +18,39 @@ To access the complete project description, click [here](https://github.com/Past
 ## Features
 
 - **Multi-User Chat:** Host multiple chat rooms simultaneously, allowing users to join and participate in discussions.
+
 - **User Authentication:** Implement user authentication mechanisms to ensure secure access to chat rooms.
+
 - **Message Broadcasting:** Broadcast messages from users to all participants in a chat room.
+
 - **Command Handling:** Support basic IRC commands such as JOIN, PART, PRIVMSG, and more.
+
 - **Bot Support:** Implement a bot that can be used to automate tasks such as welcoming new users or sending messages to users in specific channels.
 
 ## Available Commands
 
 Here are the available commands in the IRC protocol supported by the 42_irc server, along with details and usage examples:
 
-| Command  | Description                                                | Example                      |
-|----------|------------------------------------------------------------|------------------------------|
-| /JOIN    | Allows a user to join a specific channel.                  | /join #channel               |
-| /MODE    | Shows, defines or modifies channel or user modes.                 | /mode #channel +i            |
-| /INVITE  | Invites a user to join a specific channel.                 | /invite user #channel        |
-| /PART    | Makes the user leave a specific channel.                   | /part #channel               |
+| Command  | Description                                                |
+|----------|------------------------------------------------------------|
+| /JOIN    | Allows a user to join a specific channel.                  |
+| /MODE    | Shows, defines or modifies channel or user modes.          |
+| /INVITE  | Invites a user to join a specific channel.                 |
+| /PART    | Makes the user leave a specific channel.                   |
+| /KICK    | Ejects a client from the channel.                          |
+| /TOPIC   | Changes or views the channel topic.                        |
+| /PRIVMSG | Sends a private message to a user or a channel.            |
+| /QUIT    | Disconnects the user from the server.                      |
+| /WHO     | Provides information about a user, a channel, or the server.|
+| /LIST    | Lists channels, number of users and their topics.                           |
 
 ### Command Details:
 
-- **/ JOIN**
+### ``JOIN``
   - **Description:** This command is used to join a specific channel on the IRC server.
   - **Example:** `/join #chat-room`
 
-- **/ MODE**
+### ``MODE``
   - **Description:** Allows defining or modifying channel or user modes.
   - **Note:** Operators' privilege might be required for some arguments.
 
@@ -50,15 +62,51 @@ Here are the available commands in the IRC protocol supported by the 42_irc serv
     | k        | Password - Sets a password for the channel. | `/mode #channel +k password` |
     | l        | Limit - Limits the number of users that can join the channel. | `/mode #channel +l 10` |
 
-- **/ INVITE**
+In our system, we use a simple way to enable and disable functionalities. 
+Here's a visual representation:
+
+| Symbol | Action | Description |
+|--------|--------|-------------|
+| `+`    | Set    | Activates a funtionality. This means that whatever functionality is tied to the command would be enabled and ready for use. |
+| `-`    | Unset  | Deactivates a functionality. This means that the functionality tied to the command would be turned off and will not respond to triggers. |
+
+
+For instance, in the case of the `mode` command:
+
+- `+k` sets a password (channel key), while `-k` unsets the password.
+- `+l` sets a limit, while `-l` unsets the limit.
+- `+i` sets the channel to invite-only, while `-i` removes the invite-only restriction.
+- `+t` sets the restriction of the TOPIC command to channel operators, while `-t` removes this restriction.
+- `+o` gives channel operator privilege, while `-o` takes the privilege away.
+
+### ``INVITE``
   - **Description:** Invites a specific user to join a channel. 
   - **Note:** Operators' privilege is required for this command.
   - **Example:** `/invite user_nick #secret-channel`
 
-- **/ PART**
+### ``PART``
   - **Description:** Makes the user leave the specified channel.
   - **Example:** `/part #channel` or just `/part` (if you're inside the channel)
 
+### ``PRIVMSG``
+  - **Description:** Sends a message to a specific user or all users in a channel. 
+  - **Note:** If a channel is specified, the message will be broadcast to all users in that channel.
+  - **Example:** `/privmsg user_nick Hello there!` or `/privmsg #channel Hello everyone!`
+  
+### ``QUIT``
+  - **Description:** Disconnects the user from the IRC server.
+  - **Note:** An optional quit message can be provided, which will be displayed to other users.
+  - **Example:** `/quit`
+
+### ``WHO``
+  - **Description:** Retrieves, channel, or server information.
+  - **Note:** The output depends on the parameters provided. It can list users in a specific channel, show details about a specific user, or list all visible users.
+  - **Example:** `/who #channel` or `/who user_nick`
+
+### ``KICK``
+  - **Description:** Removes a user from a channel.
+  - **Note:** This command requires operator privileges. An optional reason can be provided, which will be displayed to the user.
+  - **Example:** `/kick user_nick #channel`
 ## Bot
 
 ### Commands 
@@ -74,6 +122,15 @@ Here are the available commands in the IRC protocol supported by the 42_irc serv
 
 - **Welcome:** Upon joining a channel with the bot, users are greeted.
 - **Goodbye:** When users leave the channel, the bot bids them farewell.
+
+
+## About the Macros File
+
+The [Macros.hpp](includes/Macros.hpp) file is key in our system. It contains macros for messages we send to the client, adhering to the IRC protocol's specific syntax. 
+
+This protocol, like a common language, ensures the server and client understand each other. By using this protocol they can understand what actions to perform based on the messages they receive.
+
+Macros abstract away message formatting details, making our code cleaner and easier to maintain. Any changes to the message format only need to be made in one place, improving maintainability.
 
 
 ## Installation
@@ -107,8 +164,3 @@ To install and run the 42 IRC Server, follow these steps:
 ## Usage
 
 Once the server is running, users can connect to it using an IRC client application like [WeeChat](https://weechat.org/), [HexChat](https://hexchat.github.io/) or [Irssi](https://irssi.org/). They can then join chat rooms, send messages, and interact with other users in real-time.
-
-## Disclaimer
-
-Maybe you could notice a different coding style.
-[Click here](https://github.com/MagicHatJo/-42-Norm/blob/master/norme.en.pdf) to read the norm file of 42 school. 
