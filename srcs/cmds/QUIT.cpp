@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   QUIT.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/01 17:24:51 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/05/03 11:41:00 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/ircserv.hpp"
 
-void Server::QUIT(std::vector<pollfd> fds, int i, const Client client)
+void Server::QUIT(std::vector<pollfd> &fds, int i, const Client client)
 {
 	std::cout << "Connection closed by the client." << std::endl;
 	std::map<std::string, Channel> &channels = this->getChannels();

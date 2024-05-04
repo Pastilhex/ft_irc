@@ -6,13 +6,16 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/02 14:03:48 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/03 14:55:11 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
 
-Client::Client(void) {}
+Client::Client(void)
+{
+}
+
 Client::~Client(void){}
 
 void Client::setNewClient(Client &client)
@@ -22,6 +25,26 @@ void Client::setNewClient(Client &client)
 	client._tmpPassword.clear();
 	client._username.clear();
 	client._realname.clear();
+}
+
+char *Client::getBuffer(void)
+{
+	return this->_buffer;
+}
+
+void Client::setBuffer(char *buffer)
+{
+	memcpy(this->_buffer, buffer, sizeof(this->_buffer));
+}
+
+bool Client::getStatus(void)
+{
+	return this->_status;
+}
+
+void Client::setStatus(bool status)
+{
+	this->_status = status;
 }
 
 std::string Client::getRealName(void)
@@ -46,13 +69,13 @@ std::string Client::getTmpPassword(void)
 
 pollfd Client::getClientPoll(void)
 {
-	return this->clientPoll;
+	return this->_clientPoll;
 }
 
 
 void Client::setSocket(int fd)
 {
-	this->clientPoll.fd = fd;
+	this->_clientPoll.fd = fd;
 }
 
 void Client::setRealName(std::string realname)
@@ -62,22 +85,22 @@ void Client::setRealName(std::string realname)
 
 int Client::getSocket(void) const
 {
-	return this->clientPoll.fd;
+	return this->_clientPoll.fd;
 }
 
 void Client::setPoll_fd(int fd)
 {
-	this->clientPoll.fd = fd;
+	this->_clientPoll.fd = fd;
 }
 
 void Client::setPoll_events(void)
 {
-	this->clientPoll.events = POLL_IN;
+	this->_clientPoll.events = POLL_IN;
 }
 
 void Client::setPoll_revents(void)
 {
-	this->clientPoll.revents = 0;
+	this->_clientPoll.revents = 0;
 }
 
 void Client::setNick(std::string nick)

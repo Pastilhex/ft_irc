@@ -6,15 +6,15 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/02 14:07:17 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/03 14:44:49 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
 
-void Server::processCMD(Client &client, std::vector<pollfd> &fds, char *buffer, int bytesRead, int i)
+void Server::processCMD(Client &client, std::vector<pollfd> &fds, std::string message, size_t &i)
 {
-	std::string message(buffer, bytesRead);
+	// std::string message(buffer, bytesRead);
 	std::vector<std::string> splitMessage = Utils::splitVector(message, "\n");
 	while (splitMessage.size())
 	{
@@ -27,34 +27,49 @@ void Server::processCMD(Client &client, std::vector<pollfd> &fds, char *buffer, 
 			{
 				if (!(getInput()[0] == "PING"))
 					std::cout << RED << "<< " << RED + splitMessage[0] << RESET << std::endl;
+				
 				if (splitMessage[0].find("CAP LS") != std::string::npos)
 					SEND(client.getSocket(), ":* CAP * LS :42Porto Ft_IRCv1.0\r\n", "Error sending CAP LS message to client");
+				
 				else if (splitMessage[0].find("CAP END") != std::string::npos)
 					SEND(fds[i].fd, ":* CAP * END\r\n", "Error sending CAP LS message to client");
+				
 				else if (getInput()[0] == "PING")
 					SEND(client.getSocket(), RPL_PONG(client.getNick(), client.getUsername(), getInput()[1]), "Error sending PONG message");
-				else if (getInput()[0] == "PRIVMSG")
+				
+				else if (getInput()[0] == "PRIVMSG" && client.getStatus() == true)
 					PRIVMSG(message, client);
+				
 				else if (getInput()[0] == "NICK" || getInput()[0] == "USER" || getInput()[0] == "PASS")
 					login(client, splitMessage);
-				else if (getInput()[0] == "MODE")
+				
+				else if (getInput()[0] == "MODE" && client.getStatus() == true)
 					MODE(client);
-				else if (getInput()[0] == "WHO")
+				
+				else if (getInput()[0] == "WHO" && client.getStatus() == true)
 					WHO(fds[i].fd, client);
-				else if (getInput()[0] == "LIST")
+				
+				else if (getInput()[0] == "LIST" && client.getStatus() == true)
 					LIST(fds[i].fd, client);
-				else if (getInput()[0] == "JOIN")
+				
+				else if (getInput()[0] == "JOIN" && client.getStatus() == true)
 					JOIN(fds[i].fd, client);
-				else if (getInput()[0] == "PART")
+				
+				else if (getInput()[0] == "PART" && client.getStatus() == true)
 					PART(message, client);
+				
 				else if (splitMessage[0].find("QUIT") != std::string::npos)
 					QUIT(fds, i, client);
-				else if (getInput()[0] == "KICK")
+				
+				else if (getInput()[0] == "KICK" && client.getStatus() == true)
 					KICK(message, client);
-				else if (getInput()[0] == "TOPIC")
+				
+				else if (getInput()[0] == "TOPIC" && client.getStatus() == true)
 					TOPIC(client);
-				else if (getInput()[0] == "INVITE")
+				
+				else if (getInput()[0] == "INVITE" && client.getStatus() == true)
 					INVITE(client);
+				
 				splitMessage.erase(splitMessage.begin());
 			}
 		}
@@ -79,9 +94,11 @@ void Server::login(Client &client, std::vector<std::string> splitMessage)
 			
 			if (!client.getUsername().empty() && client.getUsername() != it->second.getUsername())
 				it->second.setUsername(client.getUsername());
-			else if (!client.getRealName().empty() && client.getRealName() != it->second.getRealName())
+			
+			if (!client.getRealName().empty() && client.getRealName() != it->second.getRealName())
 				it->second.setRealName(client.getRealName());
-			else if (!client.getTmpPassword().empty() && client.getTmpPassword() != it->second.getTmpPassword())
+			
+			if (!client.getTmpPassword().empty() && client.getTmpPassword() != it->second.getTmpPassword())
 				it->second.setTmpPassword(client.getTmpPassword());
 			
 			if (client.getTmpPassword() == this->getPassword())
@@ -89,7 +106,11 @@ void Server::login(Client &client, std::vector<std::string> splitMessage)
 				if (!client.getNick().empty() && !client.getUsername().empty())
 					sendWelcome(client.getSocket(), client);
 			}
-			else if (!client.getNick().empty() && !client.getUsername().empty() && !client.getTmpPassword().empty() && client.getTmpPassword() != this->getPassword())
+			
+			if (!client.getNick().empty() && !client.getUsername().empty() && !client.getTmpPassword().empty())
+				it->second.setStatus(true);
+
+			if (!client.getNick().empty() && !client.getUsername().empty() && !client.getTmpPassword().empty() && client.getTmpPassword() != this->getPassword())
 			{
 				std::cout << "<< " + splitMessage[0] << std::endl;
 				SEND(client.getSocket(), ERR_PASSWDMISMATCH(client), "Error while login");

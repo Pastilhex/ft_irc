@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/01 17:19:41 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/05/03 14:44:55 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -265,7 +265,7 @@ public:
 	 */
 	void WHO(int clientSocket, const Client client);
 
-	void QUIT(std::vector<pollfd> fds, int i, const Client client);
+	void QUIT(std::vector<pollfd> &fds, int i, const Client client);
 
 	// Utils
 	/**
@@ -368,7 +368,7 @@ public:
 	 * @param bytesRead The number of bytes read.
 	 * @param i The index of the client in the vector of file descriptors.
 	 */
-	void processCMD(Client &client, std::vector<pollfd> &fds, char *buffer, int bytesRead, int i);
+	void processCMD(Client &client, std::vector<pollfd> &fds, std::string message, size_t &i);
 
 	/**
 	 * @brief Starts the server.

@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/23 14:12:03 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/03 11:08:22 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void Server::LIST(int clientSocket, Client &client)
 		char nbrUserStr[20];
 
 		sprintf(nbrUserStr, "%d", nbrUser);
-		std::string channel = RPL_LIST(client, nbrUserStr, it);
+		std::string channel = RPL_LIST(client.getNick(), nbrUserStr, it);
 		channel += RPL_LISTEND(client);
 		SEND(clientSocket, channel, "Error updating LIST");
 	}
