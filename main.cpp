@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/23 17:28:47 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/04 01:51:58 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/05/05 11:51:51 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ void signalHandler(int signum)
 	if (signum == SIGINT)
 	{
 		server_shutdown = true;
+		std::cout << std::endl;
 		Utils::logMessage("Server shutting down...", EXIT_SUCCESS);
 	}
 }

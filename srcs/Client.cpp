@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/03 14:55:11 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/04 21:10:16 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,10 @@ char *Client::getBuffer(void)
 
 void Client::setBuffer(char *buffer)
 {
-	memcpy(this->_buffer, buffer, sizeof(this->_buffer));
+	if (buffer == 0)
+		memset(this->_buffer, 0, sizeof(this->_buffer));
+	else
+		memcpy(this->_buffer, buffer, sizeof(this->_buffer));
 }
 
 bool Client::getStatus(void)
