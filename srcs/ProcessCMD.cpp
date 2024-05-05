@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ProcessCMD.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/04 13:03:28 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/05 11:39:54 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,21 +83,14 @@ void Server::login(Client &client, std::vector<std::string> splitMessage)
 	std::map<std::string, Client>::iterator it = globalUsers.begin();
 	while (it != globalUsers.end())
 	{
+		// TRATAR AQUI
 		if (client.getClientPoll().fd == it->second.getClientPoll().fd)
 		{
-			if (!client.getNick().empty() && client.getNick() != it->second.getNick())
-			{
-				this->_globalUsers.insert(std::make_pair(client.getNick(), client));
-				this->_globalUsers.erase(it);
-				break;
-			}
-			
 			if (!client.getUsername().empty() && client.getUsername() != it->second.getUsername())
 				it->second.setUsername(client.getUsername());
 			
 			if (!client.getRealName().empty() && client.getRealName() != it->second.getRealName())
 				it->second.setRealName(client.getRealName());
-			
 			if (!client.getTmpPassword().empty() && client.getTmpPassword() != it->second.getTmpPassword())
 				it->second.setTmpPassword(client.getTmpPassword());
 			
@@ -107,13 +100,21 @@ void Server::login(Client &client, std::vector<std::string> splitMessage)
 					sendWelcome(client.getSocket(), client);
 			}
 			
-			if (!client.getNick().empty() && !client.getUsername().empty() && !client.getTmpPassword().empty())
-				it->second.setStatus(true);
-
-			if (!client.getNick().empty() && !client.getUsername().empty() && !client.getTmpPassword().empty() && client.getTmpPassword() != this->getPassword())
+			if (!it->second.getNick().empty() && !it->second.getUsername().empty() && !it->second.getTmpPassword().empty())
 			{
-				std::cout << "<< " + splitMessage[0] << std::endl;
-				SEND(client.getSocket(), ERR_PASSWDMISMATCH(client), "Error while login");
+				it->second.setStatus(true);
+				if (it->second.getTmpPassword() != this->getPassword())
+				{
+					std::cout << "<< " + splitMessage[0] << std::endl;
+					SEND(client.getSocket(), ERR_PASSWDMISMATCH(client), "Error while login");
+				}
+			}
+			
+			if (!client.getNick().empty() && !client.getUsername().empty() && client.getNick() != it->first)
+			{
+				this->_globalUsers.insert(std::make_pair(client.getNick(), client));
+				this->_globalUsers.erase(it);
+				break;
 			}
 		}
 		it++;

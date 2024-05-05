@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConnectClient.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/04 16:15:48 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/05/05 11:55:27 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,6 @@ void Server::connectClient(const int &serverSocket)
 		{
 			if (fds[i].revents & POLLIN)
 			{
-				std::cout << "POLLIN " << fds[i].fd << std::endl; sleep(2);
-				
 				std::map<std::string, Client>::iterator it_begin = _globalUsers.begin();
 				std::map<std::string, Client>::iterator it_end = _globalUsers.end();
 				for (std::map<std::string, Client>::iterator &it = it_begin; it != it_end; ++it)
@@ -48,11 +46,7 @@ void Server::connectClient(const int &serverSocket)
 						Client &client = it->second;
 						if (client.getSocket() == 0)
 							throw std::runtime_error("Cliente não encontrado");						
-						/*
-							A minha ideia seria verificar se o comando que chega tem quebra de linha "\n", 
-							que é o que o nc envia no final dos comandos.
-							Enquanto não receber "\n" ele acumula os comandos no buffer do seu próprio cliente.
-						*/
+
 						int bytesRead = recv(fds[i].fd, tmp, sizeof(tmp), 0);
 						bytesTotal += bytesRead;
 						char *ptr = strchr(tmp, '\n');
@@ -81,7 +75,7 @@ void Server::connectClient(const int &serverSocket)
 						{
 							std::cerr << "Erro ao receber dados do cliente." << std::endl;
 						}
-						else if (bytesRead == 0) // || server == 2
+						else if (bytesRead == 0)
 						{
 							QUIT(fds, i, client);
 						}
@@ -89,12 +83,13 @@ void Server::connectClient(const int &serverSocket)
 						{
 							std::string message(client.getBuffer(), bytesTotal);
 							processCMD(client, fds, message, i);
-							// memset(buffer, '\0', sizeof(buffer));
-							// memset(tmp, '\0', sizeof(tmp));
 							bytesTotal = 0;
 						}
+						client.setBuffer(NULL);
+						break;
 					}
 				}
+				fds[i].revents = 0;
 			}
 		}
 	}
