@@ -6,7 +6,7 @@
 /*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:41:57 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/01 17:26:52 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/05/06 22:11:58 by lpicoli-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -261,12 +261,12 @@ void Channel::setRestrictedTopic(bool mode)
 	this->_restrictedTopic = mode;
 }
 
-void Channel::setBot(Client *bot)
+void Channel::setBot(Client bot)
 {
 	this->_bot = bot;
 }
 
-Client *Channel::getBot(void)
+Client Channel::getBot(void)
 {
 	return this->_bot;
 }

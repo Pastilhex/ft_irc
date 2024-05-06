@@ -6,7 +6,7 @@
 /*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/27 20:36:06 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/05/06 22:11:37 by lpicoli-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ private:
 	std::vector<std::string> _invited;           /* List of invited users (nicknames) */
 	std::vector<char> _modes;                    /* List of channel modes */
 	time_t _creationTime;                        /* Channel creation time */
-	Client *_bot;
+	Client _bot;
 
 public:
 
@@ -53,8 +53,8 @@ public:
 	 * @return The creation time of the channel as a string.
 	 */
 	std::string getCreationTime(void);
-	Client* getBot(void);
-	void setBot(Client *bot);
+	Client getBot(void);
+	void setBot(Client bot);
 
 	bool botExists(void);
 
