@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/03 14:44:55 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/06 11:55:40 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -264,6 +264,8 @@ public:
 	 * @param client The client object.
 	 */
 	void WHO(int clientSocket, const Client client);
+
+	void WHOIS(const Client client);
 
 	void QUIT(std::vector<pollfd> &fds, int i, const Client client);
 

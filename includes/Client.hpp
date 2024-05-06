@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/03 13:38:00 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/06 11:55:11 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ public:
 	 * @brief Get the real name of the client.
 	 * @return The real name of the client.
 	 */
-	std::string getRealName(void);
+	std::string getRealName(void) const;
 
 	/**
 	 * @brief Get the nickname of the client.

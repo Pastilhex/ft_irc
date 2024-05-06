@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ircserv.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 13:07:13 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/29 22:49:27 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/05/06 10:49:09 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,6 @@ void SEND(int socket, std::string msg, std::string error)
 {
 	if (send(socket, msg.c_str(), msg.length(), 0) == -1)
 		std::cerr << error << std::endl;
-	if (!(msg.find("PONG") != std::string::npos))
+	//if (!(msg.find("PONG") != std::string::npos))
 		std::cout << GREEN << ">> " << msg << RESET;
 }

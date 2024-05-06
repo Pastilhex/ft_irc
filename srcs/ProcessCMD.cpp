@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ProcessCMD.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/05 11:39:54 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/06 11:57:02 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void Server::processCMD(Client &client, std::vector<pollfd> &fds, std::string me
 			setInput(splitMessage[0]);
 			if (getInput().size() >= 1)
 			{
-				if (!(getInput()[0] == "PING"))
+				//if (!(getInput()[0] == "PING"))
 					std::cout << RED << "<< " << RED + splitMessage[0] << RESET << std::endl;
 				
 				if (splitMessage[0].find("CAP LS") != std::string::npos)
@@ -69,6 +69,9 @@ void Server::processCMD(Client &client, std::vector<pollfd> &fds, std::string me
 				
 				else if (getInput()[0] == "INVITE" && client.getStatus() == true)
 					INVITE(client);
+				
+				else if ((getInput()[0] == "WHOIS" || getInput()[0] == "whois") && client.getStatus() == true)
+					WHOIS(client);
 				
 				splitMessage.erase(splitMessage.begin());
 			}
