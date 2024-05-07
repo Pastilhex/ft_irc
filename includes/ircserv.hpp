@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ircserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 06:36:04 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/04 01:50:25 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/05/07 20:40:14 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ extern bool server_shutdown;
 # define BOLD_GREEN		"\001\033[1;92m\002"
 
 #include <iostream>
+#include <algorithm>
 #include <arpa/inet.h>
 #include <cctype>
 #include <cerrno>
@@ -33,6 +34,7 @@ extern bool server_shutdown;
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <exception>
 #include <fcntl.h>
 #include <map>
 #include <netdb.h>
@@ -45,8 +47,6 @@ extern bool server_shutdown;
 #include <sys/socket.h>
 #include <sys/poll.h>
 #include <sstream>
-#include <exception>
-#include <algorithm>
 
 #include "Server.hpp"
 #include "Client.hpp"
