@@ -43,11 +43,15 @@ $(OBJDIR)/main.o: main.cpp
 	@$(eval COMPILE_COUNT=$(shell echo $$(($(COMPILE_COUNT)+1))))
 	@printf "\r[\033[32m%3d%%\033[0m] Compiling: $<    " $$(($(COMPILE_COUNT) * 100 / $(NUM_SRCS)))
 
+leaks: $(NAME)
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --log-file=valgrind-output.txt ./$(NAME) 6667 pass
+
 clean:
 	rm -rf $(OBJDIR)
 
 fclean: clean
 	rm -f $(NAME)
+	rm -rf valgrind*
 
 re: fclean all
 
