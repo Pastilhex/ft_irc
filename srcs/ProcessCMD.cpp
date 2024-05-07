@@ -25,7 +25,7 @@ void Server::processCMD(Client &client, std::vector<pollfd> &fds, std::string me
 			setInput(splitMessage[0]);
 			if (getInput().size() >= 1)
 			{
-				//if (!(getInput()[0] == "PING"))
+				if (!(getInput()[0] == "PING"))
 					std::cout << RED << "<< " << RED + splitMessage[0] << RESET << std::endl;
 				
 				if (splitMessage[0].find("CAP LS") != std::string::npos)

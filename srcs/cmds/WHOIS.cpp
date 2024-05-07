@@ -14,18 +14,31 @@
 
 void Server::WHOIS(const Client client)
 {
-	// :harpy.de.SpotChat.org 311 ivo systwi ~systwi SpotChat-na4j3d.res.spectrum.com * :systwi
-	// :harpy.de.SpotChat.org 319 ivo systwi :@#test #linux #spotchat #linuxmint-nl #linuxmint-chat #linuxmint-help
-	// :harpy.de.SpotChat.org 312 ivo systwi harpy.de.SpotChat.org :is it a Bird?
-	// :harpy.de.SpotChat.org 330 ivo systwi systwi :is logged in as
-	// :harpy.de.SpotChat.org 671 ivo systwi :is using a secure connection
-	// :harpy.de.SpotChat.org 317 ivo systwi 194282 1714798951 :seconds idle, signon time
-	// :harpy.de.SpotChat.org 318 ivo systwi :End of /WHOIS list.
-
+	std::string channelList;
 	std::map<std::string, Client> &globalUsers = getGlobalUsers();
 	std::map<std::string, Client>::iterator it = globalUsers.find(getInput()[1]);
 	if (it != globalUsers.end())
 	{
-		SEND(client.getSocket(), RPL_WHOISUSER(client, it->second), "Error sending WHOIS message");
+		std::map<std::string, Channel> channels = getChannels();
+		std::map<std::string, Channel>::iterator it = channels.begin();
+		while (it != channels.end())
+		{
+			std::map<std::string, Client> users = it->second.getUsers();
+			std::map<std::string, Client>::iterator us = users.find(getInput()[1]);
+			if (us != users.end())
+			{
+				if (Utils::isOperator(it->second, getInput()[1]))
+					channelList += "@";
+				channelList += it->first;
+				channelList += " ";
+			}
+			++it;
+		}
+		Utils::trim(channelList);
+		SEND(client.getSocket(), ":" + getHostname() + " 311 " + client.getNick() + " " + getInput()[1] + " ~" + getInput()[1] + " " + "  FT_IRC_42Porto_v1.0 * :" + getInput()[1] + "\r\n", "Error sending WHOIS message");
+		SEND(client.getSocket(), ":" + getHostname() + " 319 " + client.getNick() + " " + getInput()[1] + " :" + channelList + "\r\n", "Error sending WHOIS message");
+		SEND(client.getSocket(), ":" + getHostname() + " 312 " + client.getNick() + " " + getInput()[1] + " " + getHostname() + " :is it a Bird, is it Superman? No, it's " + getInput()[1] + "\r\n", "Error sending WHOIS message");
+		SEND(client.getSocket(), ":" + getHostname() + " 330 " + client.getNick() + " " + getInput()[1] + " " + getInput()[1] + " :is logged in as" + "\r\n", "Error sending WHOIS message");
+		SEND(client.getSocket(), ":" + getHostname() + " 318 " + client.getNick() + " " + getInput()[1] + " :End of /WHOIS list." + "\r\n", "Error sending WHOIS message");
 	}
 }

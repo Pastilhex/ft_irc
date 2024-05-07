@@ -62,6 +62,6 @@ void SEND(int socket, std::string msg, std::string error)
 {
 	if (send(socket, msg.c_str(), msg.length(), 0) == -1)
 		std::cerr << error << std::endl;
-	//if (!(msg.find("PONG") != std::string::npos))
+	if (!(msg.find("PONG") != std::string::npos))
 		std::cout << GREEN << ">> " << msg << RESET;
 }
