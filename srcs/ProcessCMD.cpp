@@ -87,9 +87,6 @@ void Server::login(Client &client, std::vector<std::string> splitMessage)
 	{
 		if (client.getClientPoll().fd == it->second.getClientPoll().fd)
 		{
-			if (!client.getNick().empty() && client.getNick() != it->second.getNick())
-				it->second.setNick(client.getNick());
-
 			if (!client.getUsername().empty() && client.getUsername() != it->second.getUsername())
 				it->second.setUsername(client.getUsername());
 
@@ -116,7 +113,7 @@ void Server::login(Client &client, std::vector<std::string> splitMessage)
 					it->second.setStatus(true);
 			}
 
-			if (!client.getNick().empty() && !client.getUsername().empty() && client.getNick() != it->first)
+			if (!client.getNick().empty() && client.getNick() != it->first && !client.getUsername().empty())
 			{
 				this->_globalUsers.insert(std::make_pair(client.getNick(), client));
 				this->_globalUsers.erase(it);
@@ -124,5 +121,31 @@ void Server::login(Client &client, std::vector<std::string> splitMessage)
 			}
 		}
 		it++;
+	}
+
+	if (getInput().size() == 2 && getInput()[0] == "NICK" && client.getStatus() == true)
+	{
+		std::map<std::string, Client> &globalUsers = getGlobalUsers();
+		std::map<std::string, Client>::iterator it = globalUsers.find(client.getNick());
+		if (it != globalUsers.end())
+			it->second.setNick(getInput()[1]);
+		
+		std::map<std::string, Channel> &channels = getChannels();
+		std::map<std::string, Channel>::iterator ch = channels.begin();
+		while (ch != channels.end())
+		{
+			std::map<std::string, Client> &users = ch->second.getUsers();
+			std::map<std::string, Client>::iterator us = users.find(client.getNick());
+			if (us != globalUsers.end())
+				us->second.setNick(getInput()[1]);
+
+			std::vector<std::string> &operators = ch->second.getOperators();
+			std::vector<std::string>::iterator op = find(operators.begin(), operators.end(), "@" + getInput()[1]);
+			if (op != operators.end())
+			{
+				*op = "@" + getInput()[1];
+			}
+		}	
+		
 	}
 }
