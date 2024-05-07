@@ -124,9 +124,9 @@ void Client::setTmpPassword(std::string pass)
 	this->_tmpPassword = pass;
 }
 
-void Client::getClientLoginData(Server server, std::string message, std::map<std::string, Client> globalUsers, std::string hostname)
+void Client::getClientLoginData(Server server, std::string message, std::map<std::string, Client> globalUsers, Client client)
 {
-	if (isCMD(message, "NICK") || isCMD(message, "USER") || isCMD(message, "PASS"))
+	if ((isCMD(message, "NICK") || isCMD(message, "USER") || isCMD(message, "PASS")) && client.getStatus() == false)
 	{
 		if (server.getInput().size() >= 1 && server.getInput()[0] == "NICK")
 		{
@@ -135,7 +135,7 @@ void Client::getClientLoginData(Server server, std::string message, std::map<std
 				std::string nickname = server.getInput()[1];
 				std::map<std::string, Client>::iterator gb = globalUsers.find(nickname);
 				if (gb != globalUsers.end())
-					SEND(getSocket(), ERR_NICKNAMEINUSE(hostname, nickname), "Error while getting nickname");
+					SEND(getSocket(), ERR_NICKNAMEINUSE(server, nickname), "Error while getting nickname");
 				else
 				{
 					std::string oldNick = getNick();
@@ -157,6 +157,7 @@ void Client::getClientLoginData(Server server, std::string message, std::map<std
 			if (server.getInput().size() == 5 && !server.getInput()[4].empty())
 				setRealName(server.getInput()[4]);
 		}
+		
 		if (server.getInput().size() == 1 && server.getInput()[0] == "PASS")
 			SEND(this->getSocket(), (server.getHostname() + " 461 " + this->getNick() + " PASS :Not enough parameters.\r\n"), "Error sending login msg");
 		else if (server.getInput().size() >= 1 && server.getInput()[0] == "PASS")

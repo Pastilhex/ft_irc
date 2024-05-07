@@ -140,7 +140,7 @@ public:
 	 * @param globalUsers The map of global users.
 	 * @param hostname The hostname of the server.
 	 */
-	void getClientLoginData(Server server, std::string message, std::map<std::string, Client> globalUsers, std::string hostname);
+	void getClientLoginData(Server server, std::string message, std::map<std::string, Client> globalUsers, Client client);
 
 	virtual void help() {}
 };

@@ -134,8 +134,8 @@
 	(server.getHostname() + " 431 " + client + " :There is no nickname.\r\n")
 
 /* :localhost 433 bad_nick :Nickname is already in use. */
-#define ERR_NICKNAMEINUSE(hostname, nickname) \
-	(":" + hostname + " 433 " + nickname + " :Nickname is already in use.\r\n")
+#define ERR_NICKNAMEINUSE(server, nickname) \
+	(":" + server.getHostname() + " 433 " + nickname + " :Nickname is already in use.\r\n")
 
 #define RPL_PART(channel, reason) \
 	(USER_ID(NICKNAME, USERNAME) + " PART " + channel + " " + (reason.empty() ? "Without any reason" : reason) + "\r\n")
