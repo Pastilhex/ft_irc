@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/07 12:34:48 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/05/07 16:59:06 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,9 +124,9 @@ void Client::setTmpPassword(std::string pass)
 	this->_tmpPassword = pass;
 }
 
-void Client::getClientLoginData(Server server, std::string message, std::map<std::string, Client> globalUsers, Client client)
+void Client::getClientLoginData(Server server, std::string message, std::map<std::string, Client> globalUsers)
 {
-	if ((isCMD(message, "NICK") || isCMD(message, "USER") || isCMD(message, "PASS")) && client.getStatus() == false)
+	if ((isCMD(message, "NICK") || isCMD(message, "USER") || isCMD(message, "PASS")) && this->getStatus() == false)
 	{
 		if (server.getInput().size() >= 1 && server.getInput()[0] == "NICK")
 		{

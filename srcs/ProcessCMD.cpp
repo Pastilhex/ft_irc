@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ProcessCMD.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/06 11:57:02 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/07 18:12:01 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ void Server::processCMD(Client &client, std::vector<pollfd> &fds, std::string me
 
 void Server::login(Client &client, std::vector<std::string> splitMessage)
 {
-	client.getClientLoginData(*this, splitMessage[0], getGlobalUsers(), client);
+	client.getClientLoginData(*this, splitMessage[0], getGlobalUsers());
 	std::map<std::string, Client> &globalUsers = getGlobalUsers();
 	std::map<std::string, Client>::iterator it = globalUsers.begin();
 	while (it != globalUsers.end())
@@ -110,42 +110,54 @@ void Server::login(Client &client, std::vector<std::string> splitMessage)
 					SEND(client.getSocket(), ERR_PASSWDMISMATCH(client), "Error while login");
 				}
 				else
+				{
 					it->second.setStatus(true);
-			}
-
-			if (!client.getNick().empty() && client.getNick() != it->first && !client.getUsername().empty())
-			{
-				this->_globalUsers.insert(std::make_pair(client.getNick(), client));
-				this->_globalUsers.erase(it);
-				break;
+					this->_globalUsers.insert(std::make_pair(client.getNick(), client));
+					this->_globalUsers.erase(it);
+					break;
+				}
 			}
 		}
 		it++;
 	}
 
-	if (getInput().size() == 2 && getInput()[0] == "NICK" && client.getStatus() == true)
-	{
-		std::map<std::string, Client> &globalUsers = getGlobalUsers();
-		std::map<std::string, Client>::iterator it = globalUsers.find(client.getNick());
-		if (it != globalUsers.end())
-			it->second.setNick(getInput()[1]);
-		
-		std::map<std::string, Channel> &channels = getChannels();
-		std::map<std::string, Channel>::iterator ch = channels.begin();
-		while (ch != channels.end())
-		{
-			std::map<std::string, Client> &users = ch->second.getUsers();
-			std::map<std::string, Client>::iterator us = users.find(client.getNick());
-			if (us != globalUsers.end())
-				us->second.setNick(getInput()[1]);
+	// if (getInput().size() == 2 && getInput()[0] == "NICK" && client.getStatus() == true)
+	// {
+	// 	if (client.getNick() != getInput()[1])
+	// 	{
+	// 		std::string oldNick = client.getNick();
+	// 		client.setNick(getInput()[1]);
+	// 		std::map<std::string, Client> &globalUsers = getGlobalUsers();
+	// 		std::map<std::string, Client>::iterator it = globalUsers.find(oldNick);
+	// 		if (it != globalUsers.end())
+	// 		{
+	// 			std::map<std::string, Channel> &channels = getChannels();
+	// 			std::map<std::string, Channel>::iterator ch = channels.begin();
+	// 			while (ch != channels.end())
+	// 			{
+	// 				std::map<std::string, Client> &users = ch->second.getUsers();
+	// 				std::map<std::string, Client>::iterator us = users.find(oldNick);
+	// 				if (us != users.end())
+	// 				{
+	// 					users.erase(us);
+	// 					users.insert(std::make_pair(client.getNick(), client));
+	// 				}
 
-			std::vector<std::string> &operators = ch->second.getOperators();
-			std::vector<std::string>::iterator op = find(operators.begin(), operators.end(), "@" + getInput()[1]);
-			if (op != operators.end())
-			{
-				*op = "@" + getInput()[1];
-			}
-		}	
-		
-	}
+	// 				std::string opNick = "@" + oldNick;
+	// 				std::vector<std::string> &operators = ch->second.getOperators();
+	// 				std::vector<std::string>::iterator op = find(operators.begin(), operators.end(), opNick);
+	// 				if (op != operators.end())
+	// 				{
+	// 					*op = "@" + getInput()[1];
+	// 				}
+	// 				setInput(ch->first + " " + getInput()[1]);
+	// 				updateChannel(ch->second);
+	// 				++ch;
+	// 			}	
+	// 			globalUsers.erase(it);
+	// 			globalUsers.insert(std::make_pair(client.getNick(), client));
+	// 		}
+	// 	}
+	// }
+	// setInput(splitMessage[0]);
 }
