@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConnectClient.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/06 22:14:41 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/05/07 11:10:15 by jhogonca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void Server::connectClient(const int &serverSocket)
 	{
 		if (server_shutdown == true)
 			break;
-		char tmp[2048] = {};
+		char tmp[2048] = {0};
 		int activity = poll(fds.data(), fds.size(), -1);
 		if (activity == -1 && !server_shutdown)
 		{
@@ -54,7 +54,7 @@ void Server::connectClient(const int &serverSocket)
 						{
 							if (strlen(client.getBuffer()) != 0)
 							{
-								char buffer[2048] = {};
+								char buffer[2048] = {0};
 								memcpy(buffer, client.getBuffer(), bytesTotal - bytesRead);
 								strcat(buffer, tmp);
 								client.setBuffer(buffer);
@@ -65,7 +65,7 @@ void Server::connectClient(const int &serverSocket)
 						}
 						else
 						{
-							char buffer[2048] = {};
+							char buffer[2048] = {0};
 							memcpy(buffer, client.getBuffer(), bytesTotal - bytesRead);
 							strcat(buffer, tmp);
 							client.setBuffer(buffer);
@@ -85,7 +85,7 @@ void Server::connectClient(const int &serverSocket)
 							processCMD(client, fds, message, i);
 							bytesTotal = 0;
 						}
-						client.setBuffer(NULL);
+						// client.setBuffer(NULL);
 						break;
 					}
 				}
@@ -103,7 +103,7 @@ void Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
 	{
 		Client *client = new Client();
 		client->setStatus(false);
-		char tmp[2048] = {};
+		char tmp[2048] = {0};
 		client->setBuffer(tmp);
 		struct sockaddr_in clientAddress;
 		socklen_t clientAddressSize = sizeof(clientAddress);
