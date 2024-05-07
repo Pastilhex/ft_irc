@@ -52,7 +52,8 @@ void Server::connectClient(const int &serverSocket)
 						char *ptr = strchr(tmp, '\n');
 						if (ptr == NULL && bytesRead != 0)
 						{
-							if (strlen(client.getBuffer()) != 0)
+							char *buf = client.getBuffer(); 
+							if (strlen(buf))
 							{
 								char buffer[2048] = {0};
 								memcpy(buffer, client.getBuffer(), bytesTotal - bytesRead);
