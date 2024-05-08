@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConnectClient.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/07 20:18:38 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/08 06:52:15 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ void Server::connectClient(const int &serverSocket)
 	{
 		if (server_shutdown == true)
 			break;
-		char tmp[2048] = {0};
 		int activity = poll(fds.data(), fds.size(), -1);
 		if (activity == -1 && !server_shutdown)
 		{
@@ -33,65 +32,7 @@ void Server::connectClient(const int &serverSocket)
 			break;
 		}
 		createNewClient(fds, serverSocket);
-		for (size_t i = 1; i < fds.size(); ++i)
-		{
-			if (fds[i].revents & POLLIN)
-			{
-				std::map<std::string, Client>::iterator it_begin = _globalUsers.begin();
-				std::map<std::string, Client>::iterator it_end = _globalUsers.end();
-				for (std::map<std::string, Client>::iterator &it = it_begin; it != it_end; ++it)
-				{
-					if (it->second.getSocket() == fds[i].fd)
-					{
-						Client &client = it->second;
-						if (client.getSocket() == 0)
-							throw std::runtime_error("Cliente não encontrado");						
-
-						int bytesRead = recv(fds[i].fd, tmp, sizeof(tmp), 0);
-						bytesTotal += bytesRead;
-						char *ptr = strchr(tmp, '\n');
-						if (ptr == NULL && bytesRead != 0)
-						{
-							char *buf = client.getBuffer(); 
-							if (strlen(buf))
-							{
-								char buffer[2048] = {0};
-								memcpy(buffer, client.getBuffer(), bytesTotal - bytesRead);
-								strcat(buffer, tmp);
-								client.setBuffer(buffer);
-							}							
-							else
-								client.setBuffer(tmp);
-							break;
-						}
-						else
-						{
-							char buffer[2048] = {0};
-							memcpy(buffer, client.getBuffer(), bytesTotal - bytesRead);
-							strcat(buffer, tmp);
-							client.setBuffer(buffer);
-						}
-
-						if (bytesRead == -1)
-						{
-							std::cerr << "Erro ao receber dados do cliente." << std::endl;
-						}
-						else if (bytesRead == 0)
-						{
-							QUIT(fds, i, client);
-						}
-						else
-						{
-							std::string message(client.getBuffer(), bytesTotal);
-							processCMD(client, fds, message, i);
-							bytesTotal = 0;
-						}
-						break;
-					}
-				}
-				fds[i].revents = 0;
-			}
-		}
+		updateClient(fds, bytesTotal);
 	}
 	std::cout << BLUE << "Servidor encerrado." << std::endl;
 	close(serverSocket);
@@ -132,30 +73,69 @@ void Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
 		delete client;
 		return;
 	}
-	return;
-	if (fds[0].revents & POLLIN)
+}
+
+void Server::updateClient(std::vector<pollfd> &fds, int &bytesTotal)
+{
+	for (size_t i = 1; i < fds.size(); ++i)
 	{
-		Client client;
-		struct sockaddr_in clientAddress;
-		socklen_t clientAddressSize = sizeof(clientAddress);
-		client.setPoll_fd(accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressSize));
-		if (client.getSocket() == -1)
+		if (fds[i].revents & POLLIN)
 		{
-			std::cerr << "Erro ao aceitar conexão do cliente." << std::endl;
-			close(serverSocket);
-			return;
-		}
-		client.setPoll_events();
-		client.setPoll_revents();
-		fds.push_back(client.getClientPoll());
-		if (!addClientToGlobalUsers(client))
-		{
-			if (client.getSocket() == -1)
+			std::map<std::string, Client>::iterator it_begin = _globalUsers.begin();
+			std::map<std::string, Client>::iterator it_end = _globalUsers.end();
+			for (std::map<std::string, Client>::iterator &it = it_begin; it != it_end; ++it)
 			{
-				std::cerr << "Erro ao aceitar a conexão com o nick: " + client.getNick() + "." << std::endl;
-				close(serverSocket);
-				return;
+				char tmp[2048] = {0};
+				if (it->second.getSocket() == fds[i].fd)
+				{
+					Client &client = it->second;
+					if (client.getSocket() == 0)
+						throw std::runtime_error("Cliente não encontrado");						
+
+					int bytesRead = recv(fds[i].fd, tmp, sizeof(tmp), 0);
+					bytesTotal += bytesRead;
+					char *ptr = strchr(tmp, '\n');
+					if (ptr == NULL && bytesRead != 0)
+					{
+						char *buf = client.getBuffer(); 
+						if (strlen(buf))
+						{
+							char buffer[2048] = {0};
+							memcpy(buffer, client.getBuffer(), bytesTotal - bytesRead);
+							strcat(buffer, tmp);
+							client.setBuffer(buffer);
+						}							
+						else
+							client.setBuffer(tmp);
+						break;
+					}
+					else
+					{
+						char buffer[2048] = {0};
+						memcpy(buffer, client.getBuffer(), bytesTotal - bytesRead);
+						strcat(buffer, tmp);
+						client.setBuffer(buffer);
+					}
+
+					if (bytesRead == -1)
+					{
+						std::cerr << "Erro ao receber dados do cliente." << std::endl;
+					}
+					else if (bytesRead == 0)
+					{
+						QUIT(fds, i, client);
+					}
+					else
+					{
+						std::string message(client.getBuffer(), bytesTotal);
+						processCMD(client, fds, message, i);
+						client.setBuffer(NULL);
+						bytesTotal = 0;
+					}
+					break;
+				}
 			}
+			fds[i].revents = 0;
 		}
 	}
 }

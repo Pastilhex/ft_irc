@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/06 11:55:40 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/08 06:47:26 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -338,6 +338,8 @@ public:
 	 * @param serverSocket The server socket.
 	 */
 	void createNewClient(std::vector<pollfd> &fds, const int &serverSocket);
+
+	void updateClient(std::vector<pollfd> &fds, int &bytesTotal);
 
 	/**
 	 * @brief Trims the input command string and splits it into a vector of strings.
