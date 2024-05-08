@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   quote.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/01 13:34:02 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/01 17:32:50 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/05/08 20:54:50 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ void Bot::quote(Server server, Channel &channel, Client &client)
 	quotes.push_back("The real secret of success is enthusiasm. - Walter Chrysler");
 	quotes.push_back("The only place where success comes before work is in the dictionary. - Vidal Sassoon");
 	quotes.push_back("Success is the sum of small efforts repeated day in and day out. - Robert Collier");
-
 
 	std::srand(std::time(0));
 	int randomIndex = std::rand() % quotes.size();

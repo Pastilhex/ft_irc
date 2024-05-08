@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   login.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 05:11:04 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/08 05:11:43 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/08 20:50:48 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ void Server::login(Client &client, std::vector<std::string> splitMessage)
 					setInput(ch->first + " " + getInput()[1]);
 					updateChannel(ch->second);
 					++ch;
-				}	
+				}
 				globalUsers.erase(it);
 				globalUsers.insert(std::make_pair(client.getNick(), client));
 			}

@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/07 16:59:06 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/08 20:50:20 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ircserv.hpp"
 
-Client::Client(void) {
+Client::Client(void)
+{
 	for (int i = 0; i < 2048; i++)
 		this->_buffer[i] = '\0';
 }
@@ -157,7 +158,7 @@ void Client::getClientLoginData(Server server, std::string message, std::map<std
 			if (server.getInput().size() == 5 && !server.getInput()[4].empty())
 				setRealName(server.getInput()[4]);
 		}
-		
+
 		if (server.getInput().size() == 1 && server.getInput()[0] == "PASS")
 			SEND(this->getSocket(), (server.getHostname() + " 461 " + this->getNick() + " PASS :Not enough parameters.\r\n"), "Error sending login msg");
 		else if (server.getInput().size() >= 1 && server.getInput()[0] == "PASS")

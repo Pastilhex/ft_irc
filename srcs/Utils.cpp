@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhogonca <jhogonca@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/25 14:51:18 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/01 17:34:42 by jhogonca         ###   ########.fr       */
+/*   Updated: 2024/05/08 20:53:27 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Utils.hpp"
-
 int Utils::logMessage(const std::string &message, int level)
 {
 	std::string logTime = getCurrentDateTimeAsString();
@@ -48,7 +47,6 @@ bool Utils::inputValidation(int argc, char *argv[])
 
 void Utils::trim(std::string &str)
 {
-	// Find the first non-whitespace character
 	size_t first = str.find_first_not_of(" ");
 	if (first == std::string::npos)
 	{
@@ -161,24 +159,21 @@ std::string Utils::findWord(const std::string &keyword, const std::string &delim
 
 std::vector<std::string> Utils::split(const std::string &str, const std::string &delimiters)
 {
-	std::vector<std::string> tokens;									   // Vetor para armazenar os tokens resultantes
-	std::string::size_type lastPos = str.find_first_not_of(delimiters, 0); // Encontra a primeira posição não de delimitadores
+	std::vector<std::string> tokens;
+	std::string::size_type lastPos = str.find_first_not_of(delimiters, 0);
 
 	while (lastPos != std::string::npos)
 	{
-		// Encontra a próxima posição de delimitador após lastPos
 		std::string::size_type pos = str.find_first_of(delimiters, lastPos);
-		// Extrai o token entre lastPos e pos
 		if (pos == std::string::npos)
 		{
-			tokens.push_back(str.substr(lastPos)); // Se não houver mais delimitadores, extrai o restante da string
+			tokens.push_back(str.substr(lastPos));
 			break;
 		}
 		else
 		{
-			tokens.push_back(str.substr(lastPos, pos - lastPos)); // Extrai o token
+			tokens.push_back(str.substr(lastPos, pos - lastPos));
 		}
-		// Encontra a próxima posição não de delimitadores após pos
 		lastPos = str.find_first_not_of(delimiters, pos);
 	}
 

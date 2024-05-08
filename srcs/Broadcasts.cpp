@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/07 20:43:07 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/08 20:46:22 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,30 +42,12 @@ void Server::sendWelcome(int clientSocket, Client &client)
 	welcome += RPL_MOTD(" :             . _                  _ - \r\n");
 	welcome += RPL_MOTD(" :               '`--._,dd###pp=xxx'\r\n");
 	welcome += RPL_MOTD(" :\r\n");
-	// welcome += RPL_MOTD(" :      LH#:            `*MMMMMMMMMMMMMMMMMMMMb#}'  `? \r\n");
-	// welcome += RPL_MOTD(" :      MMMH#             '''*'''*#MMMMMMMMMMMMM'    - \r\n");
-	// welcome += RPL_MOTD(" :      MMMMMb_                   |MMMMMMMMMMMP'     : \r\n");
-	// welcome += RPL_MOTD(" :      HMMMMMMMHo                 `MMMMMMMMMT       . \r\n");
-	// welcome += RPL_MOTD(" :      ?MMMMMMMMP                  9MMMMMMMM}       - \r\n");
-	// welcome += RPL_MOTD(" :      -?MMMMMMM                  |MMMMMMMMM?,d-    ' \r\n");
-	// welcome += RPL_MOTD(" :██╗  ██╗██████╗ ██████╗  ██████╗ ██████╗ ████████╗ ██████╗ \r\n");
-	// welcome += RPL_MOTD(" :██║  ██║╚════██╗██╔══██╗██╔═══██╗██╔══██╗╚══██╔══╝██╔═══██╗\r\n");
-	// welcome += RPL_MOTD(" :███████║ █████╔╝██████╔╝██║   ██║██████╔╝   ██║   ██║   ██║\r\n");
-	// welcome += RPL_MOTD(" :╚════██║██╔═══╝ ██╔═══╝ ██║   ██║██╔══██╗   ██║   ██║   ██║\r\n");
-	// welcome += RPL_MOTD(" :     ██║███████╗██║     ╚██████╔╝██║  ██║   ██║   ╚██████╔╝\r\n");
-	// welcome += RPL_MOTD(" :     ╚═╝╚══════╝╚═╝      ╚═════╝ ╚═╝  ╚═╝   ╚═╝    ╚═════╝ \r\n");
 	welcome += RPL_MOTD(" :    Project by:  ialves-m  lpicoli  jhogonca\r\n");
 	welcome += RPL_ENDOFMOTD();
 	if (send(clientSocket, welcome.c_str(), welcome.length(), 0) == -1)
 		std::cerr << "Erro ao enviar mensagem de boas vindas para o cliente." << std::endl;
 }
 
-/**
- * @brief Updates the channel by sending a WHO command to all users in the channel, excluding the "Bot" user.
- *
- * @param client The client who triggered the update.
- * @param channelName The name of the channel to update.
- */
 void Server::updateChannel(Channel channel)
 {
 	std::map<std::string, Client> &users = channel.getUsers();

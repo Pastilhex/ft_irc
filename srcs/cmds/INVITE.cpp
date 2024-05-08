@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   INVITE.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpicoli- <lpicoli-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/01 17:23:12 by lpicoli-         ###   ########.fr       */
+/*   Updated: 2024/05/08 20:53:43 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,12 @@ void Server::INVITE(Client client)
 	std::string invitedUser = getInput()[1];
 	std::string channel = getInput()[2];
 
-
 	if (getInput().size() != 3)
 		return;
 
 	const std::map<std::string, Channel>::iterator it = getChannels().find(channel);
 
-	if(!it->second.getInvisibility())
+	if (!it->second.getInvisibility())
 		return;
 
 	if (it == getChannels().end())

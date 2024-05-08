@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConnectClient.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/08 06:52:15 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/08 20:50:34 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ void Server::connectClient(const int &serverSocket)
 	this->serverPoll.events = POLLIN;
 	this->serverPoll.revents = 0;
 	fds.push_back(this->serverPoll);
-
 	int bytesTotal = 0;
 	while (true)
 	{
@@ -67,7 +66,7 @@ void Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
 				std::cerr << "Erro ao aceitar a conexão com o nick: " + client->getNick() + "." << std::endl;
 				close(serverSocket);
 				delete client;
-				return;	
+				return;
 			}
 		}
 		delete client;
@@ -90,21 +89,21 @@ void Server::updateClient(std::vector<pollfd> &fds, int &bytesTotal)
 				{
 					Client &client = it->second;
 					if (client.getSocket() == 0)
-						throw std::runtime_error("Cliente não encontrado");						
+						throw std::runtime_error("Cliente não encontrado");
 
 					int bytesRead = recv(fds[i].fd, tmp, sizeof(tmp), 0);
 					bytesTotal += bytesRead;
 					char *ptr = strchr(tmp, '\n');
 					if (ptr == NULL && bytesRead != 0)
 					{
-						char *buf = client.getBuffer(); 
+						char *buf = client.getBuffer();
 						if (strlen(buf))
 						{
 							char buffer[2048] = {0};
 							memcpy(buffer, client.getBuffer(), bytesTotal - bytesRead);
 							strcat(buffer, tmp);
 							client.setBuffer(buffer);
-						}							
+						}
 						else
 							client.setBuffer(tmp);
 						break;

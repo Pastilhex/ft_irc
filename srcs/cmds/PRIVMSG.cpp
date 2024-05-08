@@ -19,46 +19,21 @@ void Server::PRIVMSG(std::string message, Client client)
 	std::string channelName = "";
 	std::string msgToSend = getMessage(message);
 
-	/* if (getQuizMode())
-	{
-		std::map<std::string, Client> &users = getGlobalUsers();
-		std::map<std::string, Client>::iterator user_it = users.find(input[1]);
-		if (user_it != users.end())
-		{
-			if (user_it->second.getRealName() == "Bot")
-			{
-				std::string answer = user_it->second.getAnswer();
-				if (msgToSend == answer)
-				{
-					SEND(client.getSocket(), RPL_PRIVMSG(input[1], "Correct answer!"), "Error sending message to user.");
-					user_it->second.setScore(user_it->second.getScore() + 1);
-				}
-				else
-				{
-					SEND(client.getSocket(), RPL_PRIVMSG(input[1], "Wrong answer!"), "Error sending message to user.");
-				}
-				user_it->second.setAnswer("");
-				setQuizMode(false);
-			}
-		}
-		return;
-	} */
-	//precisamos fazer trim da mensagem, nao esta funcionando com "!create    " por exemplo 
 	Utils::trim(msgToSend);
-	if (msgToSend[0] && msgToSend[0] == '!') // Check if the command is a bot command
+	if (msgToSend[0] && msgToSend[0] == '!')
 	{
 		std::string cmd = msgToSend.substr(1);
 		std::vector<std::string> botCMD = getBotCMD();
 		std::vector<std::string>::const_iterator cmd_it = find(botCMD.begin(), botCMD.end(), cmd);
 		std::map<std::string, Channel>::iterator it = getChannels().find(input[1]);
 		if (it == this->getChannels().end())
-			return ; 
-	
+			return;
+
 		if (cmd_it != botCMD.end())
 		{
-			if(*cmd_it == "create" || *cmd_it == "delete")
-				if(!Utils::isOperator(it->second, client.getNick()))
-					return (SEND(client.getSocket(), ERR_CHANOPRIVSNEEDED(client, it->first), "Error sending ERR_CHANOPRIVSNEEDED (482)"));	
+			if (*cmd_it == "create" || *cmd_it == "delete")
+				if (!Utils::isOperator(it->second, client.getNick()))
+					return (SEND(client.getSocket(), ERR_CHANOPRIVSNEEDED(client, it->first), "Error sending ERR_CHANOPRIVSNEEDED (482)"));
 
 			if (*cmd_it == "create")
 			{
@@ -66,8 +41,8 @@ void Server::PRIVMSG(std::string message, Client client)
 				Bot::create(*this, it->second, "marvin", client);
 				return;
 			}
-			if(!it->second.botExists())
-				return ; 
+			if (!it->second.botExists())
+				return;
 
 			if (*cmd_it == "delete")
 			{
@@ -87,11 +62,11 @@ void Server::PRIVMSG(std::string message, Client client)
 			{
 				Bot::funFact(*this, it->second, client);
 			}
-			else if(*cmd_it == "welcome")
+			else if (*cmd_it == "welcome")
 			{
 				Bot::sendWelcome(*this, it->second, client);
 			}
-			else if(*cmd_it == "goodbye")
+			else if (*cmd_it == "goodbye")
 			{
 				Bot::sendGoodbye(*this, it->second, client);
 			}
@@ -115,8 +90,6 @@ void Server::PRIVMSG(std::string message, Client client)
 		std::map<std::string, Client>::iterator user_it = users.find(input[1]);
 		if (user_it != users.end())
 		{
-			if (!isDCC_SEND(input[2], client.getNick()))
-				return;
 			if (user_it->second.getRealName() != "Bot")
 				SEND(user_it->second.getSocket(), RPL_PRIVMSG(channelName, msgToSend), "Error sending message to user.");
 		}

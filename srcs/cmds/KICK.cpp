@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   KICK.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/26 07:30:40 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/08 20:53:52 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void Server::KICK(std::string message, Client client)
 		}
 		else if (isKickerOp && !isKickedOp)
 		{
-			std::map<std::string, Client>& users = it->second.getUsers();
+			std::map<std::string, Client> &users = it->second.getUsers();
 			std::map<std::string, Client>::iterator us = users.begin();
 			while (us != users.end())
 			{

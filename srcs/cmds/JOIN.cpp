@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/07 21:24:39 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/08 20:53:47 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,44 +30,44 @@ void Server::JOIN(int clientSocket, Client &client)
 
 void Server::joinChannel(int clientSocket, Client &client, std::string &channelName)
 {
-    std::map<std::string, Channel> &channels = getChannels();
-    std::map<std::string, Channel>::iterator it = channels.find(channelName);
+	std::map<std::string, Channel> &channels = getChannels();
+	std::map<std::string, Channel>::iterator it = channels.find(channelName);
 
-    if (it != channels.end()) 
+	if (it != channels.end())
 	{
-        if (isChannelFull(it->second)) {
-            SEND(client.getSocket(), ERR_CHANNELISFULL(client.getNick(), it->first), "Error sending JOIN message with mode +l advise to user");
-            return;
-        }
+		if (isChannelFull(it->second))
+		{
+			SEND(client.getSocket(), ERR_CHANNELISFULL(client.getNick(), it->first), "Error sending JOIN message with mode +l advise to user");
+			return;
+		}
 
-        if (!canJoinChannel(client, it->second))
-            return;
+		if (!canJoinChannel(client, it->second))
+			return;
 
-        it->second.setNewUser(client);
-        SEND(clientSocket, RPL_JOIN(client, channelName), "Erro ao entrar no canal.");
-        if (it->second.botExists())
-            Bot::sendWelcome(*this, it->second, client);
-        updateChannel(it->second);
-        MODE(client);
-    } 
-	else 
+		it->second.setNewUser(client);
+		SEND(clientSocket, RPL_JOIN(client, channelName), "Erro ao entrar no canal.");
+		if (it->second.botExists())
+			Bot::sendWelcome(*this, it->second, client);
+		updateChannel(it->second);
+		MODE(client);
+	}
+	else
 	{
-        bool state = (channelName[0] == '#') ? false : true;
-        Channel channel = Channel(channelName, state);
-        if (state == true)
+		bool state = (channelName[0] == '#') ? false : true;
+		Channel channel = Channel(channelName, state);
+		if (state == true)
 		{
 			channel.setNewMode('i');
 			channel.setInvisibility(true);
 		}
 		channel.setNewUser(client);
-        channel.AddOperator(client.getNick());
-        setNewChannel(channelName, channel);
-        SEND(clientSocket, RPL_JOIN(client, channelName), "Erro ao entrar no canal.");
-        MODE(client);
-        WHO(clientSocket, client);
-    }
+		channel.AddOperator(client.getNick());
+		setNewChannel(channelName, channel);
+		SEND(clientSocket, RPL_JOIN(client, channelName), "Erro ao entrar no canal.");
+		MODE(client);
+		WHO(clientSocket, client);
+	}
 }
-
 
 bool Server::isChannelFull(Channel &channel)
 {
