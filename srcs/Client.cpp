@@ -14,38 +14,30 @@
 
 Client::Client(void)
 {
-	for (int i = 0; i < 2048; i++)
-		this->_buffer[i] = '\0';
+	this->_nick.clear();
+	this->_serverPassword.clear();
+	this->_tmpPassword.clear();
+	this->_username.clear();
+	this->_realname.clear();
+	this->setStatus(false);
+	//this->cleanBuffer();
 }
 
 Client::~Client(void) {}
 
-void Client::setNewClient(Client &client)
-{
-	char tmp[2048] = {0};
-	client._nick.clear();
-	client._serverPassword.clear();
-	client._tmpPassword.clear();
-	client._username.clear();
-	client._realname.clear();
-	client.setStatus(false);
-	client.setBuffer(tmp);
-}
-
-char *Client::getBuffer(void)
+std::string Client::getBuffer(void)
 {
 	return this->_buffer;
 }
 
-void Client::setBuffer(char *buffer)
+void Client::setBuffer(std::string buffer)
 {
-	if (buffer == NULL)
-	{
-		if (this->_buffer[0] != '\0')
-			memset(this->_buffer, 0, sizeof(this->_buffer));
-	}
-	else
-		memcpy(this->_buffer, buffer, strlen(buffer));
+	this->_buffer.append(buffer);
+}
+
+void Client::cleanBuffer(void)
+{
+	this->_buffer.clear();
 }
 
 bool Client::getStatus(void)

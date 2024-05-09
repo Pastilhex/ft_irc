@@ -339,7 +339,7 @@ public:
 	 */
 	void createNewClient(std::vector<pollfd> &fds, const int &serverSocket);
 
-	void updateClient(std::vector<pollfd> &fds, int &bytesTotal);
+	void updateClient(std::vector<pollfd> &fds);
 
 	/**
 	 * @brief Trims the input command string and splits it into a vector of strings.

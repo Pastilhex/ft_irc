@@ -19,7 +19,7 @@ void Server::connectClient(const int &serverSocket)
 	this->serverPoll.events = POLLIN;
 	this->serverPoll.revents = 0;
 	fds.push_back(this->serverPoll);
-	int bytesTotal = 0;
+
 	while (true)
 	{
 		if (server_shutdown == true)
@@ -31,7 +31,7 @@ void Server::connectClient(const int &serverSocket)
 			break;
 		}
 		createNewClient(fds, serverSocket);
-		updateClient(fds, bytesTotal);
+		updateClient(fds);
 	}
 	std::cout << BLUE << "Servidor encerrado." << std::endl;
 	close(serverSocket);
@@ -42,9 +42,6 @@ void Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
 	if (fds[0].revents & POLLIN)
 	{
 		Client *client = new Client();
-		client->setStatus(false);
-		char tmp[2048] = {0};
-		client->setBuffer(tmp);
 		struct sockaddr_in clientAddress;
 		socklen_t clientAddressSize = sizeof(clientAddress);
 
@@ -74,47 +71,34 @@ void Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
 	}
 }
 
-void Server::updateClient(std::vector<pollfd> &fds, int &bytesTotal)
+void Server::updateClient(std::vector<pollfd> &fds)
 {
 	for (size_t i = 1; i < fds.size(); ++i)
 	{
 		if (fds[i].revents & POLLIN)
 		{
-			std::map<std::string, Client>::iterator it_begin = _globalUsers.begin();
-			std::map<std::string, Client>::iterator it_end = _globalUsers.end();
-			for (std::map<std::string, Client>::iterator &it = it_begin; it != it_end; ++it)
+			std::map<std::string, Client> &globalUsers = getGlobalUsers();
+			std::map<std::string, Client>::iterator it = globalUsers.begin();
+			for (; it != _globalUsers.end(); ++it)
 			{
-				char tmp[2048] = {0};
 				if (it->second.getSocket() == fds[i].fd)
 				{
-					Client &client = it->second;
-					if (client.getSocket() == 0)
+					if (it->second.getSocket() == 0)
 						throw std::runtime_error("Cliente não encontrado");
 
+					char tmp[2048] = {0};
 					int bytesRead = recv(fds[i].fd, tmp, sizeof(tmp), 0);
-					bytesTotal += bytesRead;
-					char *ptr = strchr(tmp, '\n');
-					if (ptr == NULL && bytesRead != 0)
+					std::string buffer(tmp);
+
+					size_t ptr = 0;
+					ptr = buffer.find('\n');
+					if (ptr == std::string::npos)
 					{
-						char *buf = client.getBuffer();
-						if (strlen(buf))
-						{
-							char buffer[2048] = {0};
-							memcpy(buffer, client.getBuffer(), bytesTotal - bytesRead);
-							strcat(buffer, tmp);
-							client.setBuffer(buffer);
-						}
-						else
-							client.setBuffer(tmp);
+						it->second.setBuffer(buffer);
 						break;
 					}
 					else
-					{
-						char buffer[2048] = {0};
-						memcpy(buffer, client.getBuffer(), bytesTotal - bytesRead);
-						strcat(buffer, tmp);
-						client.setBuffer(buffer);
-					}
+						it->second.setBuffer(buffer);
 
 					if (bytesRead == -1)
 					{
@@ -122,19 +106,66 @@ void Server::updateClient(std::vector<pollfd> &fds, int &bytesTotal)
 					}
 					else if (bytesRead == 0)
 					{
-						QUIT(fds, i, client);
+						QUIT(fds, i, it->second);
 					}
 					else
 					{
-						std::string message(client.getBuffer(), bytesTotal);
-						processCMD(client, fds, message, i);
-						client.setBuffer(NULL);
-						bytesTotal = 0;
+						std::string inputMessage = it->second.getBuffer();
+						it->second.cleanBuffer();
+						processCMD(it->second, fds, inputMessage, i);
 					}
 					break;
 				}
 			}
 			fds[i].revents = 0;
 		}
+
+
+		// if (fds[i].revents & POLLIN)
+		// {
+		// 	std::map<std::string, Client>::iterator it_begin = _globalUsers.begin();
+		// 	std::map<std::string, Client>::iterator it_end = _globalUsers.end();
+		// 	for (std::map<std::string, Client>::iterator &it = it_begin; it != it_end; ++it)
+		// 	{
+		// 		char tmp[2048] = {0};
+		// 		if (it->second.getSocket() == fds[i].fd)
+		// 		{
+		// 			//Client &client = it->second;
+		// 			if (it->second.getSocket() == 0)
+		// 				throw std::runtime_error("Cliente não encontrado");
+
+		// 			int bytesRead = recv(fds[i].fd, tmp, sizeof(tmp), 0);
+		// 			std::string buffer(tmp);
+
+		// 			size_t ptr = buffer.find('\n');
+		// 			if (ptr == std::string::npos)
+		// 			{
+		// 				if (!it->second.getBuffer().empty())
+		// 					it->second.setBuffer(buffer);
+		// 				else
+		// 					it->second.setBuffer(buffer);
+		// 				break;
+		// 			}
+		// 			else
+		// 				it->second.setBuffer(buffer);
+
+		// 			if (bytesRead == -1)
+		// 			{
+		// 				std::cerr << "Erro ao receber dados do cliente." << std::endl;
+		// 			}
+		// 			else if (bytesRead == 0)
+		// 			{
+		// 				QUIT(fds, i, it->second);
+		// 			}
+		// 			else
+		// 			{
+		// 				processCMD(it->second, fds, it->second.getBuffer(), i);
+		// 				it->second.cleanBuffer();
+		// 			}
+		// 			break;
+		// 		}
+		// 	}
+		// 	fds[i].revents = 0;
+		// }
 	}
 }

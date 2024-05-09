@@ -30,7 +30,8 @@ protected:
 	std::string _realname;		 /* The real name of the client. */
 	pollfd _clientPoll;			 /* The pollfd structure for polling events on the client's socket. */
 	bool _status;				 /* Active: Has Nickname and Username. Inactive: No Nickname and no Username, only connected to server */
-	char _buffer[2048];				 /* Individual Buffer for each client */
+	// char _buffer[2048];				 /* Individual Buffer for each client */
+	std::string _buffer;				 /* Individual Buffer for each client */
 
 public:
 	/**
@@ -40,8 +41,9 @@ public:
 
 	virtual ~Client(void);
 
-	char *getBuffer(void);
-	void setBuffer(char *);
+	std::string getBuffer(void);
+	void setBuffer(std::string);
+	void cleanBuffer(void);
 
 	bool getStatus(void);
 	void setStatus(bool);

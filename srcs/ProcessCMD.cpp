@@ -76,4 +76,5 @@ void Server::processCMD(Client &client, std::vector<pollfd> &fds, std::string me
 			}
 		}
 	}
+	//client.cleanBuffer();
 }
