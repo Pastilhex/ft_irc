@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   login.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 05:11:04 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/08 20:50:48 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/09 07:34:26 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void Server::login(Client &client, std::vector<std::string> splitMessage)
 {
 	{
-		client.getClientLoginData(*this, splitMessage[0], getGlobalUsers());
+		client.getClientLoginData(*this, getGlobalUsers());
 		std::map<std::string, Client> &globalUsers = getGlobalUsers();
 		std::map<std::string, Client>::iterator it = globalUsers.begin();
 		while (it != globalUsers.end())

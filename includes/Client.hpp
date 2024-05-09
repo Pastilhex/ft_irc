@@ -6,7 +6,7 @@
 /*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/07 16:37:10 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/09 07:34:08 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,7 +140,7 @@ public:
 	 * @param globalUsers The map of global users.
 	 * @param hostname The hostname of the server.
 	 */
-	void getClientLoginData(Server server, std::string message, std::map<std::string, Client> globalUsers);
+	void getClientLoginData(Server server, std::map<std::string, Client> globalUsers);
 
 	virtual void help() {}
 };

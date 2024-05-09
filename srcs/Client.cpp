@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/08 20:50:20 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/09 07:33:51 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,14 @@ Client::~Client(void) {}
 
 void Client::setNewClient(Client &client)
 {
+	char tmp[2048] = {0};
 	client._nick.clear();
 	client._serverPassword.clear();
 	client._tmpPassword.clear();
 	client._username.clear();
 	client._realname.clear();
+	client.setStatus(false);
+	client.setBuffer(tmp);
 }
 
 char *Client::getBuffer(void)
@@ -125,28 +128,44 @@ void Client::setTmpPassword(std::string pass)
 	this->_tmpPassword = pass;
 }
 
-void Client::getClientLoginData(Server server, std::string message, std::map<std::string, Client> globalUsers)
+std::string toLowerCase(const std::string &str)
 {
-	if ((isCMD(message, "NICK") || isCMD(message, "USER") || isCMD(message, "PASS")) && this->getStatus() == false)
+	std::string result = str;
+	for (size_t i = 0; i < result.length(); ++i)
+		result[i] = std::tolower(result[i]);
+	return result;
+}
+
+void Client::getClientLoginData(Server server, std::map<std::string, Client> globalUsers)
+{
+	if (server.getInput().size() >= 1 && !this->getStatus() && ((server.getInput()[0] == "NICK" || server.getInput()[0] == "USER" || server.getInput()[0] == "PASS")))
 	{
-		if (server.getInput().size() >= 1 && server.getInput()[0] == "NICK")
+		if (server.getInput().size() >= 2 && server.getInput()[0] == "NICK")
 		{
-			if (server.getInput().size() == 2)
+			std::string lowerNickname = toLowerCase(server.getInput()[1]);
+			std::string nickname = server.getInput()[1];
+			std::map<std::string, Client>::iterator gb;
+			bool nicknameExists = false;
+			for (gb = globalUsers.begin(); gb != globalUsers.end(); ++gb)
 			{
-				std::string nickname = server.getInput()[1];
-				std::map<std::string, Client>::iterator gb = globalUsers.find(nickname);
-				if (gb != globalUsers.end())
-					SEND(getSocket(), ERR_NICKNAMEINUSE(server, nickname), "Error while getting nickname");
-				else
+				if (toLowerCase(gb->first) == lowerNickname)
 				{
-					std::string oldNick = getNick();
-					globalUsers.erase(oldNick);
-					setNick(nickname);
+					nicknameExists = true;
+					break;
 				}
 			}
+			if (nicknameExists)
+				SEND(getSocket(), ERR_NICKNAMEINUSE(server, nickname), "Error while getting nickname");
 			else
-				SEND(this->getSocket(), ERR_NONICKNAMEGIVEN("Error", server), "Error sending login msg");
+			{
+				std::string oldNick = getNick();
+				globalUsers.erase(oldNick);
+				setNick(nickname);
+			}
 		}
+		else if (server.getInput().size() == 1)
+			SEND(this->getSocket(), ERR_NONICKNAMEGIVEN("Error", server), "Error sending login msg");
+
 
 		if (server.getInput().size() >= 1 && server.getInput()[0] == "USER")
 		{
