@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/08 20:50:34 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/12 22:24:13 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ void Server::connectClient(const int &serverSocket)
 	this->serverPoll.events = POLLIN;
 	this->serverPoll.revents = 0;
 	fds.push_back(this->serverPoll);
-
 	while (true)
 	{
 		if (server_shutdown == true)
@@ -44,7 +43,6 @@ void Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
 		Client *client = new Client();
 		struct sockaddr_in clientAddress;
 		socklen_t clientAddressSize = sizeof(clientAddress);
-
 		client->setPoll_fd(accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressSize));
 		if (client->getSocket() == -1)
 		{
@@ -79,7 +77,7 @@ void Server::updateClient(std::vector<pollfd> &fds)
 		{
 			std::map<std::string, Client> &globalUsers = getGlobalUsers();
 			std::map<std::string, Client>::iterator it = globalUsers.begin();
-			for (; it != _globalUsers.end(); ++it)
+			for (; it != globalUsers.end(); ++it)
 			{
 				if (it->second.getSocket() == fds[i].fd)
 				{
@@ -89,7 +87,6 @@ void Server::updateClient(std::vector<pollfd> &fds)
 					char tmp[2048] = {0};
 					int bytesRead = recv(fds[i].fd, tmp, sizeof(tmp), 0);
 					std::string buffer(tmp);
-
 					size_t ptr = 0;
 					ptr = buffer.find('\n');
 					if (ptr == std::string::npos)
@@ -101,13 +98,9 @@ void Server::updateClient(std::vector<pollfd> &fds)
 						it->second.setBuffer(buffer);
 
 					if (bytesRead == -1)
-					{
 						std::cerr << "Erro ao receber dados do cliente." << std::endl;
-					}
 					else if (bytesRead == 0)
-					{
 						QUIT(fds, i, it->second);
-					}
 					else
 					{
 						std::string inputMessage = it->second.getBuffer();
@@ -117,55 +110,6 @@ void Server::updateClient(std::vector<pollfd> &fds)
 					break;
 				}
 			}
-			fds[i].revents = 0;
 		}
-
-
-		// if (fds[i].revents & POLLIN)
-		// {
-		// 	std::map<std::string, Client>::iterator it_begin = _globalUsers.begin();
-		// 	std::map<std::string, Client>::iterator it_end = _globalUsers.end();
-		// 	for (std::map<std::string, Client>::iterator &it = it_begin; it != it_end; ++it)
-		// 	{
-		// 		char tmp[2048] = {0};
-		// 		if (it->second.getSocket() == fds[i].fd)
-		// 		{
-		// 			//Client &client = it->second;
-		// 			if (it->second.getSocket() == 0)
-		// 				throw std::runtime_error("Cliente não encontrado");
-
-		// 			int bytesRead = recv(fds[i].fd, tmp, sizeof(tmp), 0);
-		// 			std::string buffer(tmp);
-
-		// 			size_t ptr = buffer.find('\n');
-		// 			if (ptr == std::string::npos)
-		// 			{
-		// 				if (!it->second.getBuffer().empty())
-		// 					it->second.setBuffer(buffer);
-		// 				else
-		// 					it->second.setBuffer(buffer);
-		// 				break;
-		// 			}
-		// 			else
-		// 				it->second.setBuffer(buffer);
-
-		// 			if (bytesRead == -1)
-		// 			{
-		// 				std::cerr << "Erro ao receber dados do cliente." << std::endl;
-		// 			}
-		// 			else if (bytesRead == 0)
-		// 			{
-		// 				QUIT(fds, i, it->second);
-		// 			}
-		// 			else
-		// 			{
-		// 				processCMD(it->second, fds, it->second.getBuffer(), i);
-		// 				it->second.cleanBuffer();
-		// 			}
-		// 			break;
-		// 		}
-		// 	}
-		// 	fds[i].revents = 0;
-		// }
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/25 14:51:18 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/08 20:53:27 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/12 22:53:40 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,8 +57,7 @@ void Utils::trim(std::string &str)
 	str = str.substr(first, last - first + 1);
 }
 
-void Utils::printServerInfo(std::string hostname,
-							std::string port, std::string addressIP, std::string pass)
+void Utils::printServerInfo(std::string hostname, std::string port, std::string addressIP, std::string pass)
 {
 	std::cout << "Endereço IP do servidor: "
 			  << WHITE << addressIP << std::endl

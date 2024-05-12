@@ -17,16 +17,4 @@ public:
 	virtual void execute() = 0;
 };
 
-// class Bot : public Client
-// {
-// private:
-// 	std::vector<std::string> _commands;
-// public:
-// 	Server server;
-// 	// Constructor
-// 	Bot(std::string nick, Server &server);
-// 	//~Bot(){};
-// 	//void welcomeNewClient(Client client);
-// };
-
 #endif

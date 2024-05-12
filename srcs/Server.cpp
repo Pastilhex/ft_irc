@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/02 14:06:24 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/12 22:53:32 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,7 +213,6 @@ bool Server::start(const std::string &port, const std::string &password)
 	this->_password = password;
 	this->_port = std::atoi(port.c_str());
 	this->_address = createAddress(this->_port);
-
 	if (!setHostname())
 		return false;
 	setSocket(createSocket());
@@ -312,7 +311,6 @@ std::vector<std::string> Server::trimInput(std::string msg)
 			trimmed[i] = ' ';
 		}
 	}
-
 	std::stringstream ss(trimmed);
 	while (ss >> word)
 	{
@@ -335,7 +333,6 @@ bool Server::checkInput(std::vector<std::string> input, Client client)
 {
 	bool errorDetected = true;
 	std::vector<std::string> cmd;
-
 	cmd.push_back("LIST");
 	cmd.push_back("TOPIC");
 	cmd.push_back("JOIN");

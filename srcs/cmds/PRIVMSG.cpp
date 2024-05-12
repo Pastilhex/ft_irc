@@ -18,7 +18,6 @@ void Server::PRIVMSG(std::string message, Client client)
 	std::vector<std::string>::iterator inputIterator = input.begin();
 	std::string channelName = "";
 	std::string msgToSend = getMessage(message);
-
 	Utils::trim(msgToSend);
 	if (msgToSend[0] && msgToSend[0] == '!')
 	{
@@ -28,7 +27,6 @@ void Server::PRIVMSG(std::string message, Client client)
 		std::map<std::string, Channel>::iterator it = getChannels().find(input[1]);
 		if (it == this->getChannels().end())
 			return;
-
 		if (cmd_it != botCMD.end())
 		{
 			if (*cmd_it == "create" || *cmd_it == "delete")
@@ -73,7 +71,6 @@ void Server::PRIVMSG(std::string message, Client client)
 		}
 		return;
 	}
-
 	while (inputIterator != input.end())
 	{
 		if ((*inputIterator)[0] == '#' || (*inputIterator)[0] == '&')
@@ -83,7 +80,6 @@ void Server::PRIVMSG(std::string message, Client client)
 		}
 		++inputIterator;
 	}
-
 	if (channelName[0] != '#' && channelName[0] != '&')
 	{
 		std::map<std::string, Client> &users = getGlobalUsers();

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:50:44 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/09 07:33:51 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/12 22:52:29 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ Client::Client(void)
 	this->_username.clear();
 	this->_realname.clear();
 	this->setStatus(false);
-	//this->cleanBuffer();
 }
 
 Client::~Client(void) {}
@@ -157,8 +156,6 @@ void Client::getClientLoginData(Server server, std::map<std::string, Client> glo
 		}
 		else if (server.getInput().size() == 1)
 			SEND(this->getSocket(), ERR_NONICKNAMEGIVEN("Error", server), "Error sending login msg");
-
-
 		if (server.getInput().size() >= 1 && server.getInput()[0] == "USER")
 		{
 			if (server.getInput().size() >= 4 && !server.getInput()[1].empty() && !server.getInput()[2].empty() && !server.getInput()[3].empty())
@@ -169,7 +166,6 @@ void Client::getClientLoginData(Server server, std::map<std::string, Client> glo
 			if (server.getInput().size() == 5 && !server.getInput()[4].empty())
 				setRealName(server.getInput()[4]);
 		}
-
 		if (server.getInput().size() == 1 && server.getInput()[0] == "PASS")
 			SEND(this->getSocket(), (server.getHostname() + " 461 " + this->getNick() + " PASS :Not enough parameters.\r\n"), "Error sending login msg");
 		else if (server.getInput().size() >= 1 && server.getInput()[0] == "PASS")

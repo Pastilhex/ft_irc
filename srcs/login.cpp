@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   login.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ialves-m <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 05:11:04 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/09 07:34:26 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/12 22:53:04 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,19 +24,15 @@ void Server::login(Client &client, std::vector<std::string> splitMessage)
 			{
 				if (!client.getUsername().empty() && client.getUsername() != it->second.getUsername())
 					it->second.setUsername(client.getUsername());
-
 				if (!client.getRealName().empty() && client.getRealName() != it->second.getRealName())
 					it->second.setRealName(client.getRealName());
-
 				if (!client.getTmpPassword().empty() && client.getTmpPassword() != it->second.getTmpPassword())
 					it->second.setTmpPassword(client.getTmpPassword());
-
 				if (client.getTmpPassword() == this->getPassword())
 				{
 					if (!client.getNick().empty() && !client.getUsername().empty() && it->second.getStatus() == false)
 						sendWelcome(client.getSocket(), client);
 				}
-
 				if (!it->second.getNick().empty() && !it->second.getUsername().empty() && !it->second.getTmpPassword().empty() && it->second.getStatus() == false)
 				{
 					if (it->second.getTmpPassword() != this->getPassword())
@@ -78,7 +74,6 @@ void Server::login(Client &client, std::vector<std::string> splitMessage)
 						users.erase(us);
 						users.insert(std::make_pair(client.getNick(), client));
 					}
-
 					std::string opNick = "@" + oldNick;
 					std::vector<std::string> &operators = ch->second.getOperators();
 					std::vector<std::string>::iterator op = find(operators.begin(), operators.end(), opNick);

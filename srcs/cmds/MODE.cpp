@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:36:38 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/04/25 13:53:39 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/12 22:51:20 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,8 @@
 void Server::MODE(Client client)
 {
 	std::vector<std::string> mode_cmd = getInput();
-
 	if (checkInput(mode_cmd, client) || (mode_cmd.size() < 2))
 		return;
-
 	std::string channelName = mode_cmd[1];
 	const std::map<std::string, Channel>::iterator &it = getChannels().find(channelName);
 	if (mode_cmd.size() == 2)
@@ -42,19 +40,14 @@ void Server::MODE(Client client)
 	char modeFlag = mode[0];
 	char modeOption = mode[1];
 	std::string msg;
-
 	if (modeOption == 'o' && mode_cmd.size() == 4)
 		msg = handleOperatorMode(mode_cmd, it, modeOption, modeFlag, client);
-
 	if (modeOption == 'i' && mode_cmd.size() == 3)
 		handlePrivateAccessMode(it, modeOption, modeFlag, client);
-
 	if (modeOption == 't' && mode_cmd.size() == 3)
 		handleRestrictedTopicMode(it, modeFlag, client, modeOption);
-
 	if (modeOption == 'k')
 		handlePasswordMode(mode_cmd, it, modeFlag, client, modeOption);
-
 	if (modeOption == 'l')
 		handleUserLimitMode(mode_cmd, it, modeFlag, client);
 }
@@ -253,7 +246,7 @@ void Server::handleUserLimitMode(const std::vector<std::string> &mode_cmd, std::
 			return (Utils::logMessage("Invalid user limit to be set", 1), void());
 		}
 	}
-	else if (mode_cmd.size() <= 3 && modeFlag == '-')
+	else if (mode_cmd.size() <= 2 && modeFlag == '-')
 	{
 		if (it->second.getUserLimit() == UNLIMITED_USERS)
 			return (Utils::logMessage("User limit is already unset", 0), void());

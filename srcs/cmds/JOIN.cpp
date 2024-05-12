@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/08 20:53:47 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/12 22:55:05 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,6 @@ bool Server::canJoinChannel(const Client &client, Channel &channel)
 {
 	std::vector<char> mode = channel.getModes();
 	std::vector<char>::iterator mode_it = mode.begin();
-
 	for (; mode_it != mode.end(); ++mode_it)
 	{
 		if (*mode_it == 'i')
@@ -92,7 +91,7 @@ bool Server::canJoinChannel(const Client &client, Channel &channel)
 		if (*mode_it == 'k')
 		{
 			std::vector<std::string> input = getInput();
-			if (input.size() < 3 || input[2] != getPassword())
+			if (input.size() < 3 || input[2] != channel.getPassword())
 			{
 				SEND(client.getSocket(), ERR_PASSWDMISMATCH(client), "Error sending JOIN message with mode +k advise to user");
 				return false;

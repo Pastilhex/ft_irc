@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/03 11:41:00 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/12 22:51:57 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ void Server::QUIT(std::vector<pollfd> &fds, int i, const Client client)
 	std::cout << "Connection closed by the client." << std::endl;
 	std::map<std::string, Channel> &channels = this->getChannels();
 	std::map<std::string, Channel>::iterator ch = channels.begin();
-
 	std::map<std::string, Client> &globalUsers = this->getGlobalUsers();
 	std::map<std::string, Client>::iterator gb = globalUsers.begin();
 	while (gb != globalUsers.end())
@@ -27,7 +26,6 @@ void Server::QUIT(std::vector<pollfd> &fds, int i, const Client client)
 		else
 			++gb;
 	}
-
 	while (ch != channels.end())
 	{
 		std::map<std::string, Client> &users = ch->second.getUsers();
@@ -45,7 +43,6 @@ void Server::QUIT(std::vector<pollfd> &fds, int i, const Client client)
 			else
 				++us;
 		}
-
 		std::vector<std::string> &operators = ch->second.getOperators();
 		std::vector<std::string>::iterator op = operators.begin();
 		while (op != operators.end())
@@ -55,7 +52,6 @@ void Server::QUIT(std::vector<pollfd> &fds, int i, const Client client)
 			else
 				++op;
 		}
-
 		std::vector<std::string> &invitedUsers = ch->second.getInvitedUsers();
 		std::vector<std::string>::iterator in = invitedUsers.begin();
 		while (in != invitedUsers.end())

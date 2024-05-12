@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/08 20:53:52 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/12 22:50:39 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,9 @@ void Server::KICK(std::string message, Client client)
 {
 	bool isKickerOp = false;
 	bool isKickedOp = false;
-
 	std::string kickNick = getInput()[2];
 	std::string reason = (getInput().size() == 4 && !getInput()[3].empty()) ? getInput()[3] : "";
 	std::string channelName = getInputCmd(message, "KICK");
-
 	std::map<std::string, Channel> &channels = getChannels();
 	std::map<std::string, Channel>::iterator it = channels.find(channelName);
 	if (it != channels.end())

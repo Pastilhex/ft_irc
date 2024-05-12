@@ -6,7 +6,7 @@ NAME = ircserv
 CXX = c++ -g
 CXXFLAGS = -std=c++98
 WWWFLAGS = -Wall -Wextra -Werror ${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG
-SANITIZE_FLAGS = -pedantic-errors -fsanitize=address
+SANITIZE_FLAGS = #-pedantic-errors -fsanitize=address
 
 # Diretórios
 SRCDIR = srcs

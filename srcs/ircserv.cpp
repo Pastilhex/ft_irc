@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 13:07:13 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/06 10:49:09 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/12 22:52:48 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,19 +17,15 @@ std::string getCurrentDateTime()
 	char buffer[80];
 	std::time_t rawtime;
 	std::tm *timeinfo;
-
 	std::time(&rawtime);
 	timeinfo = std::localtime(&rawtime);
-
 	std::strftime(buffer, 80, "%H:%M:%S %b %d %Y", timeinfo);
-
 	return std::string(buffer);
 }
 
 bool isCMD(std::string message, std::string cmd)
 {
 	size_t cmdPos = message.find(cmd);
-
 	if (cmdPos == 0 || (cmdPos != std::string::npos && (cmdPos == 1 || (cmdPos > 1 && message[cmdPos - 1] == '\n'))))
 		return true;
 	return false;
