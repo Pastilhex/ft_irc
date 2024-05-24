@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 12:32:22 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/12 22:24:13 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/24 21:11:09 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@ void Server::connectClient(const int &serverSocket)
 		if (server_shutdown == true)
 			break;
 		int activity = poll(fds.data(), fds.size(), -1);
+		usleep(500000);
+
 		if (activity == -1 && !server_shutdown)
 		{
 			std::cerr << "Erro ao chamar poll()." << std::endl;
@@ -40,6 +42,7 @@ void Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
 {
 	if (fds[0].revents & POLLIN)
 	{
+		std::cout << "Novo cliente conectado." << std::endl;
 		Client *client = new Client();
 		struct sockaddr_in clientAddress;
 		socklen_t clientAddressSize = sizeof(clientAddress);
@@ -64,6 +67,8 @@ void Server::createNewClient(std::vector<pollfd> &fds, const int &serverSocket)
 				return;
 			}
 		}
+		std::cout << "Users: " << getGlobalUsers().size() << std::endl;
+		
 		delete client;
 		return;
 	}
@@ -76,14 +81,11 @@ void Server::updateClient(std::vector<pollfd> &fds)
 		if (fds[i].revents & POLLIN)
 		{
 			std::map<std::string, Client> &globalUsers = getGlobalUsers();
-			std::map<std::string, Client>::iterator it = globalUsers.begin();
-			for (; it != globalUsers.end(); ++it)
+			std::map<std::string, Client>::iterator it;
+			for (it = globalUsers.begin(); it != globalUsers.end(); ++it)
 			{
 				if (it->second.getSocket() == fds[i].fd)
 				{
-					if (it->second.getSocket() == 0)
-						throw std::runtime_error("Cliente não encontrado");
-
 					char tmp[2048] = {0};
 					int bytesRead = recv(fds[i].fd, tmp, sizeof(tmp), 0);
 					std::string buffer(tmp);
@@ -107,6 +109,7 @@ void Server::updateClient(std::vector<pollfd> &fds)
 						it->second.cleanBuffer();
 						processCMD(it->second, fds, inputMessage, i);
 					}
+					fds[i].revents = 0;
 					break;
 				}
 			}

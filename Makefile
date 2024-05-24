@@ -5,7 +5,7 @@ NAME = ircserv
 # Compilador
 CXX = c++ -g
 CXXFLAGS = -std=c++98
-WWWFLAGS = -Wall -Wextra -Werror ${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG
+WWWFLAGS = -Wall -Wextra -Werror ${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG -pg
 SANITIZE_FLAGS = #-pedantic-errors -fsanitize=address
 
 # Diretórios

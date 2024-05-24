@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:38:21 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/12 22:53:32 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/24 21:11:17 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,11 +166,17 @@ std::string Server::getAddressIP(void)
 	return ipAddress;
 }
 
+std::string intToString(int number) {
+    std::stringstream ss;
+    ss << number;
+    return ss.str();
+}
+
 bool Server::addClientToGlobalUsers(Client client)
 {
+	std::string name = intToString(client.getSocket());
 	typedef std::map<std::string, Client> ClientMap;
-	std::pair<ClientMap::iterator, bool> result = this->_globalUsers.insert(std::make_pair(client.getNick(), client));
-
+	std::pair<ClientMap::iterator, bool> result = this->_globalUsers.insert(std::make_pair(name, client));
 	if (result.second)
 		return true;
 	else
@@ -228,7 +234,7 @@ bool Server::start(const std::string &port, const std::string &password)
 
 bool Server::listenSocket(const int &serverSocket)
 {
-	if (listen(serverSocket, 5) == -1)
+	if (listen(serverSocket, 15) == -1)
 	{
 		Utils::logMessage("Erro ao colocar o socket em modo de escuta.", EXIT_FAILURE);
 		close(serverSocket);

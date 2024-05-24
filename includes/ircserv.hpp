@@ -6,7 +6,7 @@
 /*   By: ialves-m <ialves-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 06:36:04 by ialves-m          #+#    #+#             */
-/*   Updated: 2024/05/07 20:40:14 by ialves-m         ###   ########.fr       */
+/*   Updated: 2024/05/24 20:45:34 by ialves-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ extern bool server_shutdown;
 #include <sys/socket.h>
 #include <sys/poll.h>
 #include <sstream>
+#include <sys/epoll.h>
 
 #include "Server.hpp"
 #include "Client.hpp"
